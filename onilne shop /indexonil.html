@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <title>قائمة بانبي - 24 نوع بيتزا</title>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #fdf9f0; margin: 0; }
+        .pizza-spin { animation: spin 50s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .pizza-shadow { filter: drop-shadow(0 20px 15px rgba(0,0,0,0.2)); }
+        .card-hover:hover { transform: translateY(-10px); }
+    </style>
+</head>
+<body class="overflow-x-hidden text-right">
+
+   
+<nav class="container mx-auto px-6 py-6 flex justify-between items-center relative z-20">
+    <div class="flex items-center gap-2">
+        <div class="text-3xl font-black text-red-600">PIZAATENO</div>
+    </div>
+    <div class="hidden md:flex gap-10 font-bold text-slate-800">
+        <a href="#" class="text-red-600 border-b-2 border-red-600 pb-1">الرئيسية</a>
+        <a href="#" class="hover:text-red-600 transition-colors">قائمة الطعام</a>
+        <a href="#" class="hover:text-red-600 transition-colors">العروض</a>
+        <a href="#" class="hover:text-red-600 transition-colors">اتصل بنا</a>
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="bg-yellow-400 p-2 px-6 rounded-full font-black text-slate-900 shadow-lg cursor-pointer hover:bg-yellow-500 transition-all">
+            سلة المشتريات (0)
+        </div>
+    </div>
+</nav>
+
+<section class="relative min-h-[85vh] flex items-center px-6 md:px-20 overflow-hidden mb-10">
+    <div class="container mx-auto grid md:grid-cols-2 gap-10 items-center relative z-10 text-right">
+        
+        <div class="space-y-8 order-2 md:order-1">
+            <span class="bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg animate-bounce inline-block italic">توصيل مجاني 24 ساعة</span>
+            <h1 class="text-6xl md:text-8xl font-black text-slate-900 leading-tight tracking-tighter">
+                استمتع بأفضل <br><span class="text-red-600 text-7xl md:text-9xl">بيتزا</span> <br>في المدينة
+            </h1>
+            <p class="text-xl text-slate-600 font-medium max-w-lg leading-relaxed">
+                مكونات إيطالية أصلية، عجينة طازجة يومياً، وطعم يأخذك لعالم آخر من السعادة في كل قضمة.
+            </p>
+            <button class="bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black px-12 py-5 rounded-full shadow-2xl transition-all transform hover:scale-110 text-xl shadow-yellow-200">
+                اطلب الآن 🛒
+            </button>
+        </div>
+
+        <div class="relative order-1 md:order-2 flex justify-center scale-110">
+            <img src="https://www.pngplay.com/wp-content/uploads/2/Top-View-Pizza-Transparent-Background.png" 
+                 class="w-full max-w-[550px] pizza-spin drop-shadow-[0_50px_50px_rgba(0,0,0,0.3)]" alt="Big Pizza">
+            
+            <div class="absolute top-0 right-10 bg-yellow-400 w-28 h-28 rounded-full flex flex-col items-center justify-center border-8 border-white shadow-2xl rotate-12 animate-pulse">
+                <span class="text-[10px] font-black text-slate-800 uppercase">خصم اليوم!</span>
+                <span class="text-3xl font-black text-red-600">39</span>
+                <span class="text-[10px] font-bold text-slate-800">جنية</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="absolute top-0 left-0 w-full h-full -z-10 opacity-5 shadow-inner">
+        <img src="https://panpie.vamtam.com/wp-content/uploads/2020/07/h1_shape-4.png" class="w-full h-full object-cover" alt="bg">
+    </div>
+</section>
+
+<style>
+    .pizza-spin {
+        animation: spin 60s linear infinite;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+    
+
+  
+<div class="container mx-auto px-4 py-10 text-center">
+    <span class="text-red-600 font-bold tracking-[0.2em] uppercase block mb-3 italic text-lg">
+        من مطبخنا
+    </span>
+    <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-12">
+        نحن نقدم أفضل أنواع الطعام
+    </h2>
+    
+   
+</div>
+    <div class="container mx-auto px-4 py-10 text-center">
+        <h3 class="text-5xl font-black mb-16 text-slate-900">pizaateno</h3>
+        
+        <div class="flex flex-wrap justify-center gap-4 mb-32">
+            <button onclick="showCat(this, 'all')" class="cat-btn bg-yellow-400 text-slate-900 px-10 py-3 rounded-full font-bold shadow-xl border-2 border-transparent transition-all">الكل</button>
+            <button onclick="showCat(this, 'pizza')" class="cat-btn bg-white text-slate-700 hover:bg-yellow-400 px-10 py-3 rounded-full font-bold shadow-md border border-slate-100 transition-all">بيتزا</button>
+            <button onclick="showCat(this, 'burger')" class="cat-btn bg-white text-slate-700 hover:bg-yellow-400 px-10 py-3 rounded-full font-bold shadow-md border border-slate-100 transition-all">برجر</button>
+            <button onclick="showCat(this, 'sandwich')" class="cat-btn bg-white text-slate-700 hover:bg-yellow-400 px-10 py-3 rounded-full font-bold shadow-md border border-slate-100 transition-all">سندوتشات</button>
+        </div>
+ 
+        <div id="master-grid">
+            
+            <div id="pizza" class="menu-section grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-36 mb-20">
+                <script>
+                    const pizzas = ["مارجريتا", "بيبروني", "تشيكن باربيكيو", "سوبر سوبريم", "سي فود", "خضروات", "تونا", "تشيكن رانش", "هوت دوج", "جبن", "ميت لافرز", "شاورما", "سجق", "مشروم", "جمبري", "بسطرمة", "مكسيكانو", "فصول أربعة", "تشيلي", "رانش خضار", "كرات لحم", "سموكد", "فواكه بحرية", "سبيشيال"];
+                    pizzas.forEach((name) => {
+                        document.write(`
+                            <div class="bg-white rounded-[2.5rem] p-8 shadow-xl card-hover relative flex flex-col items-center border border-slate-50">
+                                <div class="relative -mt-28 mb-6">
+                                   <img src="Download premium png of PNG Exploding seafood pizza explosion cheese photography_ by Bambamfefe about pizza png, pizza slices, pizza background, cheese pizza, and pizza 15525890 Background Removed.png" class="w-48 food-shadow">
+                                </div>
+                                <h3 class="text-2xl font-black text-slate-800 mb-2 font-black">${name}</h3>
+                                <p class="text-slate-500 text-sm mb-6 text-center leading-relaxed font-bold">عجينة هشة ومكونات طازجة 100%.</p>
+                                <div class="mt-auto w-full flex justify-between items-center border-t pt-6">
+                                    <span class="text-red-600 font-black text-xl italic font-black text-left">140 ج.م</span>
+                                    <button class="bg-yellow-400 p-2 px-4 rounded-xl font-bold">+</button>
+                                </div>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
+
+            <div id="burger" class="menu-section grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-36 mb-20 hidden">
+                <script>
+                    const burgers = ["كلاسيك", "تشيز", "مشروم", "فاير", "كرسبي", "سموك", "تاور", "باربيكيو", "دابل", "رويال"];
+                    burgers.forEach((name) => {
+                        document.write(`
+                            <div class="bg-white rounded-[2.5rem] p-8 shadow-xl card-hover relative flex flex-col items-center border-b-8 border-orange-500">
+                                <div class="relative -mt-28 mb-6">
+                                   <img src="Delicious Flying Big Hamburger Flat Lay on White Background Background Removed.png" class="w-44 food-shadow">
+                                </div>
+                                <h3 class="text-2xl font-black text-slate-800 mb-2 font-black">${name}</h3>
+                                <p class="text-slate-500 text-sm mb-6 text-center leading-relaxed font-bold">لحم بقري مشوي بجد وطعم لا يقاوم.</p>
+                                <div class="mt-auto w-full flex justify-between items-center border-t pt-6">
+                                    <span class="text-orange-600 font-black text-xl italic font-black text-left">125 ج.م</span>
+                                    <button class="bg-yellow-400 p-2 px-4 rounded-xl font-bold">+</button>
+                                </div>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
+              
+
+            <div id="sandwich" class="menu-section grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-36 mb-20 hidden">
+                <script>
+                    const sands = ["زنجر", "شاورما", "كفتة", "طاووق", "فاهيتا", "سجق", "بطاطس", "حواوشي", "بانية", "سمك", "تركي", "رومي", "جمبري", "كبدة", "مكس جبن", "هوت دوج", "برجر", "تشيكن صب", "ستيك", "تونا"];
+                    sands.forEach((name) => {
+                        document.write(`
+                            <div class="bg-white rounded-[2.5rem] p-8 shadow-xl card-hover relative flex flex-col items-center border-b-8 border-green-600">
+                                <div class="relative -mt-28 mb-6">
+                                   <img src="Cheesesteaks _ Charleys Cheesesteaks Background Removed.png" class="w-48 food-shadow">
+                                </div>
+                                <h3 class="text-2xl font-black text-slate-800 mb-2 font-black">${name}</h3>
+                                <p class="text-slate-500 text-sm mb-6 text-center leading-relaxed font-bold">خبز طازج يومياً وحشوات غنية جداً.</p>
+                                <div class="mt-auto w-full flex justify-between items-center border-t pt-6">
+                                    <span class="text-green-700 font-black text-xl italic font-black text-left">80 ج.م</span>
+                                    <button class="bg-yellow-400 p-2 px-4 rounded-xl font-bold">+</button>
+                                </div>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showCat(btn, id) {
+            const sections = document.querySelectorAll('.menu-section');
+            sections.forEach(s => {
+                s.classList.add('hidden');
+                if (id === 'all' || s.id === id) {
+                    s.classList.remove('hidden');
+                    s.classList.add('grid');
+                }
+            });
+            const btns = document.querySelectorAll('.cat-btn');
+            btns.forEach(b => {
+                b.classList.remove('bg-yellow-400', 'text-slate-900', 'shadow-xl');
+                b.classList.add('bg-white', 'text-slate-700');
+            });
+            btn.classList.add('bg-yellow-400', 'text-slate-900', 'shadow-xl');
+            btn.classList.remove('bg-white', 'text-slate-700');
+        }
+    </script>
+
+       <footer class="bg-slate-900 text-white py-20 mt-20 text-center">
+        <h2 class="text-4xl font-black mb-6">بانبي بيتزا</h2>
+        <p class="text-slate-400">جميع الحقوق محفوظة © 2026 - الطعم الإيطالي الأصلي</p>
+    </footer>
+
+</body>
+</html>
+

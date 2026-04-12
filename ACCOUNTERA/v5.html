@@ -1,0 +1,4063 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting System - Complete</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0c4da2;
+            --primary-light: #e8f0fe;
+            --secondary: #00a3bf;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --light-gray: #f3f4f6;
+            --border: #e5e7eb;
+            --white: #ffffff;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #0c4da2 0%, #1e40af 100%);
+        }
+
+        .auth-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-left h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .auth-left p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 400px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .auth-features {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .auth-feature {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 16px;
+        }
+
+        .auth-feature i {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .auth-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            color: var(--dark);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            color: var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0b3d8c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(12, 77, 162, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--gray);
+            margin-top: 12px;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--dark);
+            border: 1px solid var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main App Layout */
+        .app-container {
+            display: none;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0c4da2 0%, #0a3d7a 100%);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header i {
+            font-size: 28px;
+            color: #ffd700;
+        }
+
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .user-info {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.1);
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .user-company {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .nav-section {
+            margin-top: 20px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #ffd700;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            border-left-color: #ffd700;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h2 {
+            color: var(--dark);
+            font-size: 24px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .currency-selector {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            box-shadow: var(--shadow-lg);
+            border-radius: 8px;
+            width: 200px;
+            display: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+            color: var(--dark);
+        }
+
+        .dropdown-item:hover {
+            background: var(--light-gray);
+        }
+
+        .container {
+            padding: 30px;
+            max-width: 1400px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stat-card.revenue::before { background: var(--success); }
+        .stat-card.expenses::before { background: var(--danger); }
+        .stat-card.profit::before { background: var(--primary); }
+        .stat-card.pending::before { background: var(--warning); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-card.revenue .stat-icon { background: #d1fae5; color: var(--success); }
+        .stat-card.expenses .stat-icon { background: #fee2e2; color: var(--danger); }
+        .stat-card.profit .stat-icon { background: #dbeafe; color: var(--primary); }
+        .stat-card.pending .stat-icon { background: #fef3c7; color: var(--warning); }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--light-gray);
+            padding: 12px 24px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray);
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .amount {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light-gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--border);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .line-items {
+            margin-top: 24px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .line-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .line-item:last-child {
+            border-bottom: none;
+        }
+
+        .line-item input, .line-item select {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .journal-line {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr auto;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .totals-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--light-gray);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+            margin-left: auto;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .total-row.grand-total {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            padding-top: 12px;
+            border-top: 2px solid var(--border);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .account-section {
+            margin-bottom: 24px;
+        }
+
+        .account-header {
+            padding: 12px 24px;
+            background: var(--primary-light);
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .account-row:hover {
+            background: #f9fafb;
+        }
+
+        .account-code {
+            font-family: monospace;
+            color: var(--gray);
+            font-weight: 600;
+            width: 80px;
+        }
+
+        .account-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .account-type {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 20px;
+        }
+
+        .type-asset { background: #dbeafe; color: #1e40af; }
+        .type-liability { background: #fce7f3; color: #9d174d; }
+        .type-equity { background: #d1fae5; color: #065f46; }
+        .type-revenue { background: #fef3c7; color: #92400e; }
+        .type-expense { background: #fee2e2; color: #991b1b; }
+
+        .account-balance {
+            font-family: monospace;
+            font-weight: 600;
+            text-align: right;
+            width: 150px;
+        }
+
+        .debit { color: var(--success); }
+        .credit { color: var(--danger); }
+
+        .journal-entry {
+            background: #fafafa;
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .journal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .journal-lines {
+            display: grid;
+            grid-template-columns: 1fr 100px 100px;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .journal-lines div {
+            padding: 4px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .bank-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bank-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+
+        .bank-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bank-number {
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bank-balance {
+            font-size: 28px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bank-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Ratio Cards */
+        .ratio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .ratio-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--primary);
+            transition: transform 0.2s;
+        }
+
+        .ratio-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .ratio-title {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ratio-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .ratio-formula {
+            font-size: 12px;
+            color: var(--gray);
+            font-family: monospace;
+            background: var(--light-gray);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .ratio-status {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ratio-status.good { color: var(--success); }
+        .ratio-status.warning { color: var(--warning); }
+        .ratio-status.danger { color: var(--danger); }
+
+        .cashflow-section {
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .cashflow-header {
+            background: var(--primary);
+            color: white;
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cashflow-content {
+            padding: 20px 24px;
+        }
+
+        .cashflow-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cashflow-item:last-child {
+            border-bottom: none;
+        }
+
+        .cashflow-subtotal {
+            background: var(--light-gray);
+            padding: 16px 24px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            border-top: 2px solid var(--border);
+        }
+
+        .cashflow-total {
+            background: var(--primary);
+            color: white;
+            padding: 20px 24px;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .auth-left {
+                padding: 30px;
+                min-height: 300px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid, .charts-grid, .form-grid, .ratio-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .line-item, .journal-line {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+        .file-preview-item {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.file-preview-item:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+
+.drop-zone-active {
+    border-color: var(--primary) !important;
+    background: var(--primary-light) !important;
+}
+    </style>
+</head>
+<body>
+
+    <!-- AUTHENTICATION CONTAINER -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-left">
+            <h1><i class="fas fa-calculator" style="margin-right: 15px;"></i>ACCOUNTERA</h1>
+            <p>Professional accounting software for your business. Manage invoices, expenses, and financial reports with ease.</p>
+            
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Cloud Storage</span>
+                </div>
+                <div class="auth-feature">
+                    <i class="fas fa-calculator"></i>
+                    <span>Automatic Calculations</span>
+                </div>
+                <div class="auth-feature">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Real-time Reports</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="auth-right">
+            <!-- LOGIN FORM -->
+            <div id="loginForm" class="auth-box">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to your account to continue</p>
+                </div>
+                
+                <div id="loginError" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Invalid email or password</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                        <input type="checkbox" id="rememberMe" style="width: auto;">
+                        Remember me
+                    </label>
+                    <a href="#" style="font-size: 14px; color: var(--primary); text-decoration: none;">Forgot password?</a>
+                </div>
+                
+                <button class="btn btn-primary" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                
+                <button class="btn btn-outline" onclick="showRegister()">
+                    Create New Account
+                </button>
+                
+                <div class="auth-footer">
+                    <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+                </div>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="registerForm" class="auth-box" style="display: none;">
+                <div class="auth-header">
+                    <h2>Create Account</h2>
+                    <p>Start your free accounting journey</p>
+                </div>
+                
+                <div id="registerError" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Please fill all fields correctly</span>
+                </div>
+                
+                <div id="registerSuccess" class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Account created successfully! Please login.</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" id="regCompany" placeholder="Your Company LLC" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm password" required>
+                </div>
+                
+                <button class="btn btn-primary" onclick="register()">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <button class="btn btn-outline" onclick="showLogin()">
+                    Already have an account? Sign In
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="appContainer" class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-calculator"></i>
+                <h1>ACCOUNTERA</h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-name" id="sidebarUserName">User Name</div>
+                <div class="user-company" id="sidebarCompany">Company Name</div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <div class="nav-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showSection('quotations')">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Quotations</span>
+                </div>
+                <div class="nav-item" onclick="showSection('invoices')">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Invoices</span>
+                </div>
+                <div class="nav-item" onclick="showSection('expenses')">
+                    <i class="fas fa-receipt"></i>
+                    <span>Expenses</span>
+                </div>
+                <div class="nav-item" onclick="showSection('journal')">
+                    <i class="fas fa-book"></i>
+                    <span>Journal Entries</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Accounting</div>
+                <div class="nav-item" onclick="showSection('banking')">
+                    <i class="fas fa-university"></i>
+                    <span>Banking</span>
+                </div>
+                <div class="nav-item" onclick="showSection('chart-accounts')">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Chart of Accounts</span>
+                </div>
+                <div class="nav-item" onclick="showSection('reports')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Financial Reports</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                <div class="nav-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2 id="page-title">Dashboard</h2>
+                <div class="user-menu">
+                    <select class="currency-selector" id="currencySelector" onchange="changeCurrency()">
+                        <option value="EGP">🇪🇬 EGP (E£)</option>
+                        <option value="USD">🇺🇸 USD ($)</option>
+                        <option value="EUR">🇪🇺 EUR (€)</option>
+                    </select>
+                    
+                    <div class="user-avatar" onclick="toggleDropdown()">
+                        <span id="userInitials">U</span>
+                        <div class="dropdown" id="userDropdown">
+                            <div class="dropdown-item" onclick="showSection('settings')">
+                                <i class="fas fa-user"></i> Profile
+                            </div>
+                            <div class="dropdown-item" onclick="showSection('settings')">
+                                <i class="fas fa-cog"></i> Settings
+                            </div>
+                            <div class="dropdown-item" onclick="logout()" style="color: var(--danger);">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <!-- DASHBOARD SECTION -->
+                <div id="dashboard-section" class="section active">
+                    <div class="stats-grid">
+                        <div class="stat-card revenue">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Total Revenue</div>
+                                    <div class="stat-value" id="totalRevenue">E£ 0.00</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span id="revenueChange">0% from last month</span>
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-arrow-trend-up"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card expenses">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Total Expenses</div>
+                                    <div class="stat-value" id="totalExpenses">E£ 0.00</div>
+                                    <div class="stat-change negative">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span id="expenseChange">0% from last month</span>
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-arrow-trend-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card profit">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Net Profit</div>
+                                    <div class="stat-value" id="netProfit">E£ 0.00</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span id="profitMargin">0% margin</span>
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card pending">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-label">Pending Quotes</div>
+                                    <div class="stat-value" id="pendingQuotes">0</div>
+                                    <div class="stat-change">
+                                        <span>awaiting approval</span>
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Revenue vs Expenses</div>
+                                <select style="padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                                    <option>Last 6 Months</option>
+                                    <option>Last Year</option>
+                                </select>
+                            </div>
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Bank Balances</div>
+                                <select style="padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                                    <option>All Accounts</option>
+                                </select>
+                            </div>
+                            <canvas id="bankChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUOTATIONS SECTION -->
+                <div id="quotations-section" class="section" style="display:none">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-title">Quotations / Estimates</div>
+                            <button class="btn btn-primary" onclick="openQuoteModal()" style="width: auto;">
+                                <i class="fas fa-plus"></i> New Quote
+                            </button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Quote #</th>
+                                    <th>Client</th>
+                                    <th>Date</th>
+                                    <th>Expiry</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right">Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quotesTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyQuotes" class="empty-state" style="display: none;">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>No quotations yet</h3>
+                            <p>Create quotes for your clients before invoicing</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INVOICES SECTION -->
+                <div id="invoices-section" class="section" style="display:none">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-title">All Invoices</div>
+                            <button class="btn btn-primary" onclick="openInvoiceModal()" style="width: auto;">
+                                <i class="fas fa-plus"></i> Create Invoice
+                            </button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Client</th>
+                                    <th>Date</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right">Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoicesTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyInvoices" class="empty-state" style="display: none;">
+                            <i class="fas fa-file-invoice"></i>
+                            <h3>No invoices yet</h3>
+                            <p>Create your first invoice to get started</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXPENSES SECTION -->
+                <div id="expenses-section" class="section" style="display:none">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-title">Expenses</div>
+                            <button class="btn btn-primary" onclick="openExpenseModal()" style="width: auto;">
+                                <i class="fas fa-plus"></i> Add Expense
+                            </button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Bank Account</th>
+                                    <th style="text-align: right">Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTable">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyExpenses" class="empty-state" style="display: none;">
+                            <i class="fas fa-receipt"></i>
+                            <h3>No expenses recorded</h3>
+                            <p>Add your first expense to track your spending</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JOURNAL SECTION -->
+                <div id="journal-section" class="section" style="display:none">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-title">Journal Entries</div>
+                            <button class="btn btn-primary" onclick="openJournalModal()" style="width: auto;">
+                                <i class="fas fa-plus"></i> New Entry
+                            </button>
+                        </div>
+                        <div id="journalEntries" style="padding: 24px;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BANKING SECTION -->
+                <div id="banking-section" class="section" style="display:none">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="font-size: 20px; font-weight: 600;">Bank Accounts</h3>
+                        <button class="btn btn-primary" onclick="openBankModal()" style="width: auto;">
+                            <i class="fas fa-plus"></i> Add Bank Account
+                        </button>
+                    </div>
+                    
+                    <div id="bankAccountsList">
+                        <!-- Bank cards populated by JS -->
+                    </div>
+
+                    <div class="data-card" style="margin-top: 30px;">
+                        <div class="card-header">
+                            <div class="card-title">Recent Bank Transactions</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Bank</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th style="text-align: right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bankTransactions">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CHART OF ACCOUNTS SECTION -->
+                <div id="chart-accounts-section" class="section" style="display:none">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-title">Chart of Accounts</div>
+                            <button class="btn btn-primary" onclick="openAccountModal()" style="width: auto;">
+                                <i class="fas fa-plus"></i> Add Account
+                            </button>
+                        </div>
+                        <div id="accountsList" style="padding: 20px;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REPORTS SECTION -->
+                <div id="reports-section" class="section" style="display:none">
+                    <div class="tabs">
+                        <div class="tab active" onclick="showReport('pnl')">Profit & Loss</div>
+                        <div class="tab" onclick="showReport('balance')">Balance Sheet</div>
+                        <div class="tab" onclick="showReport('cashflow')">Cash Flow</div>
+                        <div class="tab" onclick="showReport('ratios')">Financial Ratios</div>
+                        <div class="tab" onclick="showReport('trial')">Trial Balance</div>
+                    </div>
+
+                    <div id="pnl-report" class="tab-content active">
+                        <div class="data-card">
+                            <div class="card-header">
+                                <div class="card-title">Profit & Loss Statement</div>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="date" id="pnlStart" value="2026-01-01" onchange="generatePnL()">
+                                    <input type="date" id="pnlEnd" value="2026-04-10" onchange="generatePnL()">
+                                </div>
+                            </div>
+                            <div style="padding: 24px;" id="pnlContent">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="balance-report" class="tab-content">
+                        <div class="data-card">
+                            <div class="card-header">
+                                <div class="card-title">Balance Sheet</div>
+                                <span>As of April 10, 2026</span>
+                            </div>
+                            <div style="padding: 24px;" id="balanceContent">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CASH FLOW REPORT -->
+                    <div id="cashflow-report" class="tab-content">
+                        <div class="data-card">
+                            <div class="card-header">
+                                <div class="card-title">Cash Flow Statement</div>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="date" id="cashflowStart" value="2026-01-01" onchange="generateCashFlow()">
+                                    <input type="date" id="cashflowEnd" value="2026-04-10" onchange="generateCashFlow()">
+                                </div>
+                            </div>
+                            <div style="padding: 24px;" id="cashflowContent">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FINANCIAL RATIOS REPORT -->
+                    <div id="ratios-report" class="tab-content">
+                        <div class="data-card">
+                            <div class="card-header">
+                                <div class="card-title">Financial Ratios Analysis</div>
+                                <span id="ratiosDate">As of April 10, 2026</span>
+                            </div>
+                            <div style="padding: 24px;" id="ratiosContent">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="trial-report" class="tab-content">
+                        <div class="data-card">
+                            <div class="card-header">
+                                <div class="card-title">Trial Balance</div>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Account Code</th>
+                                        <th>Account Name</th>
+                                        <th style="text-align: right">Debit</th>
+                                        <th style="text-align: right">Credit</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trialBalanceTable">
+                                    <!-- Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS SECTION -->
+                <div id="settings-section" class="section" style="display:none">
+                    <div class="data-card" style="max-width: 600px;">
+                        <div class="card-header">
+                            <div class="card-title">Account Settings</div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label>Full Name</label>
+                                <input type="text" id="settingsName" style="width: 100%;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label>Company Name</label>
+                                <input type="text" id="settingsCompany" style="width: 100%;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label>Email</label>
+                                <input type="email" id="settingsEmail" style="width: 100%;" readonly>
+                            </div>
+                            
+                            <button class="btn btn-primary" onclick="saveSettings()" style="width: auto;">Save Changes</button>
+                        </div>
+                    </div>
+
+                    <div class="data-card" style="max-width: 600px; margin-top: 20px;">
+                        <div class="card-header">
+                            <div class="card-title">Danger Zone</div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <button class="btn btn-danger" onclick="clearAllData()" style="width: auto;">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                            <p style="margin-top: 10px; font-size: 14px; color: var(--gray);">
+                                This will delete all your data. This action cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUOTATION MODAL -->
+    <div id="quoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create New Quotation</div>
+                <button class="close-btn" onclick="closeModal('quoteModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" id="quoteClient" placeholder="Enter client name">
+                    </div>
+                    <div class="form-group">
+                        <label>Quote Date</label>
+                        <input type="date" id="quoteDate" value="2026-04-10">
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="date" id="quoteExpiry" value="2026-05-10">
+                    </div>
+                    <div class="form-group">
+                        <label>Quote #</label>
+                        <input type="text" id="quoteNumber" readonly>
+                    </div>
+                </div>
+
+                <div class="line-items">
+                    <div style="padding: 12px; background: var(--primary); color: white; font-weight: 600; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px;">
+                        <div>Description</div>
+                        <div>Qty</div>
+                        <div>Rate</div>
+                        <div>Amount</div>
+                        <div></div>
+                    </div>
+                    <div id="quoteLineItems">
+                        <div class="line-item">
+                            <input type="text" placeholder="Item description" class="quote-item-desc">
+                            <input type="number" placeholder="1" class="quote-item-qty" value="1" onchange="calculateQuote()">
+                            <input type="number" placeholder="0.00" class="quote-item-rate" value="0" onchange="calculateQuote()">
+                            <input type="text" placeholder="0.00" class="quote-item-amount" readonly>
+                            <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateQuote()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 12px; background: #f9fafb;">
+                        <button class="btn btn-secondary" onclick="addQuoteLine()" style="width: auto;">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    </div>
+                </div>
+
+                <div class="totals-section">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span id="quoteSubtotal">E£ 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Tax (14%):</span>
+                        <span id="quoteTax">E£ 0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total:</span>
+                        <span id="quoteTotal">E£ 0.00</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="closeModal('quoteModal')" style="width: auto;">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveQuote()" style="width: auto;">Save Quote</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INVOICE MODAL -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create New Invoice</div>
+                <button class="close-btn" onclick="closeModal('invoiceModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" id="invClient" placeholder="Enter client name">
+                    </div>
+                    <div class="form-group">
+                        <label>Invoice Date</label>
+                        <input type="date" id="invDate" value="2026-04-10">
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="invDueDate" value="2026-05-10">
+                    </div>
+                    <div class="form-group">
+                        <label>Invoice #</label>
+                        <input type="text" id="invNumber" readonly>
+                    </div>
+                </div>
+
+                <div class="line-items">
+                    <div style="padding: 12px; background: var(--primary); color: white; font-weight: 600; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px;">
+                        <div>Description</div>
+                        <div>Qty</div>
+                        <div>Rate</div>
+                        <div>Amount</div>
+                        <div></div>
+                    </div>
+                    <div id="lineItemsContainer">
+                        <div class="line-item">
+                            <input type="text" placeholder="Item description" class="item-desc">
+                            <input type="number" placeholder="1" class="item-qty" value="1" onchange="calculateInvoice()">
+                            <input type="number" placeholder="0.00" class="item-rate" value="0" onchange="calculateInvoice()">
+                            <input type="text" placeholder="0.00" class="item-amount" readonly>
+                            <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateInvoice()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 12px; background: #f9fafb;">
+                        <button class="btn btn-secondary" onclick="addInvoiceLine()" style="width: auto;">
+                            <i class="fas fa-plus"></i> Add Line Item
+                        </button>
+                    </div>
+                </div>
+
+                <div class="totals-section">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">E£ 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Tax (14%):</span>
+                        <span id="taxAmount">E£ 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Discount:</span>
+                        <input type="number" id="discount" value="0" style="width: 100px; text-align: right;" onchange="calculateInvoice()">
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total:</span>
+                        <span id="grandTotal">E£ 0.00</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="closeModal('invoiceModal')" style="width: auto;">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveInvoice()" style="width: auto;">Save Invoice</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPENSE MODAL -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">Add Expense</div>
+                <button class="close-btn" onclick="closeModal('expenseModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="expDate" value="2026-04-10">
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Account</label>
+                        <select id="expBank" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="expCategory" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option>Office Supplies</option>
+                            <option>Rent</option>
+                            <option>Utilities</option>
+                            <option>Salaries</option>
+                            <option>Marketing</option>
+                            <option>Travel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="expDesc" placeholder="Enter description">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" id="expAmount" placeholder="0.00">
+                    </div>
+                </div>
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="closeModal('expenseModal')" style="width: auto;">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveExpense()" style="width: auto;">Save Expense</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JOURNAL ENTRY MODAL -->
+    <div id="journalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">New Journal Entry</div>
+                <button class="close-btn" onclick="closeModal('journalModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Entry Date</label>
+                        <input type="date" id="journalDate" value="2026-04-10">
+                    </div>
+                    <div class="form-group">
+                        <label>Reference #</label>
+                        <input type="text" id="journalRef" readonly>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Description/Memo</label>
+                        <input type="text" id="journalMemo" placeholder="Enter description for this entry">
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; background: #f9fafb; padding: 12px; border-radius: 8px; font-weight: 600; display: grid; grid-template-columns: 3fr 1fr 1fr auto; gap: 12px;">
+                    <div>Account</div>
+                    <div>Debit</div>
+                    <div>Credit</div>
+                    <div></div>
+                </div>
+                
+                <div id="journalLinesContainer">
+                    <div class="journal-line">
+                        <select class="journal-account" style="padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+                            <!-- Populated by JS with accounts -->
+                        </select>
+                        <input type="number" class="journal-debit" placeholder="0.00" value="0" onchange="calculateJournalTotals()">
+                        <input type="number" class="journal-credit" placeholder="0.00" value="0" onchange="calculateJournalTotals()">
+                        <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateJournalTotals()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="journal-line">
+                        <select class="journal-account" style="padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+                            <!-- Populated by JS with accounts -->
+                        </select>
+                        <input type="number" class="journal-debit" placeholder="0.00" value="0" onchange="calculateJournalTotals()">
+                        <input type="number" class="journal-credit" placeholder="0.00" value="0" onchange="calculateJournalTotals()">
+                        <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateJournalTotals()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="padding: 12px; background: #f9fafb; margin-top: 12px;">
+                    <button class="btn btn-secondary" onclick="addJournalLine()" style="width: auto;">
+                        <i class="fas fa-plus"></i> Add Line
+                    </button>
+                </div>
+
+                <div style="margin-top: 24px; padding: 20px; background: var(--light-gray); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 12px; color: var(--gray); margin-bottom: 4px;">Total Debits</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--success);" id="totalDebits">E£ 0.00</div>
+                    </div>
+                    <div style="font-size: 24px; color: var(--gray);">=</div>
+                    <div>
+                        <div style="font-size: 12px; color: var(--gray); margin-bottom: 4px;">Total Credits</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--danger);" id="totalCredits">E£ 0.00</div>
+                    </div>
+                    <div style="font-size: 12px; padding: 4px 12px; border-radius: 12px; background: #fee2e2; color: #991b1b; display: none;" id="unbalancedAlert">
+                        Unbalanced!
+                    </div>
+                    <div style="font-size: 12px; padding: 4px 12px; border-radius: 12px; background: #d1fae5; color: #065f46; display: none;" id="balancedAlert">
+                        Balanced
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="closeModal('journalModal')" style="width: auto;">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveJournalEntry()" style="width: auto;" id="saveJournalBtn" disabled>Save Entry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BANK ACCOUNT MODAL -->
+    <div id="bankModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">Add Bank Account</div>
+                <button class="close-btn" onclick="closeModal('bankModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="form-group">
+                        <label>Bank Name</label>
+                        <input type="text" id="bankName" placeholder="e.g., National Bank of Egypt">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="bankAccountNum" placeholder="e.g., 1234-5678-9012">
+                    </div>
+                    <div class="form-group">
+                        <label>Account Type</label>
+                        <select id="bankAccountType" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option>Checking</option>
+                            <option>Savings</option>
+                            <option>Credit Card</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Opening Balance</label>
+                        <input type="number" id="bankOpeningBalance" placeholder="0.00" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <select id="bankCurrency" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option value="EGP">EGP</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="closeModal('bankModal')" style="width: auto;">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveBankAccount()" style="width: auto;">Save Bank</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCOUNT MODAL (Chart of Accounts) -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">Add New Account</div>
+                <button class="close-btn" onclick="closeModal('accountModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Account Code</label>
+                    <input type="text" id="accCode" placeholder="e.g., 1050">
+                </div>
+                
+                <div class="form-group">
+                    <label>Account Name</label>
+                    <input type="text" id="accName" placeholder="e.g., Office Furniture">
+                </div>
+                
+                <div class="form-group">
+                    <label>Account Type</label>
+                    <select id="accType" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                        <option value="Asset">Asset</option>
+                        <option value="Liability">Liability</option>
+                        <option value="Equity">Equity</option>
+                        <option value="Revenue">Revenue</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Opening Balance</label>
+                    <input type="number" id="accBalance" placeholder="0.00" value="0">
+                </div>
+                
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="closeModal('accountModal')" style="width: auto;">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveAccount()" style="width: auto;">Save Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- QUOTATION MODAL - Updated with File Upload -->
+<div id="quoteModal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+            <div class="modal-title">Create New Quotation</div>
+            <button class="close-btn" onclick="closeModal('quoteModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Client Name *</label>
+                    <input type="text" id="quoteClient" placeholder="Enter client name">
+                </div>
+                <div class="form-group">
+                    <label>Quote Date</label>
+                    <input type="date" id="quoteDate" value="2026-04-10">
+                </div>
+                <div class="form-group">
+                    <label>Expiry Date</label>
+                    <input type="date" id="quoteExpiry" value="2026-05-10">
+                </div>
+                <div class="form-group">
+                    <label>Quote #</label>
+                    <input type="text" id="quoteNumber" readonly>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="form-group full-width" style="margin-top: 20px;">
+                <label>Attach Files (PDF, Word, PNG, JPG)</label>
+                <div style="border: 2px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center; background: #fafafa;" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--gray); margin-bottom: 10px;"></i>
+                    <p style="color: var(--gray); margin-bottom: 10px;">Drag & drop files here or click to browse</p>
+                    <input type="file" id="quoteFiles" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display: none;" onchange="handleFileSelect(this)">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('quoteFiles').click()" style="width: auto;">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                    <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">Max 5MB per file</p>
+                </div>
+                
+                <!-- File Preview List -->
+                <div id="filePreviewList" style="margin-top: 15px; display: none;">
+                    <div style="font-weight: 600; margin-bottom: 10px;">Selected Files:</div>
+                    <div id="fileListContainer" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+                </div>
+            </div>
+
+            <div class="line-items">
+                <div style="padding: 12px; background: var(--primary); color: white; font-weight: 600; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px;">
+                    <div>Description</div>
+                    <div>Qty</div>
+                    <div>Rate</div>
+                    <div>Amount</div>
+                    <div></div>
+                </div>
+                <div id="quoteLineItems">
+                    <div class="line-item">
+                        <input type="text" placeholder="Item description" class="quote-item-desc">
+                        <input type="number" placeholder="1" class="quote-item-qty" value="1" onchange="calculateQuote()">
+                        <input type="number" placeholder="0.00" class="quote-item-rate" value="0" onchange="calculateQuote()">
+                        <input type="text" placeholder="0.00" class="quote-item-amount" readonly>
+                        <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateQuote()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div style="padding: 12px; background: #f9fafb;">
+                    <button class="btn btn-secondary" onclick="addQuoteLine()" style="width: auto;">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </div>
+            </div>
+
+            <div class="totals-section">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span id="quoteSubtotal">E£ 0.00</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax (14%):</span>
+                    <span id="quoteTax">E£ 0.00</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total:</span>
+                    <span id="quoteTotal">E£ 0.00</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                <button class="btn btn-secondary" onclick="closeModal('quoteModal')" style="width: auto;">Cancel</button>
+                <button class="btn btn-primary" onclick="saveQuote()" style="width: auto;">
+                    <i class="fas fa-save"></i> Save Quote
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FILE PREVIEW MODAL -->
+<div id="filePreviewModal" class="modal">
+    <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+        <div class="modal-header">
+            <div class="modal-title" id="previewTitle">File Preview</div>
+            <button class="close-btn" onclick="closeModal('filePreviewModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="previewContent" style="text-align: center; padding: 20px;">
+            <!-- Content will be loaded here -->
+        </div>
+        <div style="padding: 20px; border-top: 1px solid var(--border); text-align: center;">
+            <a id="downloadLink" class="btn btn-primary" style="width: auto; text-decoration: none;" download>
+                <i class="fas fa-download"></i> Download File
+            </a>
+        </div>
+    </div>
+</div>
+    <script>
+        // Global Variables
+        let currentUser = null;
+        let currency = 'EGP';
+        let currencySymbol = 'E£';
+        let invoices = [];
+        let expenses = [];
+        let accounts = [];
+        let quotations = [];
+        let bankAccounts = [];
+        let journalEntries = [];
+        let chartInstances = {};
+
+        // Default accounts for new users
+        const defaultAccounts = [
+            { code: '1000', name: 'Cash on Hand', type: 'Asset', balance: 0 },
+            { code: '1100', name: 'Accounts Receivable', type: 'Asset', balance: 0 },
+            { code: '1200', name: 'Inventory', type: 'Asset', balance: 0 },
+            { code: '1500', name: 'Equipment', type: 'Asset', balance: 0 },
+            { code: '2000', name: 'Accounts Payable', type: 'Liability', balance: 0 },
+            { code: '2100', name: 'Tax Payable', type: 'Liability', balance: 0 },
+            { code: '3000', name: 'Owner Equity', type: 'Equity', balance: 0 },
+            { code: '4000', name: 'Revenue', type: 'Revenue', balance: 0 },
+            { code: '5000', name: 'Cost of Goods Sold', type: 'Expense', balance: 0 },
+            { code: '6000', name: 'Salaries Expense', type: 'Expense', balance: 0 },
+            { code: '6100', name: 'Rent Expense', type: 'Expense', balance: 0 },
+            { code: '6200', name: 'Utilities Expense', type: 'Expense', balance: 0 }
+        ];
+
+        // Check if user is already logged in
+        window.onload = function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                loadUserData();
+                showApp();
+            }
+        };
+
+        // Authentication Functions
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('registerError').style.display = 'none';
+        }
+
+        function register() {
+            const name = document.getElementById('regName').value;
+            const company = document.getElementById('regCompany').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPass = document.getElementById('regConfirmPassword').value;
+
+            if (!name || !company || !email || !password) {
+                showError('registerError', 'Please fill all fields');
+                return;
+            }
+
+            if (password !== confirmPass) {
+                showError('registerError', 'Passwords do not match');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('registerError', 'Password must be at least 6 characters');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.find(u => u.email === email)) {
+                showError('registerError', 'Email already registered');
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                name,
+                company,
+                email,
+                password,
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            initializeUserData(newUser.id);
+
+            document.getElementById('registerSuccess').style.display = 'flex';
+            document.getElementById('registerError').style.display = 'none';
+            
+            setTimeout(() => {
+                showLogin();
+                document.getElementById('loginEmail').value = email;
+            }, 2000);
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (!email || !password) {
+                showError('loginError', 'Please enter email and password');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                showError('loginError', 'Invalid email or password');
+                return;
+            }
+
+            currentUser = user;
+            
+            if (rememberMe) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+            }
+
+            loadUserData();
+            showApp();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            errorDiv.querySelector('span').textContent = message;
+            errorDiv.style.display = 'flex';
+        }
+
+        function showApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            
+            document.getElementById('sidebarUserName').textContent = currentUser.name;
+            document.getElementById('sidebarCompany').textContent = currentUser.company;
+            document.getElementById('userInitials').textContent = currentUser.name.charAt(0).toUpperCase();
+            
+            document.getElementById('settingsName').value = currentUser.name;
+            document.getElementById('settingsCompany').value = currentUser.company;
+            document.getElementById('settingsEmail').value = currentUser.email;
+
+            updateAll();
+        }
+
+        function updateAll() {
+            updateDashboard();
+            renderQuotations();
+            renderInvoices();
+            renderExpenses();
+            renderBankAccounts();
+            renderAccounts();
+            renderJournalEntries();
+            populateBankSelect();
+            populateJournalAccounts();
+            generatePnL();
+            generateBalanceSheet();
+            generateCashFlow();
+            generateFinancialRatios();
+            generateTrialBalance();
+            initCharts();
+        }
+
+        // Data Management
+        function initializeUserData(userId) {
+            const userData = {
+                userId,
+                invoices: [],
+                expenses: [],
+                accounts: JSON.parse(JSON.stringify(defaultAccounts)),
+                quotations: [],
+                bankAccounts: [],
+                journalEntries: [],
+                settings: { currency: 'EGP' }
+            };
+            
+            const allData = JSON.parse(localStorage.getItem('accountingData') || '{}');
+            allData[userId] = userData;
+            localStorage.setItem('accountingData', JSON.stringify(allData));
+        }
+
+        function loadUserData() {
+            const allData = JSON.parse(localStorage.getItem('accountingData') || '{}');
+            const userData = allData[currentUser.id];
+            
+            if (userData) {
+                invoices = userData.invoices || [];
+                expenses = userData.expenses || [];
+                accounts = userData.accounts || JSON.parse(JSON.stringify(defaultAccounts));
+                quotations = userData.quotations || [];
+                bankAccounts = userData.bankAccounts || [];
+                journalEntries = userData.journalEntries || [];
+                currency = userData.settings?.currency || 'EGP';
+                currencySymbol = currency === 'EGP' ? 'E£' : currency === 'USD' ? '$' : '€';
+                document.getElementById('currencySelector').value = currency;
+            } else {
+                initializeUserData(currentUser.id);
+                invoices = [];
+                expenses = [];
+                accounts = JSON.parse(JSON.stringify(defaultAccounts));
+                quotations = [];
+                bankAccounts = [];
+                journalEntries = [];
+            }
+        }
+
+        function saveUserData() {
+            const allData = JSON.parse(localStorage.getItem('accountingData') || '{}');
+            allData[currentUser.id] = {
+                userId: currentUser.id,
+                invoices,
+                expenses,
+                accounts,
+                quotations,
+                bankAccounts,
+                journalEntries,
+                settings: { currency }
+            };
+            localStorage.setItem('accountingData', JSON.stringify(allData));
+        }
+
+        function saveSettings() {
+            const newName = document.getElementById('settingsName').value;
+            const newCompany = document.getElementById('settingsCompany').value;
+            
+            currentUser.name = newName;
+            currentUser.company = newCompany;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex] = currentUser;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            if (localStorage.getItem('currentUser')) {
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+            
+            document.getElementById('sidebarUserName').textContent = newName;
+            document.getElementById('sidebarCompany').textContent = newCompany;
+            document.getElementById('userInitials').textContent = newName.charAt(0).toUpperCase();
+            
+            alert('Settings saved successfully!');
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure? This will delete ALL your data forever!')) {
+                invoices = [];
+                expenses = [];
+                accounts = JSON.parse(JSON.stringify(defaultAccounts));
+                quotations = [];
+                bankAccounts = [];
+                journalEntries = [];
+                saveUserData();
+                updateAll();
+                alert('All data cleared');
+            }
+        }
+
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.style.display = 'none';
+                sec.classList.remove('active');
+            });
+            
+            document.getElementById(section + '-section').style.display = 'block';
+            document.getElementById(section + '-section').classList.add('active');
+            
+            const titles = {
+                'dashboard': 'Dashboard',
+                'quotations': 'Quotations',
+                'invoices': 'Invoices',
+                'expenses': 'Expenses',
+                'journal': 'Journal Entries',
+                'banking': 'Banking',
+                'chart-accounts': 'Chart of Accounts',
+                'reports': 'Financial Reports',
+                'settings': 'Settings'
+            };
+            document.getElementById('page-title').textContent = titles[section];
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const text = item.textContent.trim();
+                if (text === titles[section] || (section === 'chart-accounts' && text.includes('Chart'))) {
+                    item.classList.add('active');
+                }
+            });
+            
+            document.getElementById('userDropdown').classList.remove('active');
+        }
+
+        function toggleDropdown() {
+            document.getElementById('userDropdown').classList.toggle('active');
+        }
+
+        function changeCurrency() {
+            const selector = document.getElementById('currencySelector');
+            currency = selector.value;
+            currencySymbol = currency === 'EGP' ? 'E£' : currency === 'USD' ? '$' : '€';
+            saveUserData();
+            updateAll();
+        }
+
+        function formatMoney(amount) {
+            return currencySymbol + ' ' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Dashboard
+        function updateDashboard() {
+            const totalRev = invoices.filter(inv => inv.status === 'Paid').reduce((sum, inv) => sum + inv.amount, 0);
+            const totalExp = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const profit = totalRev - totalExp;
+            
+            document.getElementById('totalRevenue').textContent = formatMoney(totalRev);
+            document.getElementById('totalExpenses').textContent = formatMoney(totalExp);
+            document.getElementById('netProfit').textContent = formatMoney(profit);
+            document.getElementById('pendingQuotes').textContent = quotations.filter(q => q.status === 'Pending').length;
+            document.getElementById('profitMargin').textContent = totalRev > 0 ? ((profit / totalRev) * 100).toFixed(1) + '% margin' : '0% margin';
+        }
+
+        // Quotations
+        function renderQuotations() {
+            const tbody = document.getElementById('quotesTable');
+            const emptyState = document.getElementById('emptyQuotes');
+            
+            tbody.innerHTML = '';
+            
+            if (quotations.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            quotations.forEach(quote => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${quote.id}</td>
+                    <td>${quote.client}</td>
+                    <td>${quote.date}</td>
+                    <td>${quote.expiry}</td>
+                    <td><span class="badge ${quote.status === 'Approved' ? 'badge-success' : quote.status === 'Rejected' ? 'badge-danger' : 'badge-warning'}">${quote.status}</span></td>
+                    <td class="amount" style="text-align: right">${formatMoney(quote.amount)}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="convertQuoteToInvoice('${quote.id}')" ${quote.status !== 'Pending' ? 'disabled' : ''} style="width: auto; margin-right: 5px;">
+                            <i class="fas fa-file-invoice"></i> Invoice
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteQuote('${quote.id}')" style="width: auto;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openQuoteModal() {
+            document.getElementById('quoteModal').classList.add('active');
+            document.getElementById('quoteNumber').value = 'QUO-' + String(quotations.length + 1).padStart(3, '0');
+            calculateQuote();
+        }
+
+        function addQuoteLine() {
+            const container = document.getElementById('quoteLineItems');
+            const item = document.createElement('div');
+            item.className = 'line-item';
+            item.innerHTML = `
+                <input type="text" placeholder="Item description" class="quote-item-desc">
+                <input type="number" placeholder="1" class="quote-item-qty" value="1" onchange="calculateQuote()">
+                <input type="number" placeholder="0.00" class="quote-item-rate" value="0" onchange="calculateQuote()">
+                <input type="text" placeholder="0.00" class="quote-item-amount" readonly>
+                <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateQuote()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(item);
+        }
+
+        function calculateQuote() {
+            let subtotal = 0;
+            document.querySelectorAll('#quoteLineItems .line-item').forEach(row => {
+                const qty = parseFloat(row.querySelector('.quote-item-qty').value) || 0;
+                const rate = parseFloat(row.querySelector('.quote-item-rate').value) || 0;
+                const amount = qty * rate;
+                row.querySelector('.quote-item-amount').value = formatMoney(amount);
+                subtotal += amount;
+            });
+
+            const tax = subtotal * 0.14;
+            const total = subtotal + tax;
+
+            document.getElementById('quoteSubtotal').textContent = formatMoney(subtotal);
+            document.getElementById('quoteTax').textContent = formatMoney(tax);
+            document.getElementById('quoteTotal').textContent = formatMoney(total);
+        }
+
+        function saveQuote() {
+            const client = document.getElementById('quoteClient').value;
+            const totalText = document.getElementById('quoteTotal').textContent;
+            const total = parseFloat(totalText.replace(/[^\d.-]/g, ''));
+            
+            if (!client) {
+                alert('Please enter client name');
+                return;
+            }
+
+            const newQuote = {
+                id: document.getElementById('quoteNumber').value,
+                client: client,
+                date: document.getElementById('quoteDate').value,
+                expiry: document.getElementById('quoteExpiry').value,
+                amount: total,
+                status: 'Pending'
+            };
+
+            quotations.push(newQuote);
+            saveUserData();
+            renderQuotations();
+            updateDashboard();
+            closeModal('quoteModal');
+            
+            document.getElementById('quoteClient').value = '';
+        }
+
+        function convertQuoteToInvoice(id) {
+            const quote = quotations.find(q => q.id === id);
+            if (quote) {
+                quote.status = 'Approved';
+                
+                const newInvoice = {
+                    id: 'INV-' + String(invoices.length + 1).padStart(3, '0'),
+                    client: quote.client,
+                    date: new Date().toISOString().split('T')[0],
+                    dueDate: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
+                    amount: quote.amount,
+                    status: 'Pending'
+                };
+                
+                invoices.push(newInvoice);
+                accounts.find(a => a.code === '1100').balance += newInvoice.amount;
+                accounts.find(a => a.code === '4000').balance += newInvoice.amount;
+                
+                saveUserData();
+                updateAll();
+                alert('Quote converted to Invoice ' + newInvoice.id);
+            }
+        }
+
+        function deleteQuote(id) {
+            if (confirm('Delete this quotation?')) {
+                const index = quotations.findIndex(q => q.id === id);
+                if (index > -1) {
+                    quotations.splice(index, 1);
+                    saveUserData();
+                    renderQuotations();
+                    updateDashboard();
+                }
+            }
+        }
+
+        // Invoices
+        function renderInvoices() {
+            const tbody = document.getElementById('invoicesTable');
+            const emptyState = document.getElementById('emptyInvoices');
+            
+            tbody.innerHTML = '';
+            
+            if (invoices.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            invoices.forEach(inv => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${inv.id}</td>
+                    <td>${inv.client}</td>
+                    <td>${inv.date}</td>
+                    <td>${inv.dueDate}</td>
+                    <td><span class="badge ${inv.status === 'Paid' ? 'badge-success' : inv.status === 'Overdue' ? 'badge-danger' : 'badge-warning'}">${inv.status}</span></td>
+                    <td class="amount" style="text-align: right">${formatMoney(inv.amount)}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="markInvoicePaid('${inv.id}')" ${inv.status === 'Paid' ? 'disabled' : ''} style="width: auto; margin-right: 5px;">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteInvoice('${inv.id}')" style="width: auto;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openInvoiceModal() {
+            document.getElementById('invoiceModal').classList.add('active');
+            document.getElementById('invNumber').value = 'INV-' + String(invoices.length + 1).padStart(3, '0');
+            calculateInvoice();
+        }
+
+        function addInvoiceLine() {
+            const container = document.getElementById('lineItemsContainer');
+            const item = document.createElement('div');
+            item.className = 'line-item';
+            item.innerHTML = `
+                <input type="text" placeholder="Item description" class="item-desc">
+                <input type="number" placeholder="1" class="item-qty" value="1" onchange="calculateInvoice()">
+                <input type="number" placeholder="0.00" class="item-rate" value="0" onchange="calculateInvoice()">
+                <input type="text" placeholder="0.00" class="item-amount" readonly>
+                <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateInvoice()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(item);
+        }
+
+        function calculateInvoice() {
+            let subtotal = 0;
+            document.querySelectorAll('#lineItemsContainer .line-item').forEach(row => {
+                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+                const amount = qty * rate;
+                row.querySelector('.item-amount').value = formatMoney(amount);
+                subtotal += amount;
+            });
+
+            const tax = subtotal * 0.14;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const total = subtotal + tax - discount;
+
+            document.getElementById('subtotal').textContent = formatMoney(subtotal);
+            document.getElementById('taxAmount').textContent = formatMoney(tax);
+            document.getElementById('grandTotal').textContent = formatMoney(total);
+        }
+
+        function saveInvoice() {
+            const client = document.getElementById('invClient').value;
+            const totalText = document.getElementById('grandTotal').textContent;
+            const total = parseFloat(totalText.replace(/[^\d.-]/g, ''));
+            
+            if (!client) {
+                alert('Please enter client name');
+                return;
+            }
+
+            const newInvoice = {
+                id: document.getElementById('invNumber').value,
+                client: client,
+                date: document.getElementById('invDate').value,
+                dueDate: document.getElementById('invDueDate').value,
+                amount: total,
+                status: 'Pending'
+            };
+
+            invoices.push(newInvoice);
+            accounts.find(a => a.code === '1100').balance += total;
+            accounts.find(a => a.code === '4000').balance += total;
+            
+            saveUserData();
+            updateAll();
+            closeModal('invoiceModal');
+            
+            document.getElementById('invClient').value = '';
+        }
+
+        function markInvoicePaid(id) {
+            const inv = invoices.find(i => i.id === id);
+            if (inv && inv.status !== 'Paid') {
+                inv.status = 'Paid';
+                accounts.find(a => a.code === '1100').balance -= inv.amount;
+                
+                if (bankAccounts.length > 0) {
+                    bankAccounts[0].balance += inv.amount;
+                } else {
+                    accounts.find(a => a.code === '1000').balance += inv.amount;
+                }
+                
+                saveUserData();
+                updateAll();
+            }
+        }
+
+        function deleteInvoice(id) {
+            if (confirm('Delete this invoice?')) {
+                const index = invoices.findIndex(i => i.id === id);
+                if (index > -1) {
+                    const inv = invoices[index];
+                    if (inv.status === 'Paid') {
+                        if (bankAccounts.length > 0) bankAccounts[0].balance -= inv.amount;
+                        else accounts.find(a => a.code === '1000').balance -= inv.amount;
+                    } else {
+                        accounts.find(a => a.code === '1100').balance -= inv.amount;
+                    }
+                    accounts.find(a => a.code === '4000').balance -= inv.amount;
+                    
+                    invoices.splice(index, 1);
+                    saveUserData();
+                    updateAll();
+                }
+            }
+        }
+
+        // Expenses
+        function populateBankSelect() {
+            const select = document.getElementById('expBank');
+            if (!select) return;
+            
+            select.innerHTML = '';
+            
+            if (bankAccounts.length === 0) {
+                const option = document.createElement('option');
+                option.value = 'cash';
+                option.textContent = 'Cash on Hand';
+                select.appendChild(option);
+            } else {
+                bankAccounts.forEach(bank => {
+                    const option = document.createElement('option');
+                    option.value = bank.id;
+                    option.textContent = bank.name + ' (' + formatMoney(bank.balance) + ')';
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        function renderExpenses() {
+            const tbody = document.getElementById('expensesTable');
+            const emptyState = document.getElementById('emptyExpenses');
+            
+            tbody.innerHTML = '';
+            
+            if (expenses.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            expenses.forEach(exp => {
+                const bank = bankAccounts.find(b => b.id === exp.bankId);
+                const bankName = bank ? bank.name : 'Cash';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${exp.date}</td>
+                    <td>${exp.category}</td>
+                    <td>${exp.description}</td>
+                    <td>${bankName}</td>
+                    <td class="amount text-danger" style="text-align: right">${formatMoney(exp.amount)}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteExpense(${exp.id})" style="width: auto; background: var(--danger); color: white;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openExpenseModal() {
+            document.getElementById('expenseModal').classList.add('active');
+            populateBankSelect();
+        }
+
+        function saveExpense() {
+            const category = document.getElementById('expCategory').value;
+            const amount = parseFloat(document.getElementById('expAmount').value) || 0;
+            const bankId = document.getElementById('expBank').value;
+            
+            if (!amount) {
+                alert('Please enter amount');
+                return;
+            }
+            
+            const newExpense = {
+                id: Date.now(),
+                date: document.getElementById('expDate').value,
+                category: category,
+                description: document.getElementById('expDesc').value,
+                bankId: bankId,
+                amount: amount
+            };
+
+            expenses.push(newExpense);
+            
+            if (bankId === 'cash') {
+                accounts.find(a => a.code === '1000').balance -= amount;
+            } else {
+                const bank = bankAccounts.find(b => b.id == bankId);
+                if (bank) bank.balance -= amount;
+            }
+            
+            if (category === 'Salaries') accounts.find(a => a.code === '6000').balance += amount;
+            else if (category === 'Rent') accounts.find(a => a.code === '6100').balance += amount;
+            else if (category === 'Utilities') accounts.find(a => a.code === '6200').balance += amount;
+            else accounts.find(a => a.code === '5000').balance += amount;
+            
+            saveUserData();
+            updateAll();
+            closeModal('expenseModal');
+            
+            document.getElementById('expDesc').value = '';
+            document.getElementById('expAmount').value = '';
+        }
+
+        function deleteExpense(id) {
+            if (confirm('Delete this expense?')) {
+                const index = expenses.findIndex(e => e.id === id);
+                if (index > -1) {
+                    const exp = expenses[index];
+                    
+                    if (exp.bankId === 'cash') {
+                        accounts.find(a => a.code === '1000').balance += exp.amount;
+                    } else {
+                        const bank = bankAccounts.find(b => b.id == exp.bankId);
+                        if (bank) bank.balance += exp.amount;
+                    }
+                    
+                    if (exp.category === 'Salaries') accounts.find(a => a.code === '6000').balance -= exp.amount;
+                    else if (exp.category === 'Rent') accounts.find(a => a.code === '6100').balance -= exp.amount;
+                    else if (exp.category === 'Utilities') accounts.find(a => a.code === '6200').balance -= exp.amount;
+                    else accounts.find(a => a.code === '5000').balance -= exp.amount;
+                    
+                    expenses.splice(index, 1);
+                    saveUserData();
+                    updateAll();
+                }
+            }
+        }
+
+        // Banking
+        function renderBankAccounts() {
+            const container = document.getElementById('bankAccountsList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (bankAccounts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-university"></i>
+                        <h3>No bank accounts added</h3>
+                        <p>Add your first bank account to track balances</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            bankAccounts.forEach(bank => {
+                const card = document.createElement('div');
+                card.className = 'bank-card';
+                card.innerHTML = `
+                    <div class="bank-name">${bank.name}</div>
+                    <div class="bank-number">${bank.accountNum}</div>
+                    <div class="bank-label">Current Balance</div>
+                    <div class="bank-balance">${formatMoney(bank.balance)}</div>
+                `;
+                container.appendChild(card);
+            });
+            
+            const tbody = document.getElementById('bankTransactions');
+            tbody.innerHTML = '';
+            
+            const bankTxns = expenses.filter(e => e.bankId !== 'cash').map(e => {
+                const bank = bankAccounts.find(b => b.id == e.bankId);
+                return { ...e, bankName: bank ? bank.name : 'Unknown', type: 'Expense' };
+            });
+            
+            invoices.filter(i => i.status === 'Paid').forEach(inv => {
+                bankTxns.push({
+                    date: inv.date,
+                    bankName: bankAccounts.length > 0 ? bankAccounts[0].name : 'Cash',
+                    description: 'Payment from ' + inv.client,
+                    type: 'Deposit',
+                    amount: inv.amount
+                });
+            });
+            
+            bankTxns.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10).forEach(txn => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${txn.date}</td>
+                    <td>${txn.bankName}</td>
+                    <td>${txn.description}</td>
+                    <td><span class="badge ${txn.type === 'Deposit' ? 'badge-success' : 'badge-danger'}">${txn.type}</span></td>
+                    <td class="amount ${txn.type === 'Deposit' ? 'text-success' : 'text-danger'}" style="text-align: right">
+                        ${txn.type === 'Deposit' ? '+' : '-'}${formatMoney(txn.amount)}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openBankModal() {
+            document.getElementById('bankModal').classList.add('active');
+        }
+
+        function saveBankAccount() {
+            const name = document.getElementById('bankName').value;
+            const accountNum = document.getElementById('bankAccountNum').value;
+            const balance = parseFloat(document.getElementById('bankOpeningBalance').value) || 0;
+            
+            if (!name) {
+                alert('Please enter bank name');
+                return;
+            }
+            
+            const newBank = {
+                id: Date.now(),
+                name: name,
+                accountNum: accountNum || '0000',
+                type: document.getElementById('bankAccountType').value,
+                balance: balance,
+                currency: document.getElementById('bankCurrency').value
+            };
+            
+            bankAccounts.push(newBank);
+            
+            accounts.push({
+                code: '1' + (900 + bankAccounts.length),
+                name: name + ' Account',
+                type: 'Asset',
+                balance: balance
+            });
+            
+            saveUserData();
+            renderBankAccounts();
+            populateBankSelect();
+            generateBalanceSheet();
+            closeModal('bankModal');
+            
+            document.getElementById('bankName').value = '';
+            document.getElementById('bankAccountNum').value = '';
+            document.getElementById('bankOpeningBalance').value = '0';
+        }
+
+        // Chart of Accounts
+        function renderAccounts() {
+            const container = document.getElementById('accountsList');
+            container.innerHTML = '';
+            
+            const types = ['Asset', 'Liability', 'Equity', 'Revenue', 'Expense'];
+            
+            types.forEach(type => {
+                const typeAccounts = accounts.filter(a => a.type === type);
+                if (typeAccounts.length > 0) {
+                    const section = document.createElement('div');
+                    section.className = 'account-section';
+                    
+                    const typeClass = 'type-' + type.toLowerCase();
+                    
+                    section.innerHTML = `
+                        <div class="account-header">
+                            <span>${type} Accounts</span>
+                            <span class="account-type ${typeClass}">${typeAccounts.length} accounts</span>
+                        </div>
+                    `;
+                    
+                    typeAccounts.forEach(acc => {
+                        const row = document.createElement('div');
+                        row.className = 'account-row';
+                        const isDebit = acc.type === 'Asset' || acc.type === 'Expense';
+                        row.innerHTML = `
+                            <span class="account-code">${acc.code}</span>
+                            <span class="account-name">${acc.name}</span>
+                            <span class="account-balance ${isDebit ? 'debit' : 'credit'}">
+                                ${formatMoney(acc.balance)}
+                            </span>
+                        `;
+                        section.appendChild(row);
+                    });
+                    
+                    container.appendChild(section);
+                }
+            });
+        }
+
+        function openAccountModal() {
+            document.getElementById('accountModal').classList.add('active');
+            document.getElementById('accCode').value = '';
+            document.getElementById('accName').value = '';
+            document.getElementById('accBalance').value = '0';
+        }
+
+        function saveAccount() {
+            const code = document.getElementById('accCode').value.trim();
+            const name = document.getElementById('accName').value.trim();
+            const type = document.getElementById('accType').value;
+            const balance = parseFloat(document.getElementById('accBalance').value) || 0;
+            
+            if (!code || !name) {
+                alert('Please enter account code and name');
+                return;
+            }
+            
+            if (accounts.find(a => a.code === code)) {
+                alert('Account code already exists!');
+                return;
+            }
+            
+            accounts.push({ code, name, type, balance });
+            accounts.sort((a, b) => a.code.localeCompare(b.code));
+            
+            saveUserData();
+            renderAccounts();
+            generateTrialBalance();
+            closeModal('accountModal');
+            alert('Account created successfully!');
+        }
+
+        // Journal Entries
+        function populateJournalAccounts() {
+            const selects = document.querySelectorAll('.journal-account');
+            selects.forEach(select => {
+                const currentVal = select.value;
+                select.innerHTML = '';
+                accounts.forEach(acc => {
+                    const option = document.createElement('option');
+                    option.value = acc.code;
+                    option.textContent = `${acc.code} - ${acc.name} (${acc.type})`;
+                    select.appendChild(option);
+                });
+                if (currentVal) select.value = currentVal;
+            });
+        }
+
+        function renderJournalEntries() {
+            const container = document.getElementById('journalEntries');
+            
+            let html = '';
+            
+            if (journalEntries.length === 0 && invoices.length === 0 && expenses.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book"></i>
+                        <h3>No journal entries yet</h3>
+                        <p>Create invoices, expenses, or manual entries</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            journalEntries.slice().reverse().forEach(entry => {
+                html += `
+                    <div class="journal-entry" style="border-left-color: var(--warning);">
+                        <div class="journal-header">
+                            <span>${entry.ref} - ${entry.memo}</span>
+                            <span style="color: var(--gray);">${entry.date}</span>
+                        </div>
+                `;
+                
+                entry.lines.forEach(line => {
+                    const account = accounts.find(a => a.code === line.accountCode);
+                    html += `
+                        <div class="journal-lines">
+                            <div style="padding-left: ${line.credit > 0 ? '20px' : '0'}">${account ? account.name : line.accountCode}</div>
+                            <div class="debit">${line.debit > 0 ? formatMoney(line.debit) : ''}</div>
+                            <div class="credit">${line.credit > 0 ? formatMoney(line.credit) : ''}</div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            });
+            
+            invoices.forEach(inv => {
+                html += `
+                    <div class="journal-entry">
+                        <div class="journal-header">
+                            <span>Invoice ${inv.id} - ${inv.client}</span>
+                            <span style="color: var(--gray);">${inv.date}</span>
+                        </div>
+                        <div class="journal-lines">
+                            <div style="padding-left: 0">Accounts Receivable</div>
+                            <div class="debit">${formatMoney(inv.amount)}</div>
+                            <div></div>
+                        </div>
+                        <div class="journal-lines">
+                            <div style="padding-left: 20px">Revenue</div>
+                            <div></div>
+                            <div class="credit">${formatMoney(inv.amount)}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            expenses.forEach(exp => {
+                html += `
+                    <div class="journal-entry">
+                        <div class="journal-header">
+                            <span>${exp.category} - ${exp.description}</span>
+                            <span style="color: var(--gray);">${exp.date}</span>
+                        </div>
+                        <div class="journal-lines">
+                            <div style="padding-left: 0">${exp.category} Expense</div>
+                            <div class="debit">${formatMoney(exp.amount)}</div>
+                            <div></div>
+                        </div>
+                        <div class="journal-lines">
+                            <div style="padding-left: 20px">${exp.bankId === 'cash' ? 'Cash' : 'Bank'}</div>
+                            <div></div>
+                            <div class="credit">${formatMoney(exp.amount)}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function openJournalModal() {
+            document.getElementById('journalModal').classList.add('active');
+            document.getElementById('journalRef').value = 'JE-' + String(journalEntries.length + 1).padStart(3, '0');
+            document.getElementById('journalMemo').value = '';
+            
+            const container = document.getElementById('journalLinesContainer');
+            container.innerHTML = '';
+            addJournalLine();
+            addJournalLine();
+            
+            populateJournalAccounts();
+            calculateJournalTotals();
+        }
+
+        function addJournalLine() {
+            const container = document.getElementById('journalLinesContainer');
+            const line = document.createElement('div');
+            line.className = 'journal-line';
+            line.innerHTML = `
+                <select class="journal-account" style="padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+                    <!-- Populated by JS -->
+                </select>
+                <input type="number" class="journal-debit" placeholder="0.00" value="0" onchange="calculateJournalTotals()">
+                <input type="number" class="journal-credit" placeholder="0.00" value="0" onchange="calculateJournalTotals()">
+                <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateJournalTotals()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(line);
+            populateJournalAccounts();
+        }
+
+        function calculateJournalTotals() {
+            let totalDebits = 0;
+            let totalCredits = 0;
+            
+            document.querySelectorAll('.journal-line').forEach(line => {
+                const debit = parseFloat(line.querySelector('.journal-debit').value) || 0;
+                const credit = parseFloat(line.querySelector('.journal-credit').value) || 0;
+                totalDebits += debit;
+                totalCredits += credit;
+            });
+            
+            document.getElementById('totalDebits').textContent = formatMoney(totalDebits);
+            document.getElementById('totalCredits').textContent = formatMoney(totalCredits);
+            
+            const isBalanced = Math.abs(totalDebits - totalCredits) < 0.01;
+            const saveBtn = document.getElementById('saveJournalBtn');
+            
+            if (isBalanced && totalDebits > 0) {
+                document.getElementById('balancedAlert').style.display = 'block';
+                document.getElementById('unbalancedAlert').style.display = 'none';
+                saveBtn.disabled = false;
+            } else {
+                document.getElementById('balancedAlert').style.display = 'none';
+                document.getElementById('unbalancedAlert').style.display = 'block';
+                saveBtn.disabled = true;
+            }
+        }
+
+        function saveJournalEntry() {
+            const date = document.getElementById('journalDate').value;
+            const ref = document.getElementById('journalRef').value;
+            const memo = document.getElementById('journalMemo').value;
+            
+            if (!memo) {
+                alert('Please enter a description');
+                return;
+            }
+            
+            const lines = [];
+            document.querySelectorAll('.journal-line').forEach(line => {
+                const accountCode = line.querySelector('.journal-account').value;
+                const debit = parseFloat(line.querySelector('.journal-debit').value) || 0;
+                const credit = parseFloat(line.querySelector('.journal-credit').value) || 0;
+                
+                if (debit > 0 || credit > 0) {
+                    lines.push({ accountCode, debit, credit });
+                    
+                    const account = accounts.find(a => a.code === accountCode);
+                    if (account) {
+                        if (debit > 0) account.balance += debit;
+                        if (credit > 0) account.balance -= credit;
+                    }
+                }
+            });
+            
+            const entry = {
+                id: Date.now(),
+                date,
+                ref,
+                memo,
+                lines
+            };
+            
+            journalEntries.push(entry);
+            saveUserData();
+            renderJournalEntries();
+            generateBalanceSheet();
+            generateTrialBalance();
+            closeModal('journalModal');
+            alert('Journal entry saved successfully!');
+        }
+
+        // Financial Reports
+        function showReport(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(type + '-report').classList.add('active');
+        }
+
+        function generatePnL() {
+            const revenue = accounts.filter(a => a.type === 'Revenue').reduce((sum, a) => sum + a.balance, 0);
+            const cogs = accounts.filter(a => a.name.includes('Cost of Goods')).reduce((sum, a) => sum + a.balance, 0);
+            const grossProfit = revenue - cogs;
+            const operatingExpenses = accounts.filter(a => a.type === 'Expense').reduce((sum, a) => sum + a.balance, 0);
+            const netIncome = grossProfit - operatingExpenses;
+
+            const html = `
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h3 style="text-align: center; margin-bottom: 30px;">Profit & Loss Statement</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                            <span>Revenue</span>
+                            <span class="amount">${formatMoney(revenue)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                            <span style="padding-left: 20px;">Cost of Goods Sold</span>
+                            <span class="amount text-danger">-${formatMoney(cogs)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600; background: var(--light-gray);">
+                            <span>Gross Profit</span>
+                            <span class="amount">${formatMoney(grossProfit)}</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: 600; margin-bottom: 10px;">Operating Expenses</div>
+                        ${accounts.filter(a => a.type === 'Expense').map(exp => `
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; padding-left: 20px;">
+                                <span>${exp.name}</span>
+                                <span class="amount text-danger">-${formatMoney(exp.balance)}</span>
+                            </div>
+                        `).join('')}
+                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--border); font-weight: 600;">
+                            <span>Total Operating Expenses</span>
+                            <span class="amount text-danger">-${formatMoney(operatingExpenses)}</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; padding: 20px; background: var(--primary); color: white; border-radius: 8px; font-size: 18px; font-weight: 700;">
+                        <span>Net Income</span>
+                        <span>${formatMoney(netIncome)}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('pnlContent').innerHTML = html;
+        }
+
+        function generateBalanceSheet() {
+            const assets = accounts.filter(a => a.type === 'Asset');
+            const liabilities = accounts.filter(a => a.type === 'Liability');
+            const equity = accounts.filter(a => a.type === 'Equity');
+            
+            const totalAssets = assets.reduce((sum, a) => sum + a.balance, 0);
+            const totalLiabilities = liabilities.reduce((sum, a) => sum + a.balance, 0);
+            const totalEquity = equity.reduce((sum, a) => sum + a.balance, 0);
+            const totalLiabEquity = totalLiabilities + totalEquity;
+
+            const html = `
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <h3 style="text-align: center; margin-bottom: 30px;">Balance Sheet</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <h4 style="margin-bottom: 20px; color: var(--primary);">Assets</h4>
+                            ${assets.map(a => `
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);">
+                                    <span>${a.name}</span>
+                                    <span class="amount">${formatMoney(a.balance)}</span>
+                                </div>
+                            `).join('')}
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; margin-top: 10px; font-weight: 700; font-size: 16px; border-top: 2px solid var(--primary);">
+                                <span>Total Assets</span>
+                                <span class="amount">${formatMoney(totalAssets)}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="margin-bottom: 20px; color: var(--danger);">Liabilities & Equity</h4>
+                            
+                            <div style="margin-bottom: 30px;">
+                                <div style="font-weight: 600; margin-bottom: 10px;">Liabilities</div>
+                                ${liabilities.map(a => `
+                                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);">
+                                        <span>${a.name}</span>
+                                        <span class="amount">${formatMoney(a.balance)}</span>
+                                    </div>
+                                `).join('')}
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; font-weight: 600;">
+                                    <span>Total Liabilities</span>
+                                    <span class="amount">${formatMoney(totalLiabilities)}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 10px;">Equity</div>
+                                ${equity.map(a => `
+                                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);">
+                                        <span>${a.name}</span>
+                                        <span class="amount">${formatMoney(a.balance)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; margin-top: 10px; font-weight: 700; font-size: 16px; border-top: 2px solid var(--danger);">
+                                <span>Total Liabilities + Equity</span>
+                                <span class="amount">${formatMoney(totalLiabEquity)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('balanceContent').innerHTML = html;
+        }
+
+        // CASH FLOW STATEMENT
+        function generateCashFlow() {
+            // Operating Activities
+            const netIncome = accounts.filter(a => a.type === 'Revenue').reduce((sum, a) => sum + a.balance, 0) - 
+                             accounts.filter(a => a.type === 'Expense').reduce((sum, a) => sum + a.balance, 0);
+            
+            const arChange = accounts.find(a => a.code === '1100')?.balance || 0;
+            const apChange = accounts.find(a => a.code === '2000')?.balance || 0;
+            
+            const operatingCash = netIncome - arChange + apChange;
+            
+            // Investing Activities (Equipment changes)
+            const equipmentChange = accounts.find(a => a.code === '1500')?.balance || 0;
+            
+            // Financing Activities
+            const equityChange = accounts.find(a => a.code === '3000')?.balance || 0;
+            
+            const html = `
+                <div style="max-width: 700px; margin: 0 auto;">
+                    <h3 style="text-align: center; margin-bottom: 30px;">Cash Flow Statement</h3>
+                    
+                    <!-- Operating Activities -->
+                    <div class="cashflow-section">
+                        <div class="cashflow-header">
+                            <span>Operating Activities</span>
+                        </div>
+                        <div class="cashflow-content">
+                            <div class="cashflow-item">
+                                <span>Net Income</span>
+                                <span class="amount">${formatMoney(netIncome)}</span>
+                            </div>
+                            <div class="cashflow-item">
+                                <span style="padding-left: 20px;">Changes in Accounts Receivable</span>
+                                <span class="amount ${arChange > 0 ? 'text-danger' : 'text-success'}">${arChange > 0 ? '-' : '+'}${formatMoney(Math.abs(arChange))}</span>
+                            </div>
+                            <div class="cashflow-item">
+                                <span style="padding-left: 20px;">Changes in Accounts Payable</span>
+                                <span class="amount ${apChange > 0 ? 'text-success' : 'text-danger'}">${apChange > 0 ? '+' : '-'}${formatMoney(Math.abs(apChange))}</span>
+                            </div>
+                        </div>
+                        <div class="cashflow-subtotal">
+                            <span>Net Cash from Operating Activities</span>
+                            <span class="amount ${operatingCash >= 0 ? 'text-success' : 'text-danger'}">${operatingCash >= 0 ? '+' : ''}${formatMoney(operatingCash)}</span>
+                        </div>
+                    </div>
+
+                    <!-- Investing Activities -->
+                    <div class="cashflow-section">
+                        <div class="cashflow-header" style="background: var(--warning);">
+                            <span>Investing Activities</span>
+                        </div>
+                        <div class="cashflow-content">
+                            <div class="cashflow-item">
+                                <span>Purchase of Equipment</span>
+                                <span class="amount text-danger">-${formatMoney(equipmentChange)}</span>
+                            </div>
+                        </div>
+                        <div class="cashflow-subtotal">
+                            <span>Net Cash from Investing Activities</span>
+                            <span class="amount text-danger">-${formatMoney(equipmentChange)}</span>
+                        </div>
+                    </div>
+
+                    <!-- Financing Activities -->
+                    <div class="cashflow-section">
+                        <div class="cashflow-header" style="background: var(--success);">
+                            <span>Financing Activities</span>
+                        </div>
+                        <div class="cashflow-content">
+                            <div class="cashflow-item">
+                                <span>Owner Contributions</span>
+                                <span class="amount text-success">+${formatMoney(equityChange)}</span>
+                            </div>
+                        </div>
+                        <div class="cashflow-subtotal">
+                            <span>Net Cash from Financing Activities</span>
+                            <span class="amount text-success">+${formatMoney(equityChange)}</span>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="cashflow-total">
+                        <span>Net Increase in Cash</span>
+                        <span>${formatMoney(operatingCash - equipmentChange + equityChange)}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('cashflowContent').innerHTML = html;
+        }
+
+        // FINANCIAL RATIOS
+        function generateFinancialRatios() {
+            // Get values
+            const currentAssets = accounts.filter(a => a.type === 'Asset' && parseInt(a.code) < 1500).reduce((sum, a) => sum + a.balance, 0);
+            const inventory = accounts.find(a => a.code === '1200')?.balance || 0;
+            const currentLiabilities = accounts.filter(a => a.type === 'Liability').reduce((sum, a) => sum + a.balance, 0);
+            const totalAssets = accounts.filter(a => a.type === 'Asset').reduce((sum, a) => sum + a.balance, 0);
+            const totalLiabilities = accounts.filter(a => a.type === 'Liability').reduce((sum, a) => sum + a.balance, 0);
+            const totalEquity = accounts.filter(a => a.type === 'Equity').reduce((sum, a) => sum + a.balance, 0);
+            const revenue = accounts.filter(a => a.type === 'Revenue').reduce((sum, a) => sum + a.balance, 0);
+            const netIncome = revenue - accounts.filter(a => a.type === 'Expense').reduce((sum, a) => sum + a.balance, 0);
+            
+            // Calculate ratios
+            const currentRatio = currentLiabilities > 0 ? (currentAssets / currentLiabilities).toFixed(2) : '0.00';
+            const quickRatio = currentLiabilities > 0 ? ((currentAssets - inventory) / currentLiabilities).toFixed(2) : '0.00';
+            const debtToEquity = totalEquity > 0 ? (totalLiabilities / totalEquity).toFixed(2) : '0.00';
+            const roe = totalEquity > 0 ? ((netIncome / totalEquity) * 100).toFixed(1) : '0.0';
+            const profitMargin = revenue > 0 ? ((netIncome / revenue) * 100).toFixed(1) : '0.0';
+            const assetTurnover = totalAssets > 0 ? (revenue / totalAssets).toFixed(2) : '0.00';
+            
+            const html = `
+                <div style="max-width: 1000px; margin: 0 auto;">
+                    <h3 style="text-align: center; margin-bottom: 30px;">Financial Ratios Analysis</h3>
+                    
+                    <!-- Liquidity Ratios -->
+                    <h4 style="color: var(--primary); margin-bottom: 16px; margin-top: 30px;">Liquidity Ratios</h4>
+                    <div class="ratio-grid">
+                        <div class="ratio-card">
+                            <div class="ratio-title">Current Ratio</div>
+                            <div class="ratio-value">${currentRatio}</div>
+                            <div class="ratio-formula">Current Assets / Current Liabilities</div>
+                            <div class="ratio-status ${currentRatio >= 1.5 ? 'good' : currentRatio >= 1 ? 'warning' : 'danger'}">
+                                <i class="fas fa-${currentRatio >= 1.5 ? 'check-circle' : currentRatio >= 1 ? 'exclamation-circle' : 'times-circle'}"></i>
+                                ${currentRatio >= 1.5 ? 'Healthy' : currentRatio >= 1 ? 'Acceptable' : 'Risky'}
+                            </div>
+                        </div>
+                        
+                        <div class="ratio-card" style="border-top-color: var(--warning);">
+                            <div class="ratio-title">Quick Ratio (Acid Test)</div>
+                            <div class="ratio-value">${quickRatio}</div>
+                            <div class="ratio-formula">(Current Assets - Inventory) / Current Liabilities</div>
+                            <div class="ratio-status ${quickRatio >= 1 ? 'good' : quickRatio >= 0.8 ? 'warning' : 'danger'}">
+                                <i class="fas fa-${quickRatio >= 1 ? 'check-circle' : quickRatio >= 0.8 ? 'exclamation-circle' : 'times-circle'}"></i>
+                                ${quickRatio >= 1 ? 'Healthy' : quickRatio >= 0.8 ? 'Watch' : 'Risky'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profitability Ratios -->
+                    <h4 style="color: var(--success); margin-bottom: 16px; margin-top: 30px;">Profitability Ratios</h4>
+                    <div class="ratio-grid">
+                        <div class="ratio-card" style="border-top-color: var(--success);">
+                            <div class="ratio-title">Return on Equity (ROE)</div>
+                            <div class="ratio-value">${roe}%</div>
+                            <div class="ratio-formula">Net Income / Average Equity</div>
+                            <div class="ratio-status ${roe >= 15 ? 'good' : roe >= 5 ? 'warning' : 'danger'}">
+                                <i class="fas fa-${roe >= 15 ? 'check-circle' : roe >= 5 ? 'exclamation-circle' : 'times-circle'}"></i>
+                                ${roe >= 15 ? 'Excellent' : roe >= 5 ? 'Average' : 'Poor'}
+                            </div>
+                        </div>
+                        
+                        <div class="ratio-card" style="border-top-color: var(--success);">
+                            <div class="ratio-title">Net Profit Margin</div>
+                            <div class="ratio-value">${profitMargin}%</div>
+                            <div class="ratio-formula">Net Income / Revenue</div>
+                            <div class="ratio-status ${profitMargin >= 20 ? 'good' : profitMargin >= 10 ? 'warning' : 'danger'}">
+                                <i class="fas fa-${profitMargin >= 20 ? 'check-circle' : profitMargin >= 10 ? 'exclamation-circle' : 'times-circle'}"></i>
+                                ${profitMargin >= 20 ? 'Excellent' : profitMargin >= 10 ? 'Average' : 'Low'}
+                            </div>
+                        </div>
+                        
+                        <div class="ratio-card" style="border-top-color: var(--success);">
+                            <div class="ratio-title">Asset Turnover</div>
+                            <div class="ratio-value">${assetTurnover}x</div>
+                            <div class="ratio-formula">Revenue / Total Assets</div>
+                            <div class="ratio-status ${assetTurnover >= 1 ? 'good' : assetTurnover >= 0.5 ? 'warning' : 'danger'}">
+                                <i class="fas fa-${assetTurnover >= 1 ? 'check-circle' : assetTurnover >= 0.5 ? 'exclamation-circle' : 'times-circle'}"></i>
+                                ${assetTurnover >= 1 ? 'Efficient' : assetTurnover >= 0.5 ? 'Average' : 'Low Efficiency'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leverage Ratios -->
+                    <h4 style="color: var(--danger); margin-bottom: 16px; margin-top: 30px;">Leverage Ratios</h4>
+                    <div class="ratio-grid">
+                        <div class="ratio-card" style="border-top-color: var(--danger);">
+                            <div class="ratio-title">Debt to Equity</div>
+                            <div class="ratio-value">${debtToEquity}</div>
+                            <div class="ratio-formula">Total Liabilities / Total Equity</div>
+                            <div class="ratio-status ${debtToEquity <= 0.5 ? 'good' : debtToEquity <= 1 ? 'warning' : 'danger'}">
+                                <i class="fas fa-${debtToEquity <= 0.5 ? 'check-circle' : debtToEquity <= 1 ? 'exclamation-circle' : 'times-circle'}"></i>
+                                ${debtToEquity <= 0.5 ? 'Conservative' : debtToEquity <= 1 ? 'Moderate' : 'High Risk'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding: 20px; background: var(--light-gray); border-radius: 8px;">
+                        <h4 style="margin-bottom: 12px;">Key Insights</h4>
+                        <ul style="line-height: 1.8; color: var(--dark);">
+                            <li>Your business ${currentRatio >= 1.5 ? 'has strong liquidity' : currentRatio >= 1 ? 'has adequate liquidity' : 'may face liquidity issues'} with a current ratio of ${currentRatio}.</li>
+                            <li>The profit margin of ${profitMargin}% indicates ${profitMargin >= 20 ? 'strong pricing power' : profitMargin >= 10 ? 'reasonable profitability' : 'tight margins'}.</li>
+                            <li>ROE of ${roe}% suggests ${roe >= 15 ? 'excellent returns for investors' : roe >= 5 ? 'moderate returns' : 'poor returns'}.</li>
+                            <li>Debt levels are ${debtToEquity <= 0.5 ? 'conservative' : debtToEquity <= 1 ? 'moderate' : 'high'} at ${debtToEquity}:1 D/E ratio.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('ratiosContent').innerHTML = html;
+        }
+
+        function generateTrialBalance() {
+            const tbody = document.getElementById('trialBalanceTable');
+            let totalDebit = 0;
+            let totalCredit = 0;
+            
+            tbody.innerHTML = accounts.map(acc => {
+                let debit = 0;
+                let credit = 0;
+                
+                if (acc.type === 'Asset' || acc.type === 'Expense') {
+                    debit = acc.balance;
+                    totalDebit += debit;
+                } else {
+                    credit = acc.balance;
+                    totalCredit += credit;
+                }
+                
+                return `
+                    <tr>
+                        <td>${acc.code}</td>
+                        <td>${acc.name}</td>
+                        <td class="amount" style="text-align: right">${debit > 0 ? formatMoney(debit) : '-'}</td>
+                        <td class="amount" style="text-align: right">${credit > 0 ? formatMoney(credit) : '-'}</td>
+                    </tr>
+                `;
+            }).join('') + `
+                <tr style="background: var(--light-gray); font-weight: 700;">
+                    <td colspan="2">TOTAL</td>
+                    <td class="amount" style="text-align: right">${formatMoney(totalDebit)}</td>
+                    <td class="amount" style="text-align: right">${formatMoney(totalCredit)}</td>
+                </tr>
+            `;
+        }
+
+        // Charts
+        function initCharts() {
+            if (chartInstances.revenue) chartInstances.revenue.destroy();
+            if (chartInstances.bank) chartInstances.bank.destroy();
+
+            const ctx1 = document.getElementById('revenueChart').getContext('2d');
+            chartInstances.revenue = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000],
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    }, {
+                        label: 'Expenses',
+                        data: [8000, 12000, 10000, 15000, 14000, 18000],
+                        backgroundColor: '#ef4444',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: function(value) { return currencySymbol + value; } }
+                        }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('bankChart').getContext('2d');
+            chartInstances.bank = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: bankAccounts.length > 0 ? bankAccounts.map(b => b.name) : ['Cash', 'Receivables'],
+                    datasets: [{
+                        data: bankAccounts.length > 0 ? bankAccounts.map(b => b.balance) : [
+                            accounts.find(a => a.code === '1000')?.balance || 0,
+                            accounts.find(a => a.code === '1100')?.balance || 0
+                        ],
+                        backgroundColor: ['#0c4da2', '#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // Modal Functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+            if (!event.target.matches('.user-avatar') && !event.target.matches('.user-avatar *')) {
+                document.getElementById('userDropdown').classList.remove('active');
+            }
+        }
+        // Global variable to store temporary files
+let tempQuoteFiles = [];
+
+// Handle file selection
+function handleFileSelect(input) {
+    const files = Array.from(input.files);
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    files.forEach(file => {
+        if (file.size > maxSize) {
+            alert(`File ${file.name} is too large. Max size is 5MB.`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fileData = {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                data: e.target.result, // base64
+                id: Date.now() + Math.random()
+            };
+            tempQuoteFiles.push(fileData);
+            updateFilePreview();
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Update file preview display
+function updateFilePreview() {
+    const container = document.getElementById('fileListContainer');
+    const listDiv = document.getElementById('filePreviewList');
+    
+    if (tempQuoteFiles.length === 0) {
+        listDiv.style.display = 'none';
+        return;
+    }
+    
+    listDiv.style.display = 'block';
+    container.innerHTML = '';
+    
+    tempQuoteFiles.forEach((file, index) => {
+        const fileIcon = getFileIcon(file.type);
+        const size = (file.size / 1024).toFixed(1) + ' KB';
+        
+        const div = document.createElement('div');
+        div.style.cssText = 'background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 10px; min-width: 200px;';
+        div.innerHTML = `
+            <i class="${fileIcon}" style="font-size: 24px; color: var(--primary);"></i>
+            <div style="flex: 1; overflow: hidden;">
+                <div style="font-weight: 500; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${file.name}</div>
+                <div style="font-size: 11px; color: var(--gray);">${size}</div>
+            </div>
+            <button onclick="removeTempFile(${index})" style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 4px;">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// Get appropriate icon for file type
+function getFileIcon(mimeType) {
+    if (mimeType.includes('pdf')) return 'fas fa-file-pdf';
+    if (mimeType.includes('word') || mimeType.includes('document')) return 'fas fa-file-word';
+    if (mimeType.includes('image')) return 'fas fa-file-image';
+    return 'fas fa-file';
+}
+
+// Remove file from temp list
+function removeTempFile(index) {
+    tempQuoteFiles.splice(index, 1);
+    updateFilePreview();
+}
+
+// Update saveQuote function
+function saveQuote() {
+    const client = document.getElementById('quoteClient').value;
+    const totalText = document.getElementById('quoteTotal').textContent;
+    const total = parseFloat(totalText.replace(/[^\d.-]/g, ''));
+    
+    if (!client) {
+        alert('Please enter client name');
+        return;
+    }
+
+    const newQuote = {
+        id: document.getElementById('quoteNumber').value,
+        client: client,
+        date: document.getElementById('quoteDate').value,
+        expiry: document.getElementById('quoteExpiry').value,
+        amount: total,
+        status: 'Pending',
+        files: [...tempQuoteFiles] // Save files with quote
+    };
+
+    quotations.push(newQuote);
+    saveUserData();
+    renderQuotations();
+    updateDashboard();
+    closeModal('quoteModal');
+    
+    // Reset form
+    document.getElementById('quoteClient').value = '';
+    tempQuoteFiles = [];
+    updateFilePreview();
+    document.getElementById('quoteLineItems').innerHTML = `
+        <div class="line-item">
+            <input type="text" placeholder="Item description" class="quote-item-desc">
+            <input type="number" placeholder="1" class="quote-item-qty" value="1" onchange="calculateQuote()">
+            <input type="number" placeholder="0.00" class="quote-item-rate" value="0" onchange="calculateQuote()">
+            <input type="text" placeholder="0.00" class="quote-item-amount" readonly>
+            <button class="btn btn-danger" onclick="this.parentElement.remove(); calculateQuote()" style="padding: 6px 12px; background: var(--danger); color: white;">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    calculateQuote();
+}
+
+// Update renderQuotations to show file attachments
+function renderQuotations() {
+    const tbody = document.getElementById('quotesTable');
+    const emptyState = document.getElementById('emptyQuotes');
+    
+    tbody.innerHTML = '';
+    
+    if (quotations.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    quotations.forEach(quote => {
+        const hasFiles = quote.files && quote.files.length > 0;
+        const fileBadge = hasFiles ? `<span class="badge badge-info" style="margin-left: 5px;"><i class="fas fa-paperclip"></i> ${quote.files.length}</span>` : '';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${quote.id}</td>
+            <td>${quote.client} ${fileBadge}</td>
+            <td>${quote.date}</td>
+            <td>${quote.expiry}</td>
+            <td><span class="badge ${quote.status === 'Approved' ? 'badge-success' : quote.status === 'Rejected' ? 'badge-danger' : 'badge-warning'}">${quote.status}</span></td>
+            <td class="amount" style="text-align: right">${formatMoney(quote.amount)}</td>
+            <td>
+                ${hasFiles ? `<button class="btn btn-secondary" onclick="viewQuoteFiles('${quote.id}')" style="width: auto; margin-right: 5px;" title="View Files"><i class="fas fa-folder-open"></i></button>` : ''}
+                <button class="btn btn-primary" onclick="convertQuoteToInvoice('${quote.id}')" ${quote.status !== 'Pending' ? 'disabled' : ''} style="width: auto; margin-right: 5px;">
+                    <i class="fas fa-file-invoice"></i> Invoice
+                </button>
+                <button class="btn btn-danger" onclick="deleteQuote('${quote.id}')" style="width: auto;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// View files attached to quote
+function viewQuoteFiles(quoteId) {
+    const quote = quotations.find(q => q.id === quoteId);
+    if (!quote || !quote.files || quote.files.length === 0) return;
+    
+    // If single file, preview directly
+    if (quote.files.length === 1) {
+        previewFile(quote.files[0]);
+    } else {
+        // Show list of files
+        let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">';
+        quote.files.forEach(file => {
+            const icon = getFileIcon(file.type);
+            html += `
+                <div style="border: 1px solid var(--border); border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;" 
+                     onmouseover="this.style.boxShadow='var(--shadow)'" 
+                     onmouseout="this.style.boxShadow='none'"
+                     onclick='previewFile(${JSON.stringify(file).replace(/'/g, "&#39;")})'>
+                    <i class="${icon}" style="font-size: 48px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <div style="font-weight: 500; font-size: 13px; margin-bottom: 5px; word-break: break-all;">${file.name}</div>
+                    <div style="font-size: 11px; color: var(--gray);">${(file.size / 1024).toFixed(1)} KB</div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        document.getElementById('previewTitle').textContent = `Files for ${quote.id}`;
+        document.getElementById('previewContent').innerHTML = html;
+        document.getElementById('downloadLink').style.display = 'none';
+        document.getElementById('filePreviewModal').classList.add('active');
+    }
+}
+
+// Preview individual file
+function previewFile(file) {
+    document.getElementById('previewTitle').textContent = file.name;
+    const content = document.getElementById('previewContent');
+    const downloadLink = document.getElementById('downloadLink');
+    
+    if (file.type.includes('image')) {
+        content.innerHTML = `<img src="${file.data}" style="max-width: 100%; max-height: 60vh; border-radius: 8px;">`;
+    } else if (file.type.includes('pdf')) {
+        content.innerHTML = `<iframe src="${file.data}" style="width: 100%; height: 60vh; border: none;"></iframe>`;
+    } else {
+        // For Word docs - show icon and download only
+        content.innerHTML = `
+            <div style="padding: 40px; text-align: center;">
+                <i class="fas fa-file-word" style="font-size: 64px; color: var(--primary); margin-bottom: 20px;"></i>
+                <p>This file type cannot be previewed</p>
+                <p style="font-size: 12px; color: var(--gray);">${file.name}</p>
+            </div>
+        `;
+    }
+    
+    downloadLink.href = file.data;
+    downloadLink.download = file.name;
+    downloadLink.style.display = 'inline-flex';
+    document.getElementById('filePreviewModal').classList.add('active');
+}
+
+// Drag and drop support
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    
+    if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--primary)';
+            dropZone.style.background = '#e8f0fe';
+        });
+        
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.background = '#fafafa';
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.background = '#fafafa';
+            
+            const files = Array.from(e.dataTransfer.files);
+            handleFileSelect({ files: files });
+        });
+    }
+});
+    </script>
+</body>
+</html>

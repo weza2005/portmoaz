@@ -1,0 +1,21 @@
+/* تخصيص شكل السكرول بار */
+::-webkit-scrollbar {
+  width: 10px; /* عرض السكرول */
+}
+
+/* الخلفية بتاعة السكرول */
+::-webkit-scrollbar-track {
+  background: #0f172a; /* لون Slate-900 نفس خلفية الموقع */
+}
+
+/* الجزء اللي بيتحرك (الـ Handle) */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #06b6d4, #3b82f6); /* تدرج لوني Cyan to Blue */
+  border-radius: 10px; /* زوايا دائرية */
+  border: 2px solid #0f172a; /* فراغ بسيط عشان يبان كأنه عايم */
+}
+
+/* لما تقف بالماوس على السكرول */
+::-webkit-scrollbar-thumb:hover {
+  background: #22d3ee; /* لون أنور شوية */
+}

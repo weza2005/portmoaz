@@ -1,0 +1,362 @@
+ <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .product-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+
+      
+    /* عشان السلة تكون انسيابية وما يطلعش سكرول بار خارجي */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* أنيميشن ظهور المنتجات */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+ 
+    /* تصغير الحاوية الأساسية للمنتج */
+    .product-card img {
+        height: 180px; /* طول ثابت ومناسب للموبايل */
+        width: 100%;
+        object-fit: cover;
+    }
+    /* تحسين شكل الكارت */
+    .product-card {
+        background: #f8fafc;
+        border-radius: 1.5rem;
+        padding: 8px;
+        transition: all 0.3s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+
+
+    </style>
+</head>
+<body class="bg-white text-slate-900 pb-24">
+
+    <nav class="sticky top-0 bg-white/90 backdrop-blur-md z-50 px-5 py-4 flex justify-between items-center border-b border-slate-100">
+        <div class="font-black text-2xl italic tracking-tighter">BROVA<span class="text-cyan-600">.</span></div>
+        <div class="flex gap-4">
+        
+            <button onclick="toggleCart()" class="relative transition-transform active:scale-110">
+    <svg class="w-7 h-7 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+    </svg>
+    <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-sm border border-white">0</span>
+</button>
+        </div>
+    </nav>
+
+    <div class="flex gap-3 px-4 py-6 overflow-x-auto no-scrollbar sticky top-[65px] bg-white z-40">
+        <button onclick="filterProducts('all')" class="cat-btn active bg-slate-950 text-white px-8 py-3 rounded-full text-sm font-bold shadow-lg transition-all whitespace-nowrap">الكل</button>
+        <button onclick="filterProducts('tshirts')" class="cat-btn bg-slate-100 text-slate-500 px-8 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap">تيشرتات</button>
+        <button onclick="filterProducts('pants')" class="cat-btn bg-slate-100 text-slate-500 px-8 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap">بناطيل</button>
+        <button onclick="filterProducts('acc')" class="cat-btn bg-slate-100 text-slate-500 px-8 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap">اكسسوارات</button>
+    </div>
+
+    <div id="products-grid" class="px-4 grid grid-cols-2 gap-x-4 gap-y-8">
+        </div>
+
+
+
+<div id="cart-modal" class="fixed inset-0 z-[100] hidden overflow-hidden">
+    <div onclick="toggleCart()" class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm transition-opacity"></div>
+    
+    <div id="cart-content" 
+         class="absolute top-0 right-0 h-full w-[85%] md:w-[400px] bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] transform transition-transform duration-500 translate-x-full flex flex-col">
+        
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div>
+                <h2 class="text-xl font-black italic">حقيبة التسوق</h2>
+                <span id="cart-items-count" class="text-xs font-bold text-cyan-600 tracking-widest uppercase">0 ITEMS</span>
+            </div>
+            <button onclick="toggleCart()" class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm hover:rotate-90 transition-all duration-300">✕</button>
+        </div>
+
+        <div id="cart-list" class="flex-grow overflow-y-auto p-6 space-y-6 no-scrollbar">
+            <p id="empty-msg" class="text-center text-slate-400 py-20 italic">السلة فاضية.. جرب تضيف حاجة!</p>
+        </div>
+
+        <div class="p-6 bg-slate-50 border-t border-slate-100 space-y-4">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-slate-500 font-bold">المجموع الكلي:</span>
+                <span id="cart-total" class="text-2xl font-black text-slate-900 tracking-tighter text-cyan-600">0 ج.م</span>
+            </div>
+            <p class="text-[10px] text-slate-400 text-center mb-4">الشحن بيتحسب في الخطوة الجاية</p>
+            <button class="w-full bg-slate-950 text-white py-5 rounded-2xl font-bold text-lg shadow-xl hover:bg-cyan-600 transition-all active:scale-95">
+                إتمام الطلب الآن 💳
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+    // 1. قاعدة بيانات المنتجات (ببيانات واقعية)
+  
+
+    ;const products = [
+    // تيشرتات
+    { id: 1, name: "تيشرت أوفر سايز أسود", price: 450, cat: "tshirts", img: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=400" },
+    { id: 2, name: "تيشرت أبيض قطن", price: 380, cat: "tshirts", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=400" },
+    { id: 7, name: "تيشرت مطبوع جرافيك", price: 520, cat: "tshirts", img: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=400" },
+    
+    // بناطيل
+    { id: 3, name: "بنطلون كارجو زيتي", price: 850, cat: "pants", img: "https://images.unsplash.com/photo-1519176442944-83911f387d97?q=80&w=400" },
+    { id: 4, name: "بنطلون جينز أزرق", price: 950, cat: "pants", img: "https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=400" },
+    { id: 8, name: "سروال رياضي مريح", price: 600, cat: "pants", img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=400" },
+    
+    // اكسسوارات
+    { id: 5, name: "ساعة يد كلاسيك", price: 2200, cat: "acc", img: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=400" },
+    { id: 6, name: "كاب بروفا شيك", price: 250, cat: "acc", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=400" },
+    { id: 9, name: "نظارة شمسية مودرن", price: 1100, cat: "acc", img: "https://images.unsplash.com/photo-1511499767390-90342f5b89a7?q=80&w=400" },
+    { id: 10, name: "محفظة جلد طبيعي", price: 750, cat: "acc", img: "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=400" }
+];
+
+     // قائمة السلة الفارغة في البداية
+// تأكد إن دي فوق خالص بره أي Function
+let cartItems = []; 
+
+function addToCart(btn, productId) {
+    // 1. إيجاد المنتج من القائمة
+    const product = products.find(p => p.id === productId);
+    
+    // 2. إضافته للمصفوفة (تأكد إنها .push)
+    cartItems.push({...product}); // بناخد نسخة من المنتج
+    
+    // 3. تحديث الواجهة
+    updateCartUI();
+    
+    // أنيميشن الزرار (اختياري بس شيك)
+    btn.classList.add('bg-green-500');
+    setTimeout(() => btn.classList.remove('bg-green-500'), 1000);
+}
+
+function updateCartUI() {
+    const badge = document.getElementById('cart-count');
+    const list = document.getElementById('cart-list');
+    const totalLabel = document.getElementById('cart-total');
+    const countLabel = document.getElementById('cart-items-count');
+
+    // تحديث الأرقام الأساسية
+    badge.innerText = cartItems.length;
+    countLabel.innerText = `(${cartItems.length})`;
+
+    // مسح القائمة الحالية عشان نعيد بنائها
+    list.innerHTML = '';
+    
+    // تصفير المجموع قبل الجمع الجديد
+    let tempTotal = 0;
+
+    if (cartItems.length === 0) {
+        list.innerHTML = '<p class="text-center text-slate-400 py-10 italic">السلة فاضية</p>';
+        totalLabel.innerText = '0 ج.م';
+        return;
+    }
+
+    // الـ Loop اللي بيجمع كل الأسعار
+    cartItems.forEach((item, index) => {
+        tempTotal += item.price; // دي أهم حتة بتجمع السعر
+        
+        list.innerHTML += `
+            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-100 mb-3 animate-fade-in">
+                <img src="${item.img}" class="w-14 h-14 rounded-2xl object-cover">
+                <div class="flex-grow">
+                    <h4 class="font-bold text-[12px]">${item.name}</h4>
+                    <span class="text-cyan-600 font-black text-xs">${item.price} ج.م</span>
+                </div>
+                <button onclick="removeFromCart(${index})" class="text-red-400 font-bold px-2">×</button>
+            </div>
+        `;
+    });
+
+    // عرض المجموع النهائي
+    totalLabel.innerText = tempTotal + " ج.م";
+}
+
+function removeFromCart(index) {
+    cartItems.splice(index, 1); // مسح العنصر
+    updateCartUI(); // إعادة الحساب
+}
+    // 2. دالة عرض المنتجات في الصفحة
+    function renderProducts(filter = 'all') {
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = ''; // مسح الشبكة الحالية
+        
+        const filtered = filter === 'all' ? products : products.filter(p => p.cat === filter);
+        
+       filtered.forEach(p => {
+    grid.innerHTML += `
+        <div class="product-card animate-fade-in group shadow-sm border border-slate-50">
+            <div class="relative overflow-hidden rounded-[1.2rem] mb-2 bg-white">
+                <img src="${p.img}" class="group-hover:scale-110 transition-transform duration-500">
+                <button onclick="addToCart(this, ${p.id})" class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-md p-2.5 rounded-full shadow-md text-cyan-600 active:scale-90 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path class="plus-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        <path class="check-icon hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="px-1">
+                <h3 class="text-[12px] font-bold text-slate-700 truncate">${p.name}</h3>
+                <span class="text-cyan-600 font-black text-xs">${p.price} ج.م</span>
+            </div>
+        </div>
+    `;
+});
+    }
+
+    // 3. دالة الفلترة (لما تدوس على الأقسام)
+    function filterProducts(cat) {
+        // تحديث شكل الزراير
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.classList.remove('bg-slate-950', 'text-white', 'shadow-lg');
+            btn.classList.add('bg-slate-100', 'text-slate-500');
+        });
+        event.currentTarget.classList.add('bg-slate-950', 'text-white', 'shadow-lg');
+        event.currentTarget.classList.remove('bg-slate-100', 'text-slate-500');
+        
+        renderProducts(cat);
+    }
+
+    // 4. دالة إضافة منتج للسلة
+    function addToCart(btn, productId) {
+        const product = products.find(p => p.id === productId);
+        cartItems.push(product); // إضافة المنتج للمصفوفة
+        
+        updateCartUI(); // تحديث شكل السلة
+function updateCartUI() {
+    const badge = document.getElementById('cart-count');
+    const list = document.getElementById('cart-list');
+    const total = document.getElementById('cart-total');
+    const emptyMsg = document.getElementById('empty-msg');
+    const countLabel = document.getElementById('cart-items-count');
+
+    // تحديث العداد اللي فوق
+    badge.innerText = cartItems.length;
+    countLabel.innerText = `(${cartItems.length})`;
+
+    if (cartItems.length === 0) {
+        emptyMsg.style.display = 'block';
+        list.innerHTML = '';
+        total.innerText = '0 ج.م';
+        return;
+    }
+
+    emptyMsg.style.display = 'none';
+    list.innerHTML = '';
+    
+    // أهم حتة: تصفير المجموع قبل ما يبدأ يجمع من جديد
+    let currentTotal = 0;
+
+    cartItems.forEach((item, index) => {
+        // جمع سعر كل منتج في المصفوفة
+        currentTotal += item.price;
+        
+        list.innerHTML += `
+            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-100 mb-4 animate-fade-in">
+                <img src="${item.img}" class="w-16 h-16 rounded-2xl object-cover shadow-sm">
+                <div class="flex-grow">
+                    <h4 class="font-bold text-[13px] text-slate-800">${item.name}</h4>
+                    <span class="text-cyan-600 font-black text-sm">${item.price} ج.م</span>
+                </div>
+                <button onclick="removeFromCart(${index})" class="text-red-400 font-bold p-2 text-xl hover:scale-110 transition-transform">×</button>
+            </div>
+        `;
+    });
+
+    // كتابة المجموع النهائي بعد ما خلصنا الـ Loop
+    total.innerText = `${currentTotal} ج.م`;
+}
+        // أنيميشن تغيير الأيقونة في الزرار
+        const plus = btn.querySelector('.plus-icon');
+        const check = btn.querySelector('.check-icon');
+        plus.classList.add('hidden');
+        check.classList.remove('hidden');
+        btn.classList.add('bg-green-500', 'text-white');
+
+        setTimeout(() => {
+            plus.classList.remove('hidden');
+            check.classList.add('hidden');
+            btn.classList.remove('bg-green-500', 'text-white');
+        }, 1000);
+    }
+
+    // 5. دالة تحديث بيانات السلة (المجموع والقائمة)
+    function updateCartUI() {
+        const badge = document.getElementById('cart-count');
+        const list = document.getElementById('cart-list');
+        const total = document.getElementById('cart-total');
+        const emptyMsg = document.getElementById('empty-msg');
+        const countLabel = document.getElementById('cart-items-count');
+
+        badge.innerText = cartItems.length;
+        countLabel.innerText = `(${cartItems.length})`;
+
+        if (cartItems.length === 0) {
+            emptyMsg.style.display = 'block';
+            list.innerHTML = '';
+            total.innerText = '0 ج.م';
+            return;
+        }
+
+        emptyMsg.style.display = 'none';
+        list.innerHTML = '';
+        let totalPrice = 0;
+
+        cartItems.forEach((item, index) => {
+            totalPrice += item.price;
+            list.innerHTML += `
+                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-100 mb-4">
+                    <img src="${item.img}" class="w-16 h-16 rounded-2xl object-cover">
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-[13px]">${item.name}</h4>
+                        <span class="text-cyan-600 font-black text-sm">${item.price} ج.م</span>
+                    </div>
+                    <button onclick="removeFromCart(${index})" class="text-red-400 font-bold p-2 text-xl">×</button>
+                </div>
+            `;
+        });
+
+        total.innerText = `${totalPrice} ج.م`;
+    }
+
+    // 6. دالة مسح منتج من السلة
+    function removeFromCart(index) {
+        cartItems.splice(index, 1);
+        updateCartUI();
+    }
+
+    // 7. دالة فتح وقفل السلة
+    function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    const content = document.getElementById('cart-content');
+    
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        // بنشيل الـ translate عشان يرجع مكانه في اليمين
+        setTimeout(() => content.classList.remove('translate-x-full'), 10);
+    } else {
+        // بنرجعه يختفي ناحية اليمين (translate-x-full)
+        content.classList.add('translate-x-full');
+        setTimeout(() => modal.classList.add('hidden'), 500);
+    }
+}
+
+    // تشغيل العرض الأولي للمنتجات عند فتح الصفحة
+    renderProducts('all');
+</script>
+
+</body>
+</html>

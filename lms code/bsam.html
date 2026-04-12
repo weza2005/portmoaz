@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfoEnc Academy | Professional Cybersecurity Training</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0f;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 50%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+        }
+        .cyber-grid {
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+        .terminal-cursor::after {
+            content: '_';
+            animation: blink 1s infinite;
+            color: #00d4ff;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+        .hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-gray-300 overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b border-cyan-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white tracking-tight">InfoEnc<span class="text-cyan-400">Academy</span></span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#courses" class="text-sm font-medium hover:text-cyan-400 transition-colors">Courses</a>
+                    <a href="#labs" class="text-sm font-medium hover:text-cyan-400 transition-colors">Virtual Labs</a>
+                    <a href="#certifications" class="text-sm font-medium hover:text-cyan-400 transition-colors">Certifications</a>
+                    <a href="#enterprise" class="text-sm font-medium hover:text-cyan-400 transition-colors">Enterprise</a>
+                    <button onclick="openStudentPortal()" class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-cyan-500 hover:to-blue-500 transition-all glow-cyan">
+                        Student Portal
+                    </button>
+                </div>
+                <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden glass-panel border-t border-cyan-500/20">
+            <div class="px-4 pt-2 pb-4 space-y-2">
+                <a href="#courses" class="block py-2 text-sm hover:text-cyan-400">Courses</a>
+                <a href="#labs" class="block py-2 text-sm hover:text-cyan-400">Virtual Labs</a>
+                <a href="#certifications" class="block py-2 text-sm hover:text-cyan-400">Certifications</a>
+                <button onclick="openStudentPortal()" class="w-full mt-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white text-sm font-medium rounded-lg">
+                    Student Portal
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center cyber-grid pt-16 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-transparent to-cyan-900/20"></div>
+        <div class="scan-line"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-sm font-mono">
+                        <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                        <span class="terminal-cursor">System Online: 2,847 Active Labs</span>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-7xl font-bold text-white leading-tight">
+                        Master <span class="gradient-text">Cybersecurity</span><br>
+                        Through Practice
+                    </h1>
+                    
+                    <p class="text-lg text-gray-400 max-w-xl leading-relaxed">
+                        Industry-leading hands-on training platform with 500+ virtual labs, 
+                        real-world cyber ranges, and certification preparation mapped to NIST, 
+                        CompTIA, and CISSP frameworks.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="openStudentPortal()" class="px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-500 hover:to-blue-500 transition-all glow-cyan flex items-center gap-2">
+                            <i data-lucide="terminal" class="w-5 h-5"></i>
+                            Access Student Portal
+                        </button>
+                        <button onclick="scrollToSection('courses')" class="px-8 py-4 border border-gray-700 text-white font-semibold rounded-xl hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all flex items-center gap-2">
+                            <i data-lucide="play-circle" class="w-5 h-5"></i>
+                            Explore Labs
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-6 text-sm text-gray-500">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-cyan-400"></i>
+                            <span>Cloud-Based</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-cyan-400"></i>
+                            <span>Auto-Scored</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-cyan-400"></i>
+                            <span>LTI Integrated</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-3xl blur-3xl opacity-20 float-animation"></div>
+                    <div class="relative glass-panel rounded-2xl p-6 border border-cyan-500/20">
+                        <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="flex gap-1.5">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                                <span class="ml-3 text-xs text-gray-500 font-mono">sInfoEnc_terminal_v2.4.sh</span>
+                            </div>
+                            <i data-lucide="wifi" class="w-4 h-4 text-cyan-400"></i>
+                        </div>
+                        <div class="font-mono text-sm space-y-2 text-gray-400">
+                            <div class="text-green-400">$ initializing_secure_environment...</div>
+                            <div class="text-cyan-400">[OK] Virtual machine allocated: Kali Linux 2024.1</div>
+                            <div class="text-cyan-400">[OK] Network isolation: Enabled</div>
+                            <div class="text-cyan-400">[OK] Lab scenario: Penetration Testing - Web App</div>
+                            <div class="text-purple-400">[INFO] Target: vulnerable-webapp.InfoEnc.local</div>
+                            <div class="text-white mt-4">$ nmap -sV -sC target</div>
+                            <div class="text-gray-500">Starting Nmap 7.94SVN...</div>
+                            <div class="text-yellow-400">Discovered open port 80/tcp on 10.0.0.15</div>
+                            <div class="text-yellow-400">Discovered open port 443/tcp on 10.0.0.15</div>
+                            <div class="text-green-400 animate-pulse">_</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 border-y border-gray-800 bg-[#0f0f15]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">500+</div>
+                    <div class="text-sm text-gray-500">Virtual Labs</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">50K+</div>
+                    <div class="text-sm text-gray-500">Active Students</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">98%</div>
+                    <div class="text-sm text-gray-500">Cert Pass Rate</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">24/7</div>
+                    <div class="text-sm text-gray-500">Lab Access</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="courses" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Enterprise-Grade Training Platform</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Comprehensive cybersecurity education with hands-on labs designed by industry experts and mapped to leading certification frameworks.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass-panel rounded-2xl p-8 hover:border-cyan-500/30 transition-all group">
+                    <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="cloud" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Cloud-Based Labs</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        Instant access to pre-configured virtual machines via browser. No setup required. 
+                        HTML5 interface with full SSH/RDP capabilities.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-cyan-400"></i>
+                            Auto-scaling infrastructure
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-cyan-400"></i>
+                            Snapshot and restore
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-cyan-400"></i>
+                            Isolated network segments
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-panel rounded-2xl p-8 hover:border-purple-500/30 transition-all group">
+                    <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="target" class="w-6 h-6 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Cyber Ranges</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        Real-world attack scenarios in safe environments. Red team vs blue team exercises, 
+                        incident response simulations, and malware analysis sandboxes.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-purple-400"></i>
+                            Real-time scoring engine
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-purple-400"></i>
+                            Team-based competitions
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-purple-400"></i>
+                            Custom scenario builder
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-panel rounded-2xl p-8 hover:border-green-500/30 transition-all group">
+                    <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Certification Prep</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        Structured learning paths for Security+, CISSP, CEH, OSCP, and more. 
+                        Practice exams with detailed performance analytics.
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400"></i>
+                            Domain-mapped curriculum
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400"></i>
+                            Progress tracking
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400"></i>
+                            Skill gap analysis
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lab Categories -->
+    <section id="labs" class="py-24 bg-[#0f0f15] relative overflow-hidden">
+        <div class="absolute inset-0 cyber-grid opacity-30"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Virtual Lab Library</h2>
+                    <p class="text-gray-400">Hands-on exercises across 12 cybersecurity domains</p>
+                </div>
+                <button onclick="openStudentPortal()" class="mt-4 md:mt-0 px-6 py-3 border border-cyan-500/30 text-cyan-400 rounded-lg hover:bg-cyan-500/10 transition-all flex items-center gap-2">
+                    <span>View All Labs</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-panel p-6 rounded-xl hover:bg-cyan-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="lock" class="w-8 h-8 text-cyan-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Cryptography</h4>
+                    <p class="text-xs text-gray-500">42 Labs</p>
+                </div>
+                <div class="glass-panel p-6 rounded-xl hover:bg-purple-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="network" class="w-8 h-8 text-purple-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Network Security</h4>
+                    <p class="text-xs text-gray-500">68 Labs</p>
+                </div>
+                <div class="glass-panel p-6 rounded-xl hover:bg-green-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="bug" class="w-8 h-8 text-green-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Malware Analysis</h4>
+                    <p class="text-xs text-gray-500">35 Labs</p>
+                </div>
+                <div class="glass-panel p-6 rounded-xl hover:bg-red-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="flame" class="w-8 h-8 text-red-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Penetration Testing</h4>
+                    <p class="text-xs text-gray-500">89 Labs</p>
+                </div>
+                <div class="glass-panel p-6 rounded-xl hover:bg-yellow-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="shield" class="w-8 h-8 text-yellow-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Defensive Security</h4>
+                    <p class="text-xs text-gray-500">54 Labs</p>
+                </div>
+                <div class="glass-panel p-6 rounded-xl hover:bg-pink-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="database" class="w-8 h-8 text-pink-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Database Security</h4>
+                    <p class="text-xs text-gray-500">28 Labs</p>
+                </div>
+                <div class="glass-panel p-6 rounded-xl hover:bg-blue-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="cloud-lightning" class="w-8 h-8 text-blue-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Cloud Security</h4>
+                    <p class="text-xs text-gray-500">45 Labs</p>
+                </div>
+                <div class="glass-panel p-6 rounded-xl hover:bg-orange-500/5 transition-all cursor-pointer group">
+                    <i data-lucide="file-search" class="w-8 h-8 text-orange-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-white font-semibold mb-1">Digital Forensics</h4>
+                    <p class="text-xs text-gray-500">37 Labs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Student Portal Modal -->
+    <div id="studentPortalModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeStudentPortal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-md rounded-2xl border border-cyan-500/30 p-8 relative overflow-hidden">
+                <div class="scan-line"></div>
+                <button onclick="closeStudentPortal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Student Portal</h3>
+                    <p class="text-sm text-gray-400">Access your virtual labs and course materials</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Student ID / Email</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-3 top-3 w-5 h-5 text-gray-500"></i>
+                            <input type="text" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:border-cyan-500 focus:outline-none transition-colors" placeholder="student@InfoEnc.edu">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3 top-3 w-5 h-5 text-gray-500"></i>
+                            <input type="password" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg py-2.5 pl-10 pr-4 text-white focus:border-cyan-500 focus:outline-none transition-colors" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <label class="flex items-center gap-2 text-gray-400 cursor-pointer">
+                            <input type="checkbox" class="rounded border-gray-700 bg-[#0a0a0f] text-cyan-500 focus:ring-cyan-500">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="text-cyan-400 hover:text-cyan-300">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold rounded-lg hover:from-cyan-500 hover:to-blue-500 transition-all glow-cyan">
+                        Sign In to Lab Environment
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-gray-800 text-center">
+                    <p class="text-sm text-gray-500 mb-4">New student? Contact your administrator for access credentials.</p>
+                    <div class="flex justify-center gap-4">
+                        <div class="flex items-center gap-2 text-xs text-gray-600">
+                            <i data-lucide="shield" class="w-4 h-4"></i>
+                            <span>256-bit Encryption</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-600">
+                            <i data-lucide="key" class="w-4 h-4"></i>
+                            <span>SSO Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Preview (Hidden by default, shown after login) -->
+    <div id="dashboardPreview" class="hidden fixed inset-0 z-[100] bg-[#0a0a0f]">
+        <div class="h-full flex">
+            <!-- Sidebar -->
+            <div class="w-64 glass-panel border-r border-cyan-500/20 hidden md:flex flex-col">
+                <div class="p-6 border-b border-cyan-500/20">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="text-lg font-bold text-white">InfoEnc</span>
+                    </div>
+                </div>
+                <nav class="flex-1 p-4 space-y-2">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-cyan-500/10 text-cyan-400 rounded-lg border border-cyan-500/20">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-white/5 rounded-lg transition-colors">
+                        <i data-lucide="terminal" class="w-5 h-5"></i>
+                        <span>My Labs</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-white/5 rounded-lg transition-colors">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        <span>Courses</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-white/5 rounded-lg transition-colors">
+                        <i data-lucide="trophy" class="w-5 h-5"></i>
+                        <span>Certifications</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-white/5 rounded-lg transition-colors">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span>Team Projects</span>
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-cyan-500/20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                            JS
+                        </div>
+                        <div>
+                            <div class="text-sm text-white font-medium">John Smith</div>
+                            <div class="text-xs text-gray-500">Student</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-auto">
+                <header class="glass-panel border-b border-cyan-500/20 p-4 flex justify-between items-center">
+                    <h1 class="text-xl font-semibold text-white">Lab Dashboard</h1>
+                    <button onclick="closeDashboard()" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                        Exit Preview
+                    </button>
+                </header>
+                
+                <div class="p-8">
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <div class="glass-panel p-6 rounded-xl border-l-4 border-cyan-500">
+                            <div class="text-sm text-gray-400 mb-1">Active Labs</div>
+                            <div class="text-2xl font-bold text-white">3 Running</div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-xl border-l-4 border-purple-500">
+                            <div class="text-sm text-gray-400 mb-1">Completed This Week</div>
+                            <div class="text-2xl font-bold text-white">12 Labs</div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-xl border-l-4 border-green-500">
+                            <div class="text-sm text-gray-400 mb-1">Certification Progress</div>
+                            <div class="text-2xl font-bold text-white">68%</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-xl p-6 mb-8">
+                        <h3 class="text-lg font-semibold text-white mb-4">Continue Learning</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-[#0a0a0f] rounded-lg border border-gray-800">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center">
+                                        <i data-lucide="flame" class="w-6 h-6 text-red-400"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white font-medium">Advanced Penetration Testing</div>
+                                        <div class="text-sm text-gray-500">Lab 4 of 12: SQL Injection</div>
+                                    </div>
+                                </div>
+                                <button class="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors">
+                                    Resume
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-[#0a0a0f] rounded-lg border border-gray-800">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <i data-lucide="cloud" class="w-6 h-6 text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white font-medium">AWS Security Fundamentals</div>
+                                        <div class="text-sm text-gray-500">Lab 2 of 8: IAM Policies</div>
+                                    </div>
+                                </div>
+                                <button class="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors">
+                                    Resume
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Available Lab Environments</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="p-4 border border-gray-800 rounded-lg hover:border-cyan-500/30 transition-colors cursor-pointer">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-cyan-400 font-mono text-sm">Kali Linux 2024.1</span>
+                                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Available</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Pre-loaded with 600+ penetration testing tools</p>
+                            </div>
+                            <div class="p-4 border border-gray-800 rounded-lg hover:border-cyan-500/30 transition-colors cursor-pointer">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-cyan-400 font-mono text-sm">Windows Server 2022</span>
+                                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Available</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Active Directory lab environment</p>
+                            </div>
+                            <div class="p-4 border border-gray-800 rounded-lg hover:border-cyan-500/30 transition-colors cursor-pointer">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-cyan-400 font-mono text-sm">Ubuntu 22.04 LTS</span>
+                                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Available</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Docker and Kubernetes enabled</p>
+                            </div>
+                            <div class="p-4 border border-gray-800 rounded-lg hover:border-cyan-500/30 transition-colors cursor-pointer">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-cyan-400 font-mono text-sm">Metasploitable 3</span>
+                                    <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded">Maintenance</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Intentionally vulnerable target machine</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certifications Section -->
+    <section id="certifications" class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Certification Paths</h2>
+                <p class="text-gray-400">Structured preparation for industry-recognized credentials</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-xl p-6 border-t-2 border-red-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">CompTIA Security+</h3>
+                        <i data-lucide="shield" class="w-6 h-6 text-red-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">Foundation-level certification covering network security, compliance, and operational security.</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">42 Labs • 32 Hours</span>
+                        <span class="text-cyan-400">Start Path →</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-6 border-t-2 border-purple-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">CISSP</h3>
+                        <i data-lucide="award" class="w-6 h-6 text-purple-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">Advanced certification for experienced security practitioners and managers.</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">89 Labs • 68 Hours</span>
+                        <span class="text-cyan-400">Start Path →</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-6 border-t-2 border-green-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">CEH v12</h3>
+                        <i data-lucide="target" class="w-6 h-6 text-green-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">Ethical hacking and penetration testing methodologies and tools.</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">76 Labs • 54 Hours</span>
+                        <span class="text-cyan-400">Start Path →</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-6 border-t-2 border-blue-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">OSCP</h3>
+                        <i data-lucide="terminal" class="w-6 h-6 text-blue-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">Hands-on offensive security certification with 24-hour exam lab.</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">124 Labs • 92 Hours</span>
+                        <span class="text-cyan-400">Start Path →</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-6 border-t-2 border-yellow-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">CISM</h3>
+                        <i data-lucide="briefcase" class="w-6 h-6 text-yellow-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">Management-focused certification for information security managers.</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">34 Labs • 28 Hours</span>
+                        <span class="text-cyan-400">Start Path →</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-6 border-t-2 border-cyan-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">Cloud Security+</h3>
+                        <i data-lucide="cloud" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">Cloud-specific security controls for AWS, Azure, and GCP environments.</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">45 Labs • 36 Hours</span>
+                        <span class="text-cyan-400">Start Path →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enterprise Section -->
+    <section id="enterprise" class="py-24 bg-[#0f0f15] relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-500/5 to-transparent"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Enterprise & Academic Solutions</h2>
+                    <p class="text-gray-400 mb-8 leading-relaxed">
+                        Deploy InfoEnc Academy across your organization or institution with full LMS integration, 
+                        custom content development, and comprehensive analytics dashboards.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="plug" class="w-6 h-6 text-cyan-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-semibold mb-1">LTI 1.3 Integration</h4>
+                                <p class="text-sm text-gray-500">Seamless connection with Canvas, Blackboard, Moodle, and custom LMS platforms.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="bar-chart-3" class="w-6 h-6 text-purple-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-semibold mb-1">Advanced Analytics</h4>
+                                <p class="text-sm text-gray-500">Track student progress, skill gaps, and lab completion rates in real-time.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="settings" class="w-6 h-6 text-green-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-semibold mb-1">Custom Lab Development</h4>
+                                <p class="text-sm text-gray-500">Work with our experts to create bespoke scenarios matching your curriculum.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex gap-4">
+                        <button class="px-6 py-3 bg-white text-[#0a0a0f] font-semibold rounded-lg hover:bg-gray-200 transition-colors">
+                            Request Demo
+                        </button>
+                        <button class="px-6 py-3 border border-gray-700 text-white rounded-lg hover:border-cyan-500/50 transition-colors">
+                            Contact Sales
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="glass-panel rounded-2xl p-8 border border-cyan-500/20">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                                    A
+                                </div>
+                                <div>
+                                    <div class="text-white font-semibold">Admin Dashboard</div>
+                                    <div class="text-xs text-gray-500">Enterprise View</div>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Live</span>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-[#0a0a0f] rounded-lg p-3 text-center">
+                                    <div class="text-2xl font-bold text-white">1,247</div>
+                                    <div class="text-xs text-gray-500">Active Users</div>
+                                </div>
+                                <div class="bg-[#0a0a0f] rounded-lg p-3 text-center">
+                                    <div class="text-2xl font-bold text-cyan-400">98.2%</div>
+                                    <div class="text-xs text-gray-500">Uptime</div>
+                                </div>
+                                <div class="bg-[#0a0a0f] rounded-lg p-3 text-center">
+                                    <div class="text-2xl font-bold text-purple-400">4.2k</div>
+                                    <div class="text-xs text-gray-500">Labs/Week</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-[#0a0a0f] rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-sm text-gray-400">Top Performing Courses</span>
+                                    <span class="text-xs text-cyan-400">View All</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-white">Penetration Testing Basics</span>
+                                        <span class="text-cyan-400">342 students</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2">
+                                        <div class="bg-cyan-500 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-white">Network Security Fundamentals</span>
+                                        <span class="text-purple-400">298 students</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2">
+                                        <div class="bg-purple-500 h-2 rounded-full" style="width: 72%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-[#0a0a0f] pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div class="col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold text-white">InfoEnc<span class="text-cyan-400">Academy</span></span>
+                    </div>
+                    <p class="text-gray-500 text-sm max-w-sm mb-4">
+                        Empowering the next generation of cybersecurity professionals through 
+                        hands-on, cloud-based virtual labs and comprehensive certification training.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:bg-gray-700 transition-all">
+                            <i data-lucide="twitter" class="w-4 h-4"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:bg-gray-700 transition-all">
+                            <i data-lucide="linkedin" class="w-4 h-4"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:bg-gray-700 transition-all">
+                            <i data-lucide="github" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Virtual Labs</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Cyber Ranges</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Certifications</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Enterprise</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Pricing</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">API Reference</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">System Status</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Support Center</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-600">©️ 2024 InfoEnc Academy. All rights reserved.</p>
+                <div class="flex gap-6 text-sm text-gray-600">
+                    <a href="#" class="hover:text-gray-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-gray-400 transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-gray-400 transition-colors">Security</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Student Portal Modal
+        function openStudentPortal() {
+            document.getElementById('studentPortalModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeStudentPortal() {
+            document.getElementById('studentPortalModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Dashboard Preview
+        function handleLogin(e) {
+            e.preventDefault();
+            closeStudentPortal();
+            document.getElementById('dashboardPreview').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function closeDashboard() {
+            document.getElementById('dashboardPreview').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Smooth scroll
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeStudentPortal();
+                closeDashboard();
+            }
+        });
+
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+                nav.classList.add('shadow-cyan-500/5');
+            } else {
+                nav.classList.remove('shadow-lg');
+                nav.classList.remove('shadow-cyan-500/5');
+            }
+        });
+    </script>
+</body>
+</html>

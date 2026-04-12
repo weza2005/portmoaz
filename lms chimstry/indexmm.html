@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemStudy Pro - Professional Chemistry LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        chem: { 50: '#e6f0ff', 100: '#cce0ff', 200: '#99c2ff', 300: '#66a3ff', 400: '#3385ff', 500: '#0066ff', 600: '#0052cc', 700: '#003d99', 800: '#002966', 900: '#001433', 950: '#0a0f1a' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { scrollbar-width: thin; scrollbar-color: #1e3a8a #0a0f1a; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0f1a; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+        
+        body { font-family: 'Cairo', 'Inter', sans-serif; overflow-x: hidden; background: #0a0f1a; }
+        body.english { font-family: 'Inter', 'Cairo', sans-serif; direction: ltr; }
+        
+        .glass { background: rgba(30, 58, 138, 0.2); backdrop-filter: blur(20px); border: 1px solid rgba(59, 130, 246, 0.1); }
+        .glass-strong { background: rgba(30, 58, 138, 0.4); backdrop-filter: blur(30px); border: 1px solid rgba(59, 130, 246, 0.2); }
+        
+        .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #60a5fa 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradient 3s ease infinite; }
+        @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .glow { box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        .glow-strong { box-shadow: 0 0 50px rgba(59, 130, 246, 0.5), 0 0 100px rgba(139, 92, 246, 0.3); }
+        
+        .float { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        
+        .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); } 50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8), 0 0 60px rgba(139, 92, 246, 0.4); } }
+        
+        .hover-lift { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hover-lift:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.4); }
+        
+        .magnetic-btn { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        #molecule-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.6; pointer-events: none; }
+        
+        #loader { position: fixed; inset: 0; background: #0a0f1a; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .loader-molecule { width: 100px; height: 100px; position: relative; animation: spin 3s linear infinite; }
+        .loader-atom { position: absolute; width: 24px; height: 24px; border-radius: 50%; box-shadow: 0 0 30px currentColor; }
+        .loader-atom:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); background: #60a5fa; color: #60a5fa; }
+        .loader-atom:nth-child(2) { bottom: 15%; left: 15%; background: #a78bfa; color: #a78bfa; }
+        .loader-atom:nth-child(3) { bottom: 15%; right: 15%; background: #34d399; color: #34d399; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .lang-switch { position: relative; width: 70px; height: 35px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 20px; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        .lang-switch::after { content: 'AR'; position: absolute; top: 3px; right: 3px; width: 29px; height: 29px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #1e3a8a; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        body.english .lang-switch::after { content: 'EN'; transform: translateX(-35px); }
+        
+        .code-input { letter-spacing: 0.3em; font-family: 'Courier New', monospace; font-weight: 800; text-transform: uppercase; }
+        
+        .video-progress { background: linear-gradient(90deg, #3b82f6, #8b5cf6); height: 4px; border-radius: 2px; transition: width 0.3s; }
+        
+        .exam-option { transition: all 0.3s; cursor: pointer; border: 2px solid #1e3a8a; }
+        .exam-option:hover { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; }
+        .exam-option.selected { background: rgba(59, 130, 246, 0.3); border-color: #60a5fa; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        
+        .stat-card { background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(59, 130, 246, 0.1)); border: 1px solid rgba(59, 130, 246, 0.2); }
+        
+        .activity-item { border-left: 3px solid transparent; transition: all 0.3s; }
+        .activity-item:hover { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        
+        .molecule-3d { width: 100%; height: 400px; border-radius: 16px; overflow: hidden; position: relative; }
+        
+        .animate-fade-up { animation: fadeUp 0.6s ease-out forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .pro-badge { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; font-weight: 800; font-size: 10px; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="text-white min-h-screen">
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-molecule">
+            <div class="loader-atom"></div>
+            <div class="loader-atom"></div>
+            <div class="loader-atom"></div>
+        </div>
+        <p class="mt-6 text-chem-300 text-lg font-medium tracking-wider" data-ar="جاري تحميل المنصة..." data-en="Loading Platform...">جاري تحميل المنصة...</p>
+        <div class="mt-4 w-48 h-1 bg-chem-800 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-chem-400 to-chem-600 animate-pulse" style="width: 70%"></div>
+        </div>
+    </div>
+
+    <!-- 3D Background -->
+    <canvas id="molecule-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-50 border-b border-chem-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-18 items-center py-4">
+                <div class="flex items-center gap-4 cursor-pointer magnetic-btn group" onclick="showPage('home')">
+                    <div class="w-12 h-12 bg-gradient-to-br from-chem-400 via-chem-500 to-purple-500 rounded-2xl flex items-center justify-center pulse-glow group-hover:scale-110 transition-transform">
+                        <i class="fas fa-flask text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-bold gradient-text tracking-tight">MR/Mohamed Nabil</span>
+                        
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8">
+                    <button onclick="showPage('home')" class="nav-link text-chem-200 hover:text-white transition-colors font-medium magnetic-btn relative group" data-ar="الرئيسية" data-en="Home">
+                        الرئيسية
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-chem-400 transition-all group-hover:w-full"></span>
+                    </button>
+                    <button onclick="show3DMolecules()" class="nav-link text-chem-300 hover:text-white transition-colors font-medium magnetic-btn relative group" data-ar="الجزيئات 3D" data-en="3D Molecules">
+                        الجزيئات 3D
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-chem-400 transition-all group-hover:w-full"></span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="lang-switch magnetic-btn" onclick="toggleLanguage()"></div>
+                    
+                    <button id="teacherLoginBtn" onclick="showTeacherLogin()" class="px-4 py-2 rounded-xl text-chem-300 hover:text-white hover:bg-chem-800/50 transition-all magnetic-btn font-medium" data-ar="مدرس" data-en="Teacher">
+                        <i class="fas fa-chalkboard-teacher mr-2"></i>مدرس
+                    </button>
+                    
+                    <button id="studentLoginBtn" onclick="showStudentLogin()" class="bg-gradient-to-r from-chem-500 to-chem-600 hover:from-chem-400 hover:to-chem-500 px-6 py-2.5 rounded-xl font-semibold transition-all magnetic-btn pulse-glow shadow-lg shadow-chem-500/20" data-ar="دخول الطالب" data-en="Student Login">
+                        <i class="fas fa-user-graduate mr-2"></i>دخول الطالب
+                    </button>
+                    
+                    <button id="logoutBtn" onclick="logout()" class="hidden px-4 py-2 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all magnetic-btn border border-red-800/50">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        <span data-ar="خروج" data-en="Logout">خروج</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 hidden">
+        <div class="glass-strong text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px]">
+            <div id="toastIcon" class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                <i class="fas fa-check text-green-400"></i>
+            </div>
+            <div>
+                <p id="toastTitle" class="font-bold text-sm text-chem-200">Success</p>
+                <p id="toastMessage" class="text-white">Operation completed</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDENT LOGIN MODAL -->
+    <div id="studentLoginModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeStudentLogin()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
+            <div class="glass-strong rounded-3xl p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-chem-500/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                
+                <button onclick="closeStudentLogin()" class="absolute top-4 left-4 text-chem-400 hover:text-white transition-colors w-10 h-10 rounded-full hover:bg-chem-800/50 flex items-center justify-center">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+                
+                <div class="text-center mb-8 relative z-10">
+                    <div class="w-20 h-20 bg-gradient-to-br from-chem-400 to-chem-600 rounded-2xl flex items-center justify-center mx-auto mb-4 float shadow-lg shadow-chem-500/30">
+                        <i class="fas fa-user-graduate text-white text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2" data-ar="دخول الطالب" data-en="Student Login">دخول الطالب</h2>
+                    <p class="text-chem-300 text-sm" data-ar="أدخل الكود الخاص بك للوصول إلى محتواك" data-en="Enter your code to access your content">أدخل الكود الخاص بك للوصول إلى محتواك</p>
+                </div>
+
+                <div class="space-y-4 relative z-10">
+                    <div>
+                        <label class="block text-chem-300 text-sm mb-2 font-medium" data-ar="كود الدخول" data-en="Access Code">كود الدخول</label>
+                        <input type="text" id="studentCodeInput" class="w-full bg-chem-900/50 border-2 border-chem-700 rounded-2xl px-4 py-4 text-center text-2xl code-input text-white focus:outline-none focus:border-chem-500 focus:shadow-lg focus:shadow-chem-500/20 transition-all placeholder-chem-600" placeholder="STU-001" maxlength="7" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    
+                    <button onclick="loginStudentWithCode()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-chem-500 to-chem-600 hover:from-chem-400 hover:to-chem-500 font-bold text-white transition-all magnetic-btn pulse-glow shadow-lg shadow-chem-500/30 text-lg" data-ar="الدخول إلى المنصة" data-en="Enter Platform">
+                        <i class="fas fa-arrow-left mr-2"></i>الدخول إلى المنصة
+                    </button>
+                    
+                    <div class="text-center pt-4 border-t border-chem-800">
+                        <p class="text-chem-400 text-xs" data-ar="ليس لديك كود؟ تواصل مع معلمك" data-en="Don't have a code? Contact your teacher">ليس لديك كود؟ تواصل مع معلمك</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEACHER LOGIN MODAL -->
+    <div id="teacherLoginModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeTeacherLogin()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
+            <div class="glass-strong rounded-3xl p-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl -ml-16 -mt-16"></div>
+                
+                <button onclick="closeTeacherLogin()" class="absolute top-4 left-4 text-chem-400 hover:text-white transition-colors w-10 h-10 rounded-full hover:bg-chem-800/50 flex items-center justify-center">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+                
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-4 float shadow-lg shadow-purple-500/30">
+                        <i class="fas fa-chalkboard-teacher text-white text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2" data-ar="دخول المعلم" data-en="Teacher Login">دخول المعلم</h2>
+                    <p class="text-chem-300 text-sm" data-ar="لوحة التحكم المتقدمة" data-en="Advanced Dashboard">لوحة التحكم المتقدمة</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-chem-300 text-sm mb-2 font-medium">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute right-4 top-1/2 transform -translate-y-1/2 text-chem-500"></i>
+                            <input type="email" id="teacherEmail" class="w-full bg-chem-900/50 border-2 border-chem-700 rounded-xl pr-12 pl-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-all" placeholder="teacher@chemstudy.com">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-chem-300 text-sm mb-2 font-medium">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute right-4 top-1/2 transform -translate-y-1/2 text-chem-500"></i>
+                            <input type="password" id="teacherPassword" class="w-full bg-chem-900/50 border-2 border-chem-700 rounded-xl pr-12 pl-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-all" placeholder="••••••••">
+                        </div>
+                    </div>
+                    
+                    <button onclick="loginTeacher()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 font-bold text-white transition-all magnetic-btn shadow-lg shadow-purple-500/30 text-lg">
+                        <i class="fas fa-arrow-left mr-2"></i>Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page">
+        <section class="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+            <div class="max-w-7xl mx-auto relative z-10 text-center pt-20">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass mb-8 animate-fade-up">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <span class="text-chem-200 text-sm font-medium" data-ar="منصة الكيمياء الاحترافية" data-en="Professional Chemistry Platform">منصة الكيمياء الاحترافية</span>
+                </div>
+                
+                <h1 class="text-6xl md:text-8xl font-bold mb-6 leading-tight animate-fade-up">
+                    <span class="gradient-text" data-ar="اكتشف" data-en="Discover">اكتشف</span><br>
+                    <span class="text-white" data-ar="عالم الكيمياء" data-en="Chemistry World">عالم الكيمياء</span>
+                </h1>
+                
+                <p class="text-chem-300 text-xl md:text-2xl max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-up font-light" data-ar="منصة تعليمية متكاملة مع فيديوهات عالية الجودة، اختبارات تفاعلية، ونماذج ثلاثية الأبعاد للجزيئات" data-en="Complete educational platform with HD videos, interactive exams, and 3D molecular models">
+                    منصة تعليمية متكاملة مع فيديوهات عالية الجودة، اختبارات تفاعلية، ونماذج ثلاثية الأبعاد للجزيئات
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up">
+                    <button onclick="showStudentLogin()" class="group bg-gradient-to-r from-chem-500 to-chem-600 hover:from-chem-400 hover:to-chem-500 px-10 py-5 rounded-2xl font-bold text-lg transition-all magnetic-btn pulse-glow shadow-xl shadow-chem-500/30 flex items-center justify-center gap-3">
+                        <span data-ar="ابدأ رحلتك" data-en="Start Your Journey">ابدأ رحلتك</span>
+                        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                    </button>
+                    <button onclick="show3DMolecules()" class="group px-10 py-5 rounded-2xl font-bold text-lg border-2 border-chem-500 hover:bg-chem-800/50 transition-all magnetic-btn flex items-center justify-center gap-3">
+                        <i class="fas fa-cube text-chem-400 group-hover:rotate-12 transition-transform"></i>
+                        <span data-ar="استكشف الجزيئات 3D" data-en="Explore 3D Molecules">استكشف الجزيئات 3D</span>
+                    </button>
+                </div>
+
+                <div class="mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                    <div class="glass rounded-2xl p-6 hover-lift cursor-pointer group animate-fade-up">
+                        <div class="text-4xl font-bold text-chem-300 mb-2 group-hover:text-chem-200 transition-colors counter" data-target="150">0</div>
+                        <div class="text-chem-400 text-sm" data-ar="فيديو تعليمي" data-en="Educational Videos">فيديو تعليمي</div>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover-lift cursor-pointer group animate-fade-up">
+                        <div class="text-4xl font-bold text-chem-300 mb-2 group-hover:text-chem-200 transition-colors counter" data-target="50">0</div>
+                        <div class="text-chem-400 text-sm" data-ar="نموذج 3D" data-en="3D Models">نموذج 3D</div>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover-lift cursor-pointer group animate-fade-up">
+                        <div class="text-4xl font-bold text-chem-300 mb-2 group-hover:text-chem-200 transition-colors counter" data-target="500">0</div>
+                        <div class="text-chem-400 text-sm" data-ar="اختبار تفاعلي" data-en="Interactive Exams">اختبار تفاعلي</div>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover-lift cursor-pointer group animate-fade-up">
+                        <div class="text-4xl font-bold text-chem-300 mb-2 group-hover:text-chem-200 transition-colors counter" data-target="10000">0</div>
+                        <div class="text-chem-400 text-sm" data-ar="طالب نشط" data-en="Active Students">طالب نشط</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D Molecules Showcase -->
+        <section id="moleculesSection" class="py-24 px-4 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16 animate-fade-up">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white" data-ar="جزيئات ثلاثية الأبعاد" data-en="3D Molecular Models">جزيئات ثلاثية الأبعاد</h2>
+                    <p class="text-chem-300 text-lg" data-ar="تفاعل مع الجزيئات في الوقت الحقيقي" data-en="Interact with molecules in real-time">تفاعل مع الجزيئات في الوقت الحقيقي</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="glass rounded-3xl p-6 hover-lift animate-fade-up">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">CO₂</h3>
+                                <p class="text-chem-400 text-sm" data-ar="ثاني أكسيد الكربون" data-en="Carbon Dioxide">ثاني أكسيد الكربون</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold">Linear</span>
+                        </div>
+                        <div id="co2-canvas" class="molecule-3d bg-chem-950/50 rounded-2xl"></div>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="rotateMolecule('co2', 'x')" class="flex-1 py-2 rounded-xl bg-chem-800 hover:bg-chem-700 transition-colors text-sm"><i class="fas fa-arrows-alt-h mr-1"></i> Rotate X</button>
+                            <button onclick="rotateMolecule('co2', 'y')" class="flex-1 py-2 rounded-xl bg-chem-800 hover:bg-chem-700 transition-colors text-sm"><i class="fas fa-arrows-alt-v mr-1"></i> Rotate Y</button>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-3xl p-6 hover-lift animate-fade-up">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">C₈H₁₀N₄O₂</h3>
+                                <p class="text-chem-400 text-sm" data-ar="الكافيين" data-en="Caffeine">الكافيين</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-bold">Complex</span>
+                        </div>
+                        <div id="caffeine-canvas" class="molecule-3d bg-chem-950/50 rounded-2xl"></div>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="rotateMolecule('caffeine', 'x')" class="flex-1 py-2 rounded-xl bg-chem-800 hover:bg-chem-700 transition-colors text-sm"><i class="fas fa-arrows-alt-h mr-1"></i> Rotate X</button>
+                            <button onclick="rotateMolecule('caffeine', 'y')" class="flex-1 py-2 rounded-xl bg-chem-800 hover:bg-chem-700 transition-colors text-sm"><i class="fas fa-arrows-alt-v mr-1"></i> Rotate Y</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- STUDENT DASHBOARD -->
+    <div id="studentDashboard" class="page hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="glass-strong rounded-3xl p-6 mb-8 flex justify-between items-center animate-fade-up">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-chem-400 to-chem-600 flex items-center justify-center pulse-glow">
+                        <i class="fas fa-user-graduate text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white" id="studentName">Student Name</h1>
+                        <p class="text-chem-300 text-sm" id="studentCodeDisplay">Code: ---</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <div class="text-center px-6 py-3 rounded-2xl bg-chem-800/50">
+                        <div class="text-2xl font-bold text-chem-300" id="studentProgress">0%</div>
+                        <div class="text-xs text-chem-400" data-ar="التقدم" data-en="Progress">التقدم</div>
+                    </div>
+                    <div class="text-center px-6 py-3 rounded-2xl bg-chem-800/50">
+                        <div class="text-2xl font-bold text-green-400" id="studentScore">0</div>
+                        <div class="text-xs text-chem-400" data-ar="النقاط" data-en="Points">النقاط</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <button onclick="switchStudentTab('videos')" id="tab-videos" class="student-tab active px-6 py-3 rounded-xl bg-chem-600 text-white font-medium transition-all magnetic-btn"><i class="fas fa-video mr-2"></i><span data-ar="الفيديوهات" data-en="Videos">الفيديوهات</span></button>
+                <button onclick="switchStudentTab('exams')" id="tab-exams" class="student-tab px-6 py-3 rounded-xl bg-chem-800/50 text-chem-300 hover:text-white transition-all magnetic-btn"><i class="fas fa-clipboard-check mr-2"></i><span data-ar="الاختبارات" data-en="Exams">الاختبارات</span></button>
+                <button onclick="switchStudentTab('activity')" id="tab-activity" class="student-tab px-6 py-3 rounded-xl bg-chem-800/50 text-chem-300 hover:text-white transition-all magnetic-btn"><i class="fas fa-chart-line mr-2"></i><span data-ar="نشاطي" data-en="My Activity">نشاطي</span></button>
+                <button onclick="switchStudentTab('grades')" id="tab-grades" class="student-tab px-6 py-3 rounded-xl bg-chem-800/50 text-chem-300 hover:text-white transition-all magnetic-btn"><i class="fas fa-star mr-2"></i><span data-ar="تقديراتي" data-en="My Grades">تقديراتي</span></button>
+            </div>
+
+            <div id="studentVideosTab" class="student-tab-content">
+                <div id="studentVideos" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="noVideosMessage" class="hidden text-center py-20">
+                    <div class="w-24 h-24 rounded-full bg-chem-800/50 flex items-center justify-center mx-auto mb-4"><i class="fas fa-video-slash text-4xl text-chem-600"></i></div>
+                    <p class="text-chem-300 text-xl" data-ar="لا توجد فيديوهات مخصصة لك حالياً" data-en="No videos assigned to you yet">لا توجد فيديوهات مخصصة لك حالياً</p>
+                </div>
+            </div>
+
+            <div id="studentExamsTab" class="student-tab-content hidden"><div id="studentExams" class="space-y-4"></div></div>
+            <div id="studentActivityTab" class="student-tab-content hidden"><div class="glass rounded-3xl p-6"><h3 class="text-xl font-bold text-white mb-6"><i class="fas fa-history text-chem-400 mr-2"></i><span data-ar="سجل النشاط" data-en="Activity Log">سجل النشاط</span></h3><div id="activityLog" class="space-y-3 max-h-96 overflow-y-auto"></div></div></div>
+            <div id="studentGradesTab" class="student-tab-content hidden"><div class="glass rounded-3xl p-6"><h3 class="text-xl font-bold text-white mb-6"><i class="fas fa-trophy text-yellow-400 mr-2"></i><span data-ar="تقديرات الاختبارات" data-en="Exam Grades">تقديرات الاختبارات</span></h3><div id="gradesList" class="space-y-3"></div></div></div>
+        </div>
+    </div>
+
+    <!-- VIDEO PLAYER MODAL -->
+    <div id="videoModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeVideo()"></div>
+        <div class="absolute inset-4 md:inset-8 bg-chem-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl shadow-chem-500/20">
+            <div class="p-4 border-b border-chem-800 flex justify-between items-center bg-chem-950/50">
+                <div><h3 class="text-xl font-bold text-white" id="videoPlayerTitle">Video Title</h3><p class="text-chem-400 text-sm" id="videoPlayerCode">Code: ---</p></div>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleFullscreen()" class="w-10 h-10 rounded-full bg-chem-800 hover:bg-chem-700 flex items-center justify-center transition-colors"><i class="fas fa-expand text-chem-300"></i></button>
+                    <button onclick="closeVideo()" class="w-10 h-10 rounded-full bg-red-900/50 hover:bg-red-900 flex items-center justify-center transition-colors"><i class="fas fa-times text-red-400"></i></button>
+                </div>
+            </div>
+            <div class="flex-1 bg-black flex items-center justify-center relative">
+                <video id="mainVideoPlayer" class="w-full h-full object-contain" controls><source src="" type="video/mp4">Your browser does not support the video tag.</video>
+            </div>
+            <div class="p-4 bg-chem-950/50 border-t border-chem-800 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <button onclick="markVideoComplete()" id="markCompleteBtn" class="px-6 py-2 rounded-xl bg-green-600 hover:bg-green-500 transition-colors font-medium"><i class="fas fa-check mr-2"></i><span data-ar="تم المشاهدة" data-en="Mark Complete">تم المشاهدة</span></button>
+                    <span id="videoProgressText" class="text-chem-400 text-sm">0% watched</span>
+                </div>
+                <div class="text-chem-400 text-sm" id="videoDuration">00:00 / 00:00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXAM MODAL -->
+    <div id="examModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-md"></div>
+        <div class="absolute inset-4 md:inset-8 bg-chem-900 rounded-3xl overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-chem-800 flex justify-between items-center bg-chem-950/50">
+                <div>
+                    <h3 class="text-2xl font-bold text-white" id="examTitle">Exam Title</h3>
+                    <div class="flex items-center gap-4 mt-2 text-sm text-chem-400"><span id="examQuestionCount">5 questions</span><span id="examTimer" class="text-yellow-400 font-mono"><i class="fas fa-clock mr-1"></i>00:00</span></div>
+                </div>
+                <button onclick="closeExam()" class="w-10 h-10 rounded-full bg-red-900/50 hover:bg-red-900 flex items-center justify-center transition-colors"><i class="fas fa-times text-red-400"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6" id="examContent"></div>
+            <div class="p-6 border-t border-chem-800 bg-chem-950/50 flex justify-between items-center">
+                <button onclick="previousQuestion()" id="prevBtn" class="px-6 py-3 rounded-xl bg-chem-800 hover:bg-chem-700 transition-colors disabled:opacity-50" disabled><i class="fas fa-arrow-right mr-2"></i>Previous</button>
+                <div class="flex gap-2" id="questionIndicators"></div>
+                <button onclick="nextQuestion()" id="nextBtn" class="px-6 py-3 rounded-xl bg-chem-600 hover:bg-chem-500 transition-colors">Next<i class="fas fa-arrow-left ml-2"></i></button>
+                <button onclick="submitExam()" id="submitBtn" class="hidden px-6 py-3 rounded-xl bg-green-600 hover:bg-green-500 transition-colors pulse-glow"><i class="fas fa-check mr-2"></i>Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEACHER DASHBOARD -->
+    <div id="teacherDashboard" class="page hidden">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="glass-strong rounded-3xl p-6 mb-8 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center pulse-glow"><i class="fas fa-chalkboard-teacher text-white text-2xl"></i></div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white" data-ar="لوحة تحكم المعلم" data-en="Teacher Dashboard">لوحة تحكم المعلم</h1>
+                        <p class="text-chem-300 text-sm" data-ar="التحكم الكامل في المحتوى والطلاب" data-en="Full control over content and students">التحكم الكامل في المحتوى والطلاب</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="px-6 py-3 rounded-xl border border-red-800/50 text-red-400 hover:bg-red-900/20 transition-colors magnetic-btn"><i class="fas fa-sign-out-alt mr-2"></i><span data-ar="خروج" data-en="Logout">خروج</span></button>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card rounded-2xl p-6 hover-lift"><div class="flex items-center justify-between mb-4"><div class="w-12 h-12 rounded-xl bg-chem-800 flex items-center justify-center"><i class="fas fa-users text-chem-400 text-xl"></i></div><span class="text-3xl font-bold text-white" id="totalStudents">0</span></div><div class="text-chem-300 text-sm" data-ar="طلاب نشطون" data-en="Active Students">طلاب نشطون</div></div>
+                <div class="stat-card rounded-2xl p-6 hover-lift"><div class="flex items-center justify-between mb-4"><div class="w-12 h-12 rounded-xl bg-purple-800/50 flex items-center justify-center"><i class="fas fa-video text-purple-400 text-xl"></i></div><span class="text-3xl font-bold text-white" id="totalVideos">0</span></div><div class="text-chem-300 text-sm" data-ar="فيديوهات" data-en="Videos">فيديوهات</div></div>
+                <div class="stat-card rounded-2xl p-6 hover-lift"><div class="flex items-center justify-between mb-4"><div class="w-12 h-12 rounded-xl bg-green-800/50 flex items-center justify-center"><i class="fas fa-clipboard-check text-green-400 text-xl"></i></div><span class="text-3xl font-bold text-white" id="totalExams">0</span></div><div class="text-chem-300 text-sm" data-ar="اختبارات" data-en="Exams">اختبارات</div></div>
+                <div class="stat-card rounded-2xl p-6 hover-lift"><div class="flex items-center justify-between mb-4"><div class="w-12 h-12 rounded-xl bg-yellow-800/50 flex items-center justify-center"><i class="fas fa-chart-line text-yellow-400 text-xl"></i></div><span class="text-3xl font-bold text-white" id="avgScore">0%</span></div><div class="text-chem-300 text-sm" data-ar="متوسط النجاح" data-en="Avg Success">متوسط النجاح</div></div>
+            </div>
+
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <button onclick="switchTeacherTab('codes')" id="teacher-tab-codes" class="teacher-tab active px-6 py-3 rounded-xl bg-chem-600 text-white font-medium transition-all magnetic-btn"><i class="fas fa-key mr-2"></i><span data-ar="أكواد الطلاب" data-en="Student Codes">أكواد الطلاب</span></button>
+                <button onclick="switchTeacherTab('videos')" id="teacher-tab-videos" class="teacher-tab px-6 py-3 rounded-xl bg-chem-800/50 text-chem-300 hover:text-white transition-all magnetic-btn"><i class="fas fa-video mr-2"></i><span data-ar="الفيديوهات" data-en="Videos">الفيديوهات</span></button>
+                <button onclick="switchTeacherTab('exams')" id="teacher-tab-exams" class="teacher-tab px-6 py-3 rounded-xl bg-chem-800/50 text-chem-300 hover:text-white transition-all magnetic-btn"><i class="fas fa-clipboard-list mr-2"></i><span data-ar="الاختبارات" data-en="Exams">الاختبارات</span></button>
+                <button onclick="switchTeacherTab('grades')" id="teacher-tab-grades" class="teacher-tab px-6 py-3 rounded-xl bg-chem-800/50 text-chem-300 hover:text-white transition-all magnetic-btn"><i class="fas fa-graduation-cap mr-2"></i><span data-ar="التقديرات" data-en="Grades">التقديرات</span></button>
+                <button onclick="switchTeacherTab('activity')" id="teacher-tab-activity" class="teacher-tab px-6 py-3 rounded-xl bg-chem-800/50 text-chem-300 hover:text-white transition-all magnetic-btn"><i class="fas fa-chart-bar mr-2"></i><span data-ar="نشاط الطلاب" data-en="Student Activity">نشاط الطلاب</span></button>
+            </div>
+
+            <div id="teacherCodesTab" class="teacher-tab-content">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4" data-ar="إنشاء كود جديد" data-en="Generate New Code">إنشاء كود جديد</h3>
+                        <div class="flex gap-2 mb-4"><input type="text" id="newStudentName" class="flex-1 bg-chem-900/50 border border-chem-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-chem-500" placeholder="اسم الطالب"></div>
+                        <button onclick="generateCode()" class="w-full py-3 rounded-xl bg-gradient-to-r from-chem-500 to-chem-600 font-bold magnetic-btn"><i class="fas fa-plus mr-2"></i><span data-ar="إنشاء كود" data-en="Generate Code">إنشاء كود</span></button>
+                        <div id="generatedCodeDisplay" class="mt-4 hidden p-4 bg-green-900/30 border border-green-600 rounded-xl text-center"><p class="text-green-400 text-sm mb-1" data-ar="الكود الجديد" data-en="New Code">الكود الجديد</p><p class="text-2xl font-bold text-white tracking-widest font-mono" id="newCodeValue">---</p></div>
+                    </div>
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4" data-ar="رفع فيديو جديد" data-en="Upload New Video">رفع فيديو جديد</h3>
+                        <input type="text" id="videoTitleInput" class="w-full bg-chem-900/50 border border-chem-700 rounded-xl px-4 py-3 text-white mb-3 focus:outline-none focus:border-chem-500" placeholder="عنوان الفيديو">
+                        <input type="file" id="videoFileInput" accept="video/mp4" class="w-full bg-chem-900/50 border border-chem-700 rounded-xl px-4 py-3 text-white mb-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-chem-700 file:text-white hover:file:bg-chem-600">
+                        <select id="videoCodeSelect" class="w-full bg-chem-900/50 border border-chem-700 rounded-xl px-4 py-3 text-white mb-3 focus:outline-none focus:border-chem-500"><option value="">اختر الكود</option></select>
+                        <button onclick="uploadVideo()" class="w-full py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-700 font-bold magnetic-btn"><i class="fas fa-upload mr-2"></i><span data-ar="رفع وتخصيص" data-en="Upload & Assign">رفع وتخصيص</span></button>
+                    </div>
+                </div>
+                <div class="glass rounded-2xl overflow-hidden"><div class="p-4 border-b border-chem-800"><h3 class="text-lg font-bold text-white" data-ar="قائمة الأكواد" data-en="Codes List">قائمة الأكواد</h3></div><table class="w-full"><thead class="bg-chem-800/30"><tr><th class="px-6 py-3 text-right text-chem-300 text-sm">الكود</th><th class="px-6 py-3 text-right text-chem-300 text-sm">الطالب</th><th class="px-6 py-3 text-right text-chem-300 text-sm">الفيديوهات</th><th class="px-6 py-3 text-right text-chem-300 text-sm">التقدم</th><th class="px-6 py-3 text-right text-chem-300 text-sm">آخر دخول</th></tr></thead><tbody id="codesTable" class="divide-y divide-chem-800"></tbody></table></div>
+            </div>
+
+            <div id="teacherVideosTab" class="teacher-tab-content hidden"><div class="glass rounded-2xl p-6 mb-6"><h3 class="text-lg font-bold text-white mb-4" data-ar="جميع الفيديوهات" data-en="All Videos">جميع الفيديوهات</h3><div id="allVideosList" class="grid md:grid-cols-3 gap-4"></div></div></div>
+
+            <div id="teacherExamsTab" class="teacher-tab-content hidden">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4" data-ar="إنشاء اختبار جديد" data-en="Create New Exam">إنشاء اختبار جديد</h3>
+                        <input type="text" id="examTitleInput" class="w-full bg-chem-900/50 border border-chem-700 rounded-xl px-4 py-3 text-white mb-3" placeholder="عنوان الاختبار">
+                        <select id="examCodeSelect" class="w-full bg-chem-900/50 border border-chem-700 rounded-xl px-4 py-3 text-white mb-3"><option value="">اختر الكود</option></select>
+                        <div id="questionsContainer" class="space-y-3 mb-4 max-h-64 overflow-y-auto"></div>
+                        <div class="flex gap-2"><button onclick="addMCQQuestion()" class="flex-1 py-2 rounded-xl bg-chem-700 hover:bg-chem-600 transition-colors text-sm"><i class="fas fa-plus mr-1"></i>MCQ</button><button onclick="addEssayQuestion()" class="flex-1 py-2 rounded-xl bg-purple-700 hover:bg-purple-600 transition-colors text-sm"><i class="fas fa-paragraph mr-1"></i>Essay</button></div>
+                        <button onclick="createExam()" class="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-chem-500 to-chem-600 font-bold magnetic-btn"><i class="fas fa-save mr-2"></i>Save Exam</button>
+                    </div>
+                    <div class="glass rounded-2xl p-6"><h3 class="text-lg font-bold text-white mb-4" data-ar="الاختبارات المنشأة" data-en="Created Exams">الاختبارات المنشأة</h3><div id="examsList" class="space-y-3 max-h-96 overflow-y-auto"></div></div>
+                </div>
+            </div>
+
+            <div id="teacherGradesTab" class="teacher-tab-content hidden"><div class="glass rounded-2xl overflow-hidden"><div class="p-4 border-b border-chem-800 flex justify-between items-center"><h3 class="text-lg font-bold text-white" data-ar="تقديرات جميع الطلاب" data-en="All Students Grades">تقديرات جميع الطلاب</h3><button onclick="exportGrades()" class="px-4 py-2 rounded-xl bg-green-600 hover:bg-green-500 transition-colors text-sm"><i class="fas fa-download mr-2"></i>Export</button></div><table class="w-full"><thead class="bg-chem-800/30"><tr><th class="px-6 py-3 text-right text-chem-300 text-sm">الطالب</th><th class="px-6 py-3 text-right text-chem-300 text-sm">الاختبار</th><th class="px-6 py-3 text-right text-chem-300 text-sm">الدرجة</th><th class="px-6 py-3 text-right text-chem-300 text-sm">النسبة</th><th class="px-6 py-3 text-right text-chem-300 text-sm">التاريخ</th></tr></thead><tbody id="gradesTable" class="divide-y divide-chem-800"></tbody></table></div></div>
+
+            <div id="teacherActivityTab" class="teacher-tab-content hidden"><div class="glass rounded-2xl p-6"><h3 class="text-lg font-bold text-white mb-6" data-ar="نشاط الطلاب بالتفصيل" data-en="Detailed Student Activity">نشاط الطلاب بالتفصيل</h3><div id="allActivityLog" class="space-y-3 max-h-[600px] overflow-y-auto"></div></div></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== STATE & DATA ====================
+        let currentUser = null;
+        let currentLang = 'ar';
+        let scene, camera, renderer, molecule;
+        let currentExam = null;
+        let currentQuestion = 0;
+        let examAnswers = {};
+        let co2Mesh, caffeineMesh;
+        let tempQuestions = [];
+
+        const db = { codes: [], videos: [], exams: [], grades: [], activity: [] };
+
+        // ==================== 3D BACKGROUND ====================
+        function init3D() {
+            const canvas = document.getElementById('molecule-canvas');
+            if (!canvas) return;
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const geometry = new THREE.IcosahedronGeometry(1, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true, transparent: true, opacity: 0.2 });
+
+            molecule = new THREE.Group();
+            for (let i = 0; i < 20; i++) {
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set((Math.random() - 0.5) * 30, (Math.random() - 0.5) * 30, (Math.random() - 0.5) * 20 - 10);
+                mesh.userData = { rotX: (Math.random() - 0.5) * 0.005, rotY: (Math.random() - 0.5) * 0.005 };
+                molecule.add(mesh);
+            }
+            scene.add(molecule);
+            camera.position.z = 8;
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            molecule.children.forEach(mesh => {
+                mesh.rotation.x += mesh.userData.rotX;
+                mesh.rotation.y += mesh.userData.rotY;
+            });
+            renderer.render(scene, camera);
+        }
+
+        // ==================== 3D MOLECULES ====================
+        function initMolecules3D() {
+            initCO2();
+            initCaffeine();
+        }
+
+        function initCO2() {
+            const container = document.getElementById('co2-canvas');
+            if (!container) return;
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            co2Mesh = new THREE.Group();
+            
+            const carbonGeo = new THREE.SphereGeometry(0.6, 32, 32);
+            const carbonMat = new THREE.MeshPhongMaterial({ color: 0x333333, shininess: 100 });
+            const carbon = new THREE.Mesh(carbonGeo, carbonMat);
+            co2Mesh.add(carbon);
+
+            const oxygenGeo = new THREE.SphereGeometry(0.5, 32, 32);
+            const oxygenMat = new THREE.MeshPhongMaterial({ color: 0xff0000, shininess: 100 });
+            
+            const oxygen1 = new THREE.Mesh(oxygenGeo, oxygenMat);
+            oxygen1.position.x = 1.5;
+            co2Mesh.add(oxygen1);
+            
+            const oxygen2 = new THREE.Mesh(oxygenGeo, oxygenMat);
+            oxygen2.position.x = -1.5;
+            co2Mesh.add(oxygen2);
+
+            const bondGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.9, 16);
+            const bondMat = new THREE.MeshPhongMaterial({ color: 0x888888 });
+            
+            const bond1 = new THREE.Mesh(bondGeo, bondMat);
+            bond1.rotation.z = Math.PI / 2;
+            bond1.position.x = 0.75;
+            co2Mesh.add(bond1);
+            
+            const bond2 = new THREE.Mesh(bondGeo, bondMat);
+            bond2.rotation.z = Math.PI / 2;
+            bond2.position.x = -0.75;
+            co2Mesh.add(bond2);
+
+            const light1 = new THREE.DirectionalLight(0xffffff, 1);
+            light1.position.set(5, 5, 5);
+            scene.add(light1);
+            const light2 = new THREE.AmbientLight(0x404040);
+            scene.add(light2);
+
+            scene.add(co2Mesh);
+            camera.position.z = 4;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                co2Mesh.rotation.y += 0.005;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        function initCaffeine() {
+            const container = document.getElementById('caffeine-canvas');
+            if (!container) return;
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            caffeineMesh = new THREE.Group();
+            
+            const ringColors = [0x333333, 0x0000ff, 0xff0000, 0x333333, 0x0000ff];
+            const positions = [[0, 0, 0], [1.2, 0.5, 0], [1.2, 1.8, 0], [0, 2.3, 0], [-1.2, 1.8, 0]];
+            
+            positions.forEach((pos, i) => {
+                const atom = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.4, 32, 32),
+                    new THREE.MeshPhongMaterial({ color: ringColors[i], shininess: 100 })
+                );
+                atom.position.set(...pos);
+                caffeineMesh.add(atom);
+            });
+
+            for (let i = 0; i < positions.length; i++) {
+                const next = (i + 1) % positions.length;
+                const start = new THREE.Vector3(...positions[i]);
+                const end = new THREE.Vector3(...positions[next]);
+                const distance = start.distanceTo(end);
+                const mid = start.clone().add(end).multiplyScalar(0.5);
+                
+                const bond = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.08, 0.08, distance, 16),
+                    new THREE.MeshPhongMaterial({ color: 0x888888 })
+                );
+                bond.position.copy(mid);
+                bond.lookAt(end);
+                bond.rotateX(Math.PI / 2);
+                caffeineMesh.add(bond);
+            }
+
+            const light1 = new THREE.DirectionalLight(0xffffff, 1);
+            light1.position.set(5, 5, 5);
+            scene.add(light1);
+            const light2 = new THREE.AmbientLight(0x404040);
+            scene.add(light2);
+
+            scene.add(caffeineMesh);
+            camera.position.z = 6;
+            camera.position.y = 1;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                caffeineMesh.rotation.y += 0.003;
+                caffeineMesh.rotation.x += 0.001;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        function rotateMolecule(type, axis) {
+            const mesh = type === 'co2' ? co2Mesh : caffeineMesh;
+            if (!mesh) return;
+            const speed = 0.5;
+            if (axis === 'x') mesh.rotation.x += speed;
+            else mesh.rotation.y += speed;
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            init3D();
+            initMagnetic();
+            
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    gsap.to(loader, { opacity: 0, duration: 0.5, onComplete: () => {
+                        loader.style.display = 'none';
+                        animateEntrance();
+                        setTimeout(initMolecules3D, 500);
+                    }});
+                }
+            }, 2000);
+        });
+
+        function animateEntrance() {
+            document.querySelectorAll('.animate-fade-up').forEach(el => {
+                gsap.to(el, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' });
+            });
+            document.querySelectorAll('.counter').forEach(counter => {
+                const target = parseInt(counter.dataset.target) || 0;
+                gsap.to(counter, { innerHTML: target, duration: 2.5, snap: { innerHTML: 1 }, ease: 'power2.out' });
+            });
+        }
+
+        function initMagnetic() {
+            document.querySelectorAll('.magnetic-btn').forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.3 });
+                });
+                btn.addEventListener('mouseleave', () => gsap.to(btn, { x: 0, y: 0, duration: 0.3 }));
+            });
+        }
+
+        // ==================== LANGUAGE ====================
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.body.classList.toggle('english');
+            document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-ar][data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${currentLang}`);
+                if (text) el.textContent = text;
+            });
+        }
+
+        // ==================== NAVIGATION ====================
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => {
+                gsap.to(p, { opacity: 0, y: -20, duration: 0.3, onComplete: () => p.classList.add('hidden') });
+            });
+            setTimeout(() => {
+                const target = document.getElementById(page + 'Page') || document.getElementById(page + 'Dashboard');
+                if (target) {
+                    target.classList.remove('hidden');
+                    gsap.fromTo(target, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 });
+                }
+            }, 300);
+        }
+
+        function show3DMolecules() {
+            const section = document.getElementById('moleculesSection');
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==================== AUTH ====================
+        function showStudentLogin() { 
+            const modal = document.getElementById('studentLoginModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                gsap.from('#studentLoginBox', { scale: 0.8, opacity: 0, duration: 0.3, ease: 'back.out(1.7)' });
+            }
+        }
+        
+        function closeStudentLogin() { 
+            const modal = document.getElementById('studentLoginModal');
+            if (modal) modal.classList.add('hidden');
+        }
+        
+        function showTeacherLogin() { 
+            const modal = document.getElementById('teacherLoginModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+        
+        function closeTeacherLogin() { 
+            const modal = document.getElementById('teacherLoginModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function loginStudentWithCode() {
+            const input = document.getElementById('studentCodeInput');
+            if (!input) return;
+            const code = input.value.toUpperCase().trim();
+            
+            if (!code) return showToast('Enter code', 'error');
+            
+            let student = db.codes.find(c => c.code === code);
+            if (!student) {
+                student = { code, name: 'Student ' + code, videos: [], exams: [], progress: 0, score: 0, lastLogin: '-' };
+                db.codes.push(student);
+            }
+            
+            student.lastLogin = new Date().toLocaleString();
+            currentUser = { type: 'student', code, name: student.name };
+            
+            logActivity(code, 'login', 'Student logged in');
+            
+            closeStudentLogin();
+            updateUI();
+            showPage('student');
+            renderStudentDashboard();
+            showToast(`Welcome ${student.name}`);
+        }
+
+        function loginTeacher() {
+            const email = document.getElementById('teacherEmail');
+            const password = document.getElementById('teacherPassword');
+            if (!email || !password) return;
+            
+            if (email.value && password.value) {
+                currentUser = { type: 'teacher', email: email.value, name: 'Teacher' };
+                closeTeacherLogin();
+                updateUI();
+                showPage('teacher');
+                renderTeacherDashboard();
+                showToast('Welcome Teacher');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            updateUI();
+            showPage('home');
+            showToast('Logged out');
+        }
+
+        function updateUI() {
+            const studentBtn = document.getElementById('studentLoginBtn');
+            const teacherBtn = document.getElementById('teacherLoginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (currentUser) {
+                if (studentBtn) studentBtn.classList.add('hidden');
+                if (teacherBtn) teacherBtn.classList.add('hidden');
+                if (logoutBtn) logoutBtn.classList.remove('hidden');
+            } else {
+                if (studentBtn) studentBtn.classList.remove('hidden');
+                if (teacherBtn) teacherBtn.classList.remove('hidden');
+                if (logoutBtn) logoutBtn.classList.add('hidden');
+            }
+        }
+
+        // ==================== STUDENT FUNCTIONS ====================
+        function renderStudentDashboard() {
+            if (!currentUser || currentUser.type !== 'student') return;
+            
+            const student = db.codes.find(c => c.code === currentUser.code);
+            if (!student) return;
+            
+            const nameEl = document.getElementById('studentName');
+            const codeEl = document.getElementById('studentCodeDisplay');
+            const progressEl = document.getElementById('studentProgress');
+            const scoreEl = document.getElementById('studentScore');
+            
+            if (nameEl) nameEl.textContent = student.name;
+            if (codeEl) codeEl.textContent = `Code: ${currentUser.code}`;
+            if (progressEl) progressEl.textContent = student.progress + '%';
+            if (scoreEl) scoreEl.textContent = student.score;
+            
+            renderStudentVideos();
+            renderStudentExams();
+            renderActivityLog();
+            renderGrades();
+        }
+
+        function switchStudentTab(tab) {
+            document.querySelectorAll('.student-tab').forEach(t => {
+                t.classList.remove('active', 'bg-chem-600', 'text-white');
+                t.classList.add('bg-chem-800/50', 'text-chem-300');
+            });
+            const activeTab = document.getElementById('tab-' + tab);
+            if (activeTab) {
+                activeTab.classList.add('active', 'bg-chem-600', 'text-white');
+                activeTab.classList.remove('bg-chem-800/50', 'text-chem-300');
+            }
+            
+            document.querySelectorAll('.student-tab-content').forEach(c => c.classList.add('hidden'));
+            const content = document.getElementById('student' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab');
+            if (content) content.classList.remove('hidden');
+        }
+
+        function renderStudentVideos() {
+            const container = document.getElementById('studentVideos');
+            const noMsg = document.getElementById('noVideosMessage');
+            if (!container) return;
+            
+            const studentVideos = db.videos.filter(v => v.code === currentUser.code);
+            
+            if (studentVideos.length === 0) {
+                container.innerHTML = '';
+                if (noMsg) noMsg.classList.remove('hidden');
+                return;
+            }
+            
+            if (noMsg) noMsg.classList.add('hidden');
+            container.innerHTML = studentVideos.map(video => `
+                <div class="glass rounded-2xl overflow-hidden hover-lift cursor-pointer group" onclick="playVideo('${video.id}')">
+                    <div class="h-48 bg-gradient-to-br from-chem-700 to-chem-900 relative flex items-center justify-center overflow-hidden">
+                        <video class="absolute inset-0 w-full h-full object-cover opacity-60" src="${video.url}" muted></video>
+                        <div class="absolute inset-0 bg-black/30"></div>
+                        <i class="fas fa-play-circle text-6xl text-white/80 group-hover:scale-110 group-hover:text-white transition-all z-10"></i>
+                        ${video.watched ? '<div class="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full"><i class="fas fa-check mr-1"></i>Done</div>' : ''}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-white mb-2 truncate">${video.title}</h3>
+                        <div class="w-full bg-chem-800 rounded-full h-2 mb-2"><div class="video-progress" style="width: ${video.progress || 0}%"></div></div>
+                        <div class="flex justify-between text-sm text-chem-400"><span>${video.progress || 0}% watched</span><span>${video.duration || '10:00'}</span></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playVideo(videoId) {
+            const video = db.videos.find(v => v.id == videoId);
+            if (!video) return;
+            
+            const titleEl = document.getElementById('videoPlayerTitle');
+            const codeEl = document.getElementById('videoPlayerCode');
+            const player = document.getElementById('mainVideoPlayer');
+            
+            if (titleEl) titleEl.textContent = video.title;
+            if (codeEl) codeEl.textContent = `Code: ${video.code}`;
+            if (player) player.src = video.url;
+            
+            const modal = document.getElementById('videoModal');
+            if (modal) modal.classList.remove('hidden');
+            
+            if (player) {
+                player.ontimeupdate = () => {
+                    if (player.duration) {
+                        const progress = (player.currentTime / player.duration) * 100;
+                        const progressText = document.getElementById('videoProgressText');
+                        if (progressText) progressText.textContent = Math.round(progress) + '% watched';
+                        video.progress = Math.round(progress);
+                    }
+                };
+            }
+        }
+
+        function closeVideo() {
+            const modal = document.getElementById('videoModal');
+            const player = document.getElementById('mainVideoPlayer');
+            if (modal) modal.classList.add('hidden');
+            if (player) {
+                player.pause();
+                player.src = '';
+            }
+        }
+
+        function markVideoComplete() {
+            const titleEl = document.getElementById('videoPlayerTitle');
+            if (!titleEl) return;
+            const video = db.videos.find(v => v.title === titleEl.textContent);
+            if (video) {
+                video.watched = true;
+                video.progress = 100;
+                logActivity(currentUser.code, 'video_complete', `Completed video: ${video.title}`);
+                updateStudentProgress();
+                renderStudentVideos();
+                showToast('Video marked as complete!');
+            }
+        }
+
+        function renderStudentExams() {
+            const container = document.getElementById('studentExams');
+            if (!container) return;
+            
+            const studentExams = db.exams.filter(e => e.code === currentUser.code);
+            const takenExams = db.grades.filter(g => g.code === currentUser.code).map(g => g.examId);
+            
+            container.innerHTML = studentExams.map(exam => {
+                const taken = takenExams.includes(exam.id);
+                return `
+                    <div class="glass rounded-2xl p-6 flex justify-between items-center ${taken ? 'opacity-60' : ''}">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">${exam.title}</h3>
+                            <div class="flex gap-4 text-sm text-chem-400"><span><i class="fas fa-question-circle mr-1"></i>${exam.questions.length} questions</span><span><i class="fas fa-clock mr-1"></i>${exam.duration || '30'} min</span></div>
+                        </div>
+                        ${taken ? '<span class="px-4 py-2 rounded-xl bg-green-600/30 text-green-400"><i class="fas fa-check mr-2"></i>Completed</span>' : `<button onclick="startExam(${exam.id})" class="px-6 py-3 rounded-xl bg-chem-600 hover:bg-chem-500 transition-colors magnetic-btn"><i class="fas fa-play mr-2"></i>Start</button>`}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function startExam(examId) {
+            const exam = db.exams.find(e => e.id === examId);
+            if (!exam) return;
+            
+            currentExam = exam;
+            currentQuestion = 0;
+            examAnswers = {};
+            
+            const titleEl = document.getElementById('examTitle');
+            const countEl = document.getElementById('examQuestionCount');
+            
+            if (titleEl) titleEl.textContent = exam.title;
+            if (countEl) countEl.textContent = `${exam.questions.length} questions`;
+            
+            const modal = document.getElementById('examModal');
+            if (modal) modal.classList.remove('hidden');
+            
+            let timeLeft = (exam.duration || 30) * 60;
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                const timerEl = document.getElementById('examTimer');
+                if (timerEl) {
+                    const mins = Math.floor(timeLeft / 60);
+                    const secs = timeLeft % 60;
+                    timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                }
+            }, 1000);
+            
+            renderQuestion();
+            updateExamNav();
+        }
+
+        function renderQuestion() {
+            if (!currentExam) return;
+            const q = currentExam.questions[currentQuestion];
+            const container = document.getElementById('examContent');
+            if (!container) return;
+            
+            let html = `<div class="max-w-3xl mx-auto"><div class="mb-6"><span class="text-chem-400 text-sm">Question ${currentQuestion + 1} of ${currentExam.questions.length}</span><h4 class="text-xl font-bold text-white mt-2">${q.text}</h4></div>`;
+            
+            if (q.type === 'mcq') {
+                html += `<div class="space-y-3">`;
+                q.options.forEach((opt, i) => {
+                    html += `<div class="exam-option border-2 rounded-xl p-4 ${examAnswers[currentQuestion] === i ? 'selected' : ''}" onclick="selectAnswer(${i})"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-chem-800 flex items-center justify-center text-sm font-bold ${examAnswers[currentQuestion] === i ? 'bg-chem-500' : ''}">${String.fromCharCode(65 + i)}</div><span class="text-white">${opt}</span></div></div>`;
+                });
+                html += `</div>`;
+            } else {
+                html += `<textarea class="w-full h-48 bg-chem-900/50 border-2 border-chem-700 rounded-xl p-4 text-white focus:outline-none focus:border-chem-500 resize-none" placeholder="Write your answer here..." onchange="saveEssayAnswer(this.value)">${examAnswers[currentQuestion] || ''}</textarea>`;
+            }
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function selectAnswer(idx) {
+            examAnswers[currentQuestion] = idx;
+            renderQuestion();
+        }
+
+        function saveEssayAnswer(text) {
+            examAnswers[currentQuestion] = text;
+        }
+
+        function nextQuestion() {
+            if (currentExam && currentQuestion < currentExam.questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+                updateExamNav();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+                updateExamNav();
+            }
+        }
+
+        function updateExamNav() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const indicators = document.getElementById('questionIndicators');
+            
+            if (prevBtn) prevBtn.disabled = currentQuestion === 0;
+            if (nextBtn) nextBtn.classList.toggle('hidden', currentQuestion === (currentExam ? currentExam.questions.length - 1 : 0));
+            if (submitBtn) submitBtn.classList.toggle('hidden', currentQuestion !== (currentExam ? currentExam.questions.length - 1 : 0));
+            
+            if (indicators && currentExam) {
+                indicators.innerHTML = currentExam.questions.map((_, i) => `<div class="w-3 h-3 rounded-full ${i === currentQuestion ? 'bg-chem-500' : examAnswers[i] !== undefined ? 'bg-green-500' : 'bg-chem-800'} cursor-pointer" onclick="jumpToQuestion(${i})"></div>`).join('');
+            }
+        }
+
+        function jumpToQuestion(idx) {
+            currentQuestion = idx;
+            renderQuestion();
+            updateExamNav();
+        }
+
+        function submitExam() {
+            if (!currentExam) return;
+            
+            let correct = 0;
+            let totalMCQ = 0;
+            
+            currentExam.questions.forEach((q, i) => {
+                if (q.type === 'mcq') {
+                    totalMCQ++;
+                    if (examAnswers[i] === q.correct) correct++;
+                }
+            });
+            
+            const score = totalMCQ > 0 ? Math.round((correct / totalMCQ) * 100) : 0;
+            
+            db.grades.push({
+                id: Date.now(),
+                code: currentUser.code,
+                examId: currentExam.id,
+                examTitle: currentExam.title,
+                score: score,
+                answers: {...examAnswers},
+                date: new Date().toLocaleString()
+            });
+            
+            const student = db.codes.find(c => c.code === currentUser.code);
+            if (student) student.score += score;
+            
+            logActivity(currentUser.code, 'exam_complete', `Completed exam: ${currentExam.title} with score ${score}%`);
+            
+            const modal = document.getElementById('examModal');
+            if (modal) modal.classList.add('hidden');
+            showToast(`Exam submitted! Score: ${score}%`);
+            renderStudentExams();
+            renderGrades();
+            updateStudentProgress();
+        }
+
+        function closeExam() {
+            if (confirm('Are you sure you want to exit? Your progress will be lost.')) {
+                const modal = document.getElementById('examModal');
+                if (modal) modal.classList.add('hidden');
+                currentExam = null;
+            }
+        }
+
+        function renderActivityLog() {
+            const container = document.getElementById('activityLog');
+            if (!container) return;
+            
+            const studentActivity = db.activity.filter(a => a.code === currentUser.code);
+            container.innerHTML = studentActivity.map(a => `
+                <div class="activity-item p-4 rounded-xl bg-chem-800/30 flex justify-between items-center">
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-chem-700 flex items-center justify-center"><i class="fas ${a.icon || 'fa-history'} text-chem-400"></i></div><div><p class="text-white text-sm">${a.action}</p><p class="text-chem-400 text-xs">${a.date}</p></div></div>
+                </div>
+            `).join('');
+        }
+
+        function renderGrades() {
+            const container = document.getElementById('gradesList');
+            if (!container) return;
+            
+            const studentGrades = db.grades.filter(g => g.code === currentUser.code);
+            container.innerHTML = studentGrades.map(g => `
+                <div class="flex justify-between items-center p-4 rounded-xl bg-chem-800/30">
+                    <div><p class="text-white font-medium">${g.examTitle}</p><p class="text-chem-400 text-xs">${g.date}</p></div>
+                    <div class="text-2xl font-bold ${g.score >= 70 ? 'text-green-400' : g.score >= 50 ? 'text-yellow-400' : 'text-red-400'}">${g.score}%</div>
+                </div>
+            `).join('');
+        }
+
+        function updateStudentProgress() {
+            const student = db.codes.find(c => c.code === currentUser.code);
+            if (!student) return;
+            
+            const videos = db.videos.filter(v => v.code === currentUser.code);
+            const watched = videos.filter(v => v.watched).length;
+            student.progress = videos.length > 0 ? Math.round((watched / videos.length) * 100) : 0;
+            
+            const progressEl = document.getElementById('studentProgress');
+            if (progressEl) progressEl.textContent = student.progress + '%';
+        }
+
+        // ==================== TEACHER FUNCTIONS ====================
+        function renderTeacherDashboard() {
+            const totalStudents = document.getElementById('totalStudents');
+            const totalVideos = document.getElementById('totalVideos');
+            const totalExams = document.getElementById('totalExams');
+            const avgScore = document.getElementById('avgScore');
+            
+            if (totalStudents) totalStudents.textContent = db.codes.length;
+            if (totalVideos) totalVideos.textContent = db.videos.length;
+            if (totalExams) totalExams.textContent = db.exams.length;
+            
+            const avg = db.grades.length > 0 ? Math.round(db.grades.reduce((a, b) => a + b.score, 0) / db.grades.length) : 0;
+            if (avgScore) avgScore.textContent = avg + '%';
+            
+            const videoSelect = document.getElementById('videoCodeSelect');
+            const examSelect = document.getElementById('examCodeSelect');
+            
+            const options = '<option value="">Select Code</option>' + db.codes.map(c => `<option value="${c.code}">${c.code} - ${c.name}</option>`).join('');
+            
+            if (videoSelect) videoSelect.innerHTML = options;
+            if (examSelect) examSelect.innerHTML = options;
+            
+            renderCodesTable();
+            renderAllVideos();
+            renderExamsList();
+            renderAllGrades();
+            renderAllActivity();
+        }
+
+        function switchTeacherTab(tab) {
+            document.querySelectorAll('.teacher-tab').forEach(t => {
+                t.classList.remove('active', 'bg-chem-600', 'text-white');
+                t.classList.add('bg-chem-800/50', 'text-chem-300');
+            });
+            const activeTab = document.getElementById('teacher-tab-' + tab);
+            if (activeTab) {
+                activeTab.classList.add('active', 'bg-chem-600', 'text-white');
+                activeTab.classList.remove('bg-chem-800/50', 'text-chem-300');
+            }
+            
+            document.querySelectorAll('.teacher-tab-content').forEach(c => c.classList.add('hidden'));
+            const content = document.getElementById('teacher' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab');
+            if (content) content.classList.remove('hidden');
+        }
+
+        function generateCode() {
+            const input = document.getElementById('newStudentName');
+            if (!input) return;
+            
+            const name = input.value.trim();
+            if (!name) return showToast('Enter student name', 'error');
+            
+            const code = 'STU-' + Math.floor(100 + Math.random() * 900);
+            db.codes.push({ code, name, videos: [], exams: [], progress: 0, score: 0, lastLogin: '-' });
+            
+            const display = document.getElementById('generatedCodeDisplay');
+            const codeVal = document.getElementById('newCodeValue');
+            
+            if (codeVal) codeVal.textContent = code;
+            if (display) display.classList.remove('hidden');
+            input.value = '';
+            
+            renderCodesTable();
+            showToast('Code generated: ' + code);
+        }
+
+        function uploadVideo() {
+            const titleInput = document.getElementById('videoTitleInput');
+            const codeSelect = document.getElementById('videoCodeSelect');
+            const fileInput = document.getElementById('videoFileInput');
+            
+            if (!titleInput || !codeSelect || !fileInput) return;
+            
+            const title = titleInput.value.trim();
+            const code = codeSelect.value;
+            
+            if (!title || !code || !fileInput.files[0]) return showToast('Please fill all fields', 'error');
+            
+            const file = fileInput.files[0];
+            const videoUrl = URL.createObjectURL(file);
+            
+            db.videos.push({
+                id: Date.now(),
+                title,
+                code,
+                url: videoUrl,
+                fileName: file.name,
+                duration: '10:00',
+                progress: 0,
+                watched: false,
+                uploadDate: new Date().toLocaleString()
+            });
+            
+            const codeData = db.codes.find(c => c.code === code);
+            if (codeData) codeData.videos.push(title);
+            
+            titleInput.value = '';
+            codeSelect.value = '';
+            fileInput.value = '';
+            
+            renderAllVideos();
+            renderCodesTable();
+            showToast('Video uploaded successfully');
+        }
+
+        function renderCodesTable() {
+            const tbody = document.getElementById('codesTable');
+            if (!tbody) return;
+            
+            tbody.innerHTML = db.codes.map(c => {
+                const videos = db.videos.filter(v => v.code === c.code).length;
+                return `<tr class="hover:bg-chem-800/20 transition-colors"><td class="px-6 py-4 font-mono text-chem-300 font-bold">${c.code}</td><td class="px-6 py-4 text-white">${c.name}</td><td class="px-6 py-4 text-chem-300">${videos} videos</td><td class="px-6 py-4"><div class="w-24 bg-chem-800 rounded-full h-2"><div class="bg-chem-500 h-2 rounded-full" style="width: ${c.progress}%"></div></div><span class="text-xs text-chem-400">${c.progress}%</span></td><td class="px-6 py-4 text-chem-400 text-sm">${c.lastLogin}</td></tr>`;
+            }).join('');
+        }
+
+        function renderAllVideos() {
+            const container = document.getElementById('allVideosList');
+            if (!container) return;
+            
+            container.innerHTML = db.videos.map(v => `
+                <div class="glass rounded-xl p-4">
+                    <div class="h-32 bg-chem-800 rounded-lg mb-3 flex items-center justify-center"><i class="fas fa-video text-3xl text-chem-600"></i></div>
+                    <h4 class="font-bold text-white text-sm mb-1 truncate">${v.title}</h4>
+                    <p class="text-chem-400 text-xs mb-2">${v.code}</p>
+                    <p class="text-chem-500 text-xs">${v.uploadDate}</p>
+                </div>
+            `).join('');
+        }
+
+        function addMCQQuestion() {
+            const container = document.getElementById('questionsContainer');
+            if (!container) return;
+            
+            const idx = tempQuestions.length;
+            const div = document.createElement('div');
+            div.className = 'glass rounded-xl p-4 space-y-2';
+            div.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-chem-400 text-sm">MCQ Question ${idx + 1}</span><button onclick="removeQuestion(${idx})" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></div><input type="text" class="w-full bg-chem-900/50 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm question-text" placeholder="Question text"><div class="space-y-2"><input type="text" class="w-full bg-chem-900/30 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm option" placeholder="Option A"><input type="text" class="w-full bg-chem-900/30 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm option" placeholder="Option B"><input type="text" class="w-full bg-chem-900/30 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm option" placeholder="Option C"><input type="text" class="w-full bg-chem-900/30 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm option" placeholder="Option D"></div><select class="correct-answer w-full bg-chem-800 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm"><option value="0">Correct: A</option><option value="1">Correct: B</option><option value="2">Correct: C</option><option value="3">Correct: D</option></select>`;
+            container.appendChild(div);
+            tempQuestions.push({ type: 'mcq', element: div });
+        }
+
+        function addEssayQuestion() {
+            const container = document.getElementById('questionsContainer');
+            if (!container) return;
+            
+            const idx = tempQuestions.length;
+            const div = document.createElement('div');
+            div.className = 'glass rounded-xl p-4 space-y-2';
+            div.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-chem-400 text-sm">Essay Question ${idx + 1}</span><button onclick="removeQuestion(${idx})" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></div><input type="text" class="w-full bg-chem-900/50 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm question-text" placeholder="Question text"><textarea class="w-full h-20 bg-chem-900/30 border border-chem-700 rounded-lg px-3 py-2 text-white text-sm model-answer" placeholder="Model answer (for reference)"></textarea>`;
+            container.appendChild(div);
+            tempQuestions.push({ type: 'essay', element: div });
+        }
+
+        function removeQuestion(idx) {
+            if (tempQuestions[idx]) {
+                tempQuestions[idx].element.remove();
+                tempQuestions.splice(idx, 1);
+                tempQuestions.forEach((q, i) => {
+                    const label = q.element.querySelector('.text-chem-400');
+                    if (label) label.textContent = (q.type === 'mcq' ? 'MCQ ' : 'Essay ') + 'Question ' + (i + 1);
+                });
+            }
+        }
+
+        function createExam() {
+            const titleInput = document.getElementById('examTitleInput');
+            const codeSelect = document.getElementById('examCodeSelect');
+            
+            if (!titleInput || !codeSelect) return;
+            
+            const title = titleInput.value.trim();
+            const code = codeSelect.value;
+            
+            if (!title || !code || tempQuestions.length === 0) return showToast('Please fill all fields and add questions', 'error');
+            
+            const questions = tempQuestions.map(q => {
+                const text = q.element.querySelector('.question-text').value;
+                if (q.type === 'mcq') {
+                    const options = Array.from(q.element.querySelectorAll('.option')).map(o => o.value);
+                    const correct = parseInt(q.element.querySelector('.correct-answer').value);
+                    return { type: 'mcq', text, options, correct };
+                } else {
+                    const modelAnswer = q.element.querySelector('.model-answer').value;
+                    return { type: 'essay', text, modelAnswer };
+                }
+            });
+            
+            db.exams.push({ id: Date.now(), title, code, questions, duration: 30, createdAt: new Date().toLocaleString() });
+            
+            titleInput.value = '';
+            codeSelect.value = '';
+            const container = document.getElementById('questionsContainer');
+            if (container) container.innerHTML = '';
+            tempQuestions = [];
+            
+            renderExamsList();
+            showToast('Exam created successfully');
+        }
+
+        function renderExamsList() {
+            const container = document.getElementById('examsList');
+            if (!container) return;
+            
+            container.innerHTML = db.exams.map(e => `
+                <div class="glass rounded-xl p-4 flex justify-between items-center">
+                    <div><h4 class="font-bold text-white">${e.title}</h4><p class="text-chem-400 text-sm">${e.code} • ${e.questions.length} questions</p></div>
+                    <button onclick="deleteExam(${e.id})" class="text-red-400 hover:text-red-300 w-10 h-10 rounded-full hover:bg-red-900/20 flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function deleteExam(id) {
+            if (confirm('Delete this exam?')) {
+                db.exams = db.exams.filter(e => e.id !== id);
+                renderExamsList();
+                showToast('Exam deleted');
+            }
+        }
+
+        function renderAllGrades() {
+            const tbody = document.getElementById('gradesTable');
+            if (!tbody) return;
+            
+            tbody.innerHTML = db.grades.map(g => {
+                const student = db.codes.find(c => c.code === g.code);
+                return `<tr class="hover:bg-chem-800/20 transition-colors"><td class="px-6 py-4 text-white">${student ? student.name : g.code}</td><td class="px-6 py-4 text-chem-300">${g.examTitle}</td><td class="px-6 py-4 font-bold ${g.score >= 70 ? 'text-green-400' : g.score >= 50 ? 'text-yellow-400' : 'text-red-400'}">${g.score}%</td><td class="px-6 py-4"><div class="w-20 bg-chem-800 rounded-full h-2"><div class="${g.score >= 70 ? 'bg-green-500' : g.score >= 50 ? 'bg-yellow-500' : 'bg-red-500'} h-2 rounded-full" style="width: ${g.score}%"></div></div></td><td class="px-6 py-4 text-chem-400 text-sm">${g.date}</td></tr>`;
+            }).join('');
+        }
+
+        function renderAllActivity() {
+            const container = document.getElementById('allActivityLog');
+            if (!container) return;
+            
+            container.innerHTML = db.activity.map(a => {
+                const student = db.codes.find(c => c.code === a.code);
+                return `<div class="activity-item p-4 rounded-xl bg-chem-800/30 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-chem-700 flex items-center justify-center"><i class="fas ${a.icon || 'fa-history'} text-chem-400"></i></div><div><p class="text-white text-sm">${student ? student.name : a.code}</p><p class="text-chem-300 text-sm">${a.action}</p></div></div><span class="text-chem-400 text-xs">${a.date}</span></div>`;
+            }).join('');
+        }
+
+        function exportGrades() {
+            const csv = 'Student,Exam,Score,Date\n' + db.grades.map(g => {
+                const student = db.codes.find(c => c.code === g.code);
+                return `${student ? student.name : g.code},${g.examTitle},${g.score}%,${g.date}`;
+            }).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'grades.csv';
+            a.click();
+            showToast('Grades exported');
+        }
+
+        function logActivity(code, type, action) {
+            const icons = { login: 'fa-sign-in-alt', video_complete: 'fa-video', exam_complete: 'fa-clipboard-check' };
+            db.activity.unshift({ code, type, action, icon: icons[type] || 'fa-history', date: new Date().toLocaleString() });
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const title = document.getElementById('toastTitle');
+            const msg = document.getElementById('toastMessage');
+            
+            if (!toast || !icon || !title || !msg) return;
+            
+            msg.textContent = message;
+            title.textContent = type === 'error' ? 'Error' : 'Success';
+            icon.innerHTML = type === 'error' ? '<i class="fas fa-exclamation text-red-400"></i>' : '<i class="fas fa-check text-green-400"></i>';
+            icon.className = type === 'error' ? 'w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center' : 'w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center';
+            
+            toast.classList.remove('hidden');
+            gsap.from(toast, { y: -30, opacity: 0, duration: 0.3 });
+            
+            setTimeout(() => {
+                gsap.to(toast, { y: -30, opacity: 0, duration: 0.3, onComplete: () => toast.classList.add('hidden') });
+            }, 3000);
+        }
+
+        function toggleFullscreen() {
+            const video = document.getElementById('mainVideoPlayer');
+            if (video && video.requestFullscreen) video.requestFullscreen();
+        }
+
+        window.addEventListener('resize', () => {
+            if (camera) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+</html>

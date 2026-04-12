@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>عرض المشروع | معاذ مصطفى</title>
+    <style> body { font-family: 'Cairo', sans-serif; } </style>
+</head>
+<body class="bg-slate-950 text-white overflow-x-hidden">
+
+    <div class="min-h-screen py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            
+            <a href="index.html" class="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-all mb-12 group">
+                <span class="group-hover:-translate-x-2 transition-transform">←</span> العودة للمعرض
+            </a>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="relative group">
+                    <div class="absolute -inset-10 bg-cyan-500/20 blur-[100px] rounded-full opacity-50"></div>
+                    
+                    <div class="relative bg-slate-800 rounded-[2.5rem] p-3 shadow-2xl border border-white/10 transform -rotate-2 hover:rotate-0 transition-all duration-700">
+                        <div class="bg-slate-900 rounded-[2rem] overflow-hidden aspect-[9/16] md:aspect-video relative">
+                            <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=1200" 
+                                 alt="KICK Energy" class="w-full h-full object-cover">
+                            
+                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
+                        </div>
+                    </div>
+
+                    <div class="absolute -bottom-6 -right-6 bg-slate-800/90 backdrop-blur-xl border border-slate-700 p-6 rounded-3xl shadow-2xl hidden md:block animate-bounce">
+                        <span class="text-cyan-400 font-bold block text-xl tracking-tighter">Live Preview</span>
+                        <span class="text-slate-400 text-xs">Project Mockup v1.0</span>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div>
+                        <h1 class="text-5xl font-black mb-4">مشروع <span class="text-cyan-400">.KICK Energy</span></h1>
+                        <p class="text-slate-400 text-lg leading-relaxed">
+                            متجر إلكتروني متكامل لمشروبات الطاقة، تم تصميمه ليكون جذاباً وسريعاً جداً. اعتمدت فيه على أحدث تريندات التصميم المظلم (Dark UI) مع توزيع مساحات يسهل عملية الشراء.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <span class="px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-cyan-400">#TailwindCSS</span>
+                        <span class="px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-blue-400">#ReactJS</span>
+                        <span class="px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-purple-400">#3D_Modeling</span>
+                    </div>
+
+                    <hr class="border-white/5">
+
+                    <div class="bg-slate-900/50 p-8 rounded-[2rem] border border-white/5 space-y-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2">
+                             طلب مشروع مشابه؟
+                            <span class="text-xs font-normal text-slate-500">(جاوب هتوصلني واتساب)</span>
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <textarea id="idea" rows="2" placeholder="ايه فكرتك للمشروع؟" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none focus:border-cyan-500"></textarea>
+                            <input id="budget" type="text" placeholder="الميزانية المتوقعة؟" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sm outline-none focus:border-cyan-500">
+                            
+                            <button onclick="sendToWA()" class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 rounded-xl font-bold transition-all shadow-lg shadow-cyan-900/20">
+                                إرسال المواصفات لمعاذ 🚀
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendToWA() {
+            const idea = document.getElementById('idea').value;
+            const budget = document.getElementById('budget').value;
+            if(!idea) { alert("اكتب الفكرة الأول يا بطل!"); return; }
+            const msg = `*طلب مشروع مشابه لـ KICK*%0A%0A*الفكرة:* ${idea}%0A*الميزانية:* ${budget}`;
+            window.open(`https://wa.me/201095329616?text=${msg}`, '_blank');
+        }
+    </script>
+</body>
+</html>

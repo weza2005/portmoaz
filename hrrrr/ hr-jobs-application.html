@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Jobs - Job Portal & Recruitment Platform</title>
+    <meta name="description" content="HR Jobs application for job seekers and employers. Apply for jobs with CV upload and voice recording.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563eb",
+                        secondary: "#1e40af",
+                        accent: "#f59e0b",
+                        dark: "#1f2937",
+                        light: "#f8fafc"
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .voice-recorder {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .admin-only {
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <i class="fas fa-briefcase text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">HR Jobs</h1>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#jobs" class="text-gray-600 hover:text-primary font-medium transition-colors">Available Jobs</a>
+                    <a href="#apply" class="text-gray-600 hover:text-primary font-medium transition-colors">Apply Now</a>
+                    <a href="#admin" class="text-gray-600 hover:text-primary font-medium transition-colors">Admin Dashboard</a>
+                    <a href="#post-job" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Post Job
+                    </a>
+                </div>
+                
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-4">
+                <a href="#jobs" class="block text-gray-600 hover:text-primary font-medium">Available Jobs</a>
+                <a href="#apply" class="block text-gray-600 hover:text-primary font-medium">Apply Now</a>
+                <a href="#admin" class="block text-gray-600 hover:text-primary font-medium">Admin Dashboard</a>
+                <a href="#post-job" class="block bg-primary text-white px-4 py-2 rounded-lg text-center">Post Job</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Find Your Dream Job Today</h2>
+                <p class="text-xl mb-8 text-blue-100">Apply with your CV and voice introduction to stand out from the crowd</p>
+                <a href="#apply" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors inline-block">
+                    <i class="fas fa-paper-plane mr-2"></i>Apply Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Available Jobs Section -->
+    <section id="jobs" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Available Jobs</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Job Card 1 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 card-hover border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Frontend Developer</h3>
+                            <p class="text-gray-600">Tech Solutions Inc.</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Remote</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">We're looking for an experienced Frontend Developer with React expertise to join our growing team.</p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">React</span>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">JavaScript</span>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Tailwind CSS</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-800 font-bold">$85,000 - $110,000</span>
+                        <button class="apply-job-btn bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors" data-job="Frontend Developer">
+                            Apply Now
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Job Card 2 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 card-hover border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Marketing Manager</h3>
+                            <p class="text-gray-600">Digital Growth Agency</p>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Hybrid</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Lead our marketing team and develop strategies to drive brand awareness and customer acquisition.</p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Digital Marketing</span>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">SEO</span>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Social Media</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-800 font-bold">$75,000 - $95,000</span>
+                        <button class="apply-job-btn bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors" data-job="Marketing Manager">
+                            Apply Now
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Job Card 3 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 card-hover border border-gray-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Data Analyst</h3>
+                            <p class="text-gray-600">Analytics Pro</p>
+                        </div>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">On-site</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Analyze complex datasets and provide insights to drive business decisions and strategy.</p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Python</span>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">SQL</span>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Tableau</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-800 font-bold">$70,000 - $90,000</span>
+                        <button class="apply-job-btn bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors" data-job="Data Analyst">
+                            Apply Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Application Form Section -->
+    <section id="apply" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Job Application Form</h2>
+                
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <form id="applicationForm">
+                        <!-- Job Selection -->
+                        <div class="mb-8">
+                            <label class="block text-gray-700 font-medium mb-3">Select Job Position</label>
+                            <select id="jobSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Choose a job position...</option>
+                                <option value="Frontend Developer">Frontend Developer</option>
+                                <option value="Marketing Manager">Marketing Manager</option>
+                                <option value="Data Analyst">Data Analyst</option>
+                                <option value="UX Designer">UX Designer</option>
+                                <option value="Project Manager">Project Manager</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Personal Information -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Personal Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Full Name *</label>
+                                    <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="John Doe">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Email Address *</label>
+                                    <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="john@example.com">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Phone Number *</label>
+                                    <input type="tel" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="+1 (555) 123-4567">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Current Position</label>
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Software Developer">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CV Upload -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Upload Your CV/Resume</h3>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                                <i class="fas fa-file-pdf text-4xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-600 mb-4">Drag and drop your CV file here, or click to browse</p>
+                                <input type="file" id="cvUpload" accept=".pdf,.doc,.docx" class="hidden">
+                                <label for="cvUpload" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-secondary transition-colors cursor-pointer inline-block">
+                                    <i class="fas fa-upload mr-2"></i>Choose File
+                                </label>
+                                <p class="text-gray-500 text-sm mt-4">Supported formats: PDF, DOC, DOCX (Max 5MB)</p>
+                                <div id="cvFileName" class="mt-4 text-green-600 font-medium hidden">
+                                    <i class="fas fa-check-circle mr-2"></i><span>File uploaded: </span><span id="fileName"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Voice Recording -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Voice Introduction</h3>
+                            <div class="voice-recorder rounded-xl p-6">
+                                <p class="text-gray-700 mb-4">Record a brief voice introduction (max 2 minutes) to tell us why you're the perfect candidate.</p>
+                                
+                                <div class="flex flex-col md:flex-row items-center justify-between">
+                                    <div class="mb-4 md:mb-0">
+                                        <div class="flex items-center space-x-4">
+                                            <button id="recordBtn" class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors">
+                                                <i class="fas fa-microphone mr-2"></i><span id="recordText">Start Recording</span>
+                                            </button>
+                                            <button id="stopBtn" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors" disabled>
+                                                <i class="fas fa-stop mr-2"></i>Stop
+                                            </button>
+                                        </div>
+                                        <div class="mt-4">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-clock text-gray-500 mr-2"></i>
+                                                <span id="timer" class="text-gray-700">00:00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div id="recordingStatus" class="hidden">
+                                            <div class="flex items-center pulse-animation">
+                                                <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                                                <span class="text-red-600 font-medium">Recording...</span>
+                                            </div>
+                                        </div>
+                                        <div id="recordingSaved" class="hidden text-green-600">
+                                            <i class="fas fa-check-circle mr-2"></i>Recording saved
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Information -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Additional Information</h3>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Why are you interested in this position? *</label>
+                                <textarea rows="4" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Tell us about your motivation and why you're a good fit..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="bg-primary text-white px-10 py-4 rounded-lg text-lg font-semibold hover:bg-secondary transition-colors">
+                                <i class="fas fa-paper-plane mr-2"></i>Submit Application
+                            </button>
+                            <p class="text-gray-500 text-sm mt-4">Your application will be sent to the HR admin for review.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Dashboard Section -->
+    <section id="admin" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Admin Dashboard</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">As an admin, you can post new jobs and review applications submitted by candidates.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Post New Job Card -->
+                <div class="bg-gray-50 rounded-xl shadow-lg p-6 admin-only">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-plus text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Post New Job</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6">Create and publish new job listings. Only admins have access to this feature.</p>
+                    <a href="#post-job" class="block bg-primary text-white text-center py-3 rounded-lg hover:bg-secondary transition-colors">
+                        <i class="fas fa-edit mr-2"></i>Create Job Posting
+                    </a>
+                </div>
+                
+                <!-- Applications Overview -->
+                <div class="bg-gray-50 rounded-xl shadow-lg p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-file-alt text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Applications Received</h3>
+                    </div>
+                    <div class="mb-6">
+                        <div class="text-4xl font-bold text-gray-800 mb-2" id="applicationCount">12</div>
+                        <p class="text-gray-600">Total applications submitted</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Pending Review</span>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">8</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Under Review</span>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">3</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Accepted</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">1</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Applications -->
+                <div class="bg-gray-50 rounded-xl shadow-lg p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Recent Applications</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">John Doe</h4>
+                                    <p class="text-gray-600 text-sm">Frontend Developer</p>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Pending</span>
+                            </div>
+                            <div class="mt-2 flex items-center text-sm text-gray-500">
+                                <i class="fas fa-phone mr-2"></i>
+                                <span>+1 (555) 123-4567</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Sarah Johnson</h4>
+                                    <p class="text-gray-600 text-sm">Marketing Manager</p>
+                                </div>
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Reviewing</span>
+                            </div>
+                            <div class="mt-2 flex items-center text-sm text-gray-500">
+                                <i class="fas fa-envelope mr-2"></i>
+                                <span>sarah@example.com</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#admin-applications" class="block text-center text-primary font-medium mt-6 hover:text-secondary">
+                        View All Applications <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Post Job Form (Admin Only) -->
+    <section id="post-job" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Post New Job</h2>
+                    <p class="text-gray-600 mb-8">This section is only accessible to admin users.</p>
+                    
+                    <form id="postJobForm">
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">Job Title *</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., Senior Software Engineer">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">Company Name *</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Your company name">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">Job Description *</label>
+                            <textarea rows="6" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Detailed job description, responsibilities, and requirements..."></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Salary Range</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., $80,000 - $120,000">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Job Type *</label>
+                                <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">Select job type</option>
+                                    <option value="full-time">Full-time</option>
+                                    <option value="part-time">Part-time</option>
+                                    <option value="contract">Contract</option>
+                                    <option value="remote">Remote</option>
+                                    <option value="hybrid">Hybrid</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">Required Skills (comma separated)</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., JavaScript, React, Node.js, AWS">
+                        </div>
+                        
+                        <div class="mb-8">
+                            <label class="block text-gray-700 font-medium mb-2">Location</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g., New York, NY or Remote">
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="bg-primary text-white px-10 py-4 rounded-lg text-lg font-semibold hover:bg-secondary transition-colors">
+                                <i class="fas fa-paper-plane mr-2"></i>Publish Job
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-8 md:mb-0">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                            <i class="fas fa-briefcase text-white text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold">HR Jobs</h2>
+                    </div>
+                    <p class="text-gray-400">Connecting talented professionals with great opportunities.</p>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400 mb-4">© 2024 HR Jobs. All rights reserved.</p>
+                    <div class="flex space-x-4 justify-center md:justify-end">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 max-w-md mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Application Submitted!</h3>
+                <p class="text-gray-600 mb-6">Your job application has been successfully submitted and sent to the HR admin for review.</p>
+                <button id="closeModal" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-secondary transition-colors">
+                    Continue Browsing Jobs
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define data at the beginning
+        const jobApplications = [
+            { 
+                "id": 1, 
+                "name": "John Doe", 
+                "position": "Frontend Developer", 
+                "email": "john@example.com", 
+                "phone": "+1 (555) 123-4567", 
+                "status": "pending",
+                "cvUploaded": true,
+                "voiceRecorded": true
+            },
+            { 
+                "id": 2, 
+                "name": "Sarah Johnson", 
+                "position": "Marketing Manager", 
+                "email": "sarah@example.com", 
+                "phone": "+1 (555) 987-6543", 
+                "status": "reviewing",
+                "cvUploaded": true,
+                "voiceRecorded": false
+            }
+        ];
+        
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+        
+        // CV upload functionality
+        const cvUpload = document.getElementById('cvUpload');
+        const cvFileName = document.getElementById('cvFileName');
+        const fileNameSpan = document.getElementById('fileName');
+        
+        cvUpload.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileNameSpan.textContent = file.name;
+                cvFileName.classList.remove('hidden');
+            }
+        });
+        
+        // Voice recording functionality
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const recordText = document.getElementById('recordText');
+        const timer = document.getElementById('timer');
+        const recordingStatus = document.getElementById('recordingStatus');
+        const recordingSaved = document.getElementById('recordingSaved');
+        
+        let isRecording = false;
+        let seconds = 0;
+        let timerInterval;
+        
+        recordBtn.addEventListener('click', function() {
+            if (!isRecording) {
+                // Start recording
+                isRecording = true;
+                recordText.textContent = "Recording...";
+                recordBtn.classList.remove('bg-red-500');
+                recordBtn.classList.add('bg-red-600');
+                stopBtn.disabled = false;
+                recordingStatus.classList.remove('hidden');
+                recordingSaved.classList.add('hidden');
+                
+                // Start timer
+                seconds = 0;
+                timerInterval = setInterval(function() {
+                    seconds++;
+                    const mins = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    timer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    
+                    // Stop after 2 minutes (120 seconds)
+                    if (seconds >= 120) {
+                        stopRecording();
+                    }
+                }, 1000);
+            }
+        });
+        
+        stopBtn.addEventListener('click', function() {
+            stopRecording();
+        });
+        
+        function stopRecording() {
+            if (isRecording) {
+                isRecording = false;
+                clearInterval(timerInterval);
+                recordText.textContent = "Start Recording";
+                recordBtn.classList.remove('bg-red-600');
+                recordBtn.classList.add('bg-red-500');
+                stopBtn.disabled = true;
+                recordingStatus.classList.add('hidden');
+                recordingSaved.classList.remove('hidden');
+                
+                // Simulate saving recording
+                setTimeout(function() {
+                    recordingSaved.classList.add('hidden');
+                }, 3000);
+            }
+        }
+        
+        // Apply job buttons
+        const applyButtons = document.querySelectorAll('.apply-job-btn');
+        applyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const jobTitle = this.getAttribute('data-job');
+                document.getElementById('jobSelect').value = jobTitle;
+                
+                // Scroll to application form
+                document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                
+                // Highlight the selected job
+                document.getElementById('jobSelect').focus();
+            });
+        });
+        
+        // Form submission
+        document.getElementById('applicationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            const jobSelect = document.getElementById('jobSelect');
+            const phoneInput = document.querySelector('input[type="tel"]');
+            const emailInput = document.querySelector('input[type="email"]');
+            
+            if (!jobSelect.value) {
+                alert('Please select a job position');
+                jobSelect.focus();
+                return;
+            }
+            
+            if (!phoneInput.value) {
+                alert('Please enter your phone number');
+                phoneInput.focus();
+                return;
+            }
+            
+            if (!emailInput.value) {
+                alert('Please enter your email address');
+                emailInput.focus();
+                return;
+            }
+            
+            // Show success modal
+            document.getElementById('successModal').classList.remove('hidden');
+            
+            // Increment application count
+            const countElement = document.getElementById('applicationCount');
+            let count = parseInt(countElement.textContent);
+            countElement.textContent = count + 1;
+            
+            // Reset form
+            this.reset();
+            cvFileName.classList.add('hidden');
+            recordingSaved.classList.add('hidden');
+            timer.textContent = "00:00";
+            seconds = 0;
+        });
+        
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('successModal').classList.add('hidden');
+        });
+        
+        // Post job form submission
+        document.getElementById('postJobForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Job posted successfully! This would be connected to a backend in a real application.');
+            this.reset();
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId !== '#') {
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+        
+        // Prevent default behavior for all anchor tags
+        document.querySelectorAll('a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
