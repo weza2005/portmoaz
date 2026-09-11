@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>çukur | Operations Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Lalezar&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{
+  --coffee-950:#1D0F08;
+  --coffee-900:#2A160D;
+  --coffee-800:#3E2415;
+  --coffee-700:#5A3421;
+  --cream:#F7EFDD;
+  --cream-2:#EFE2C6;
+  --paper:#FFFCF6;
+  --copper:#B4622A;
+  --copper-dark:#8F4A1E;
+  --caramel:#D89544;
+  --sage:#54805A;
+  --sage-light:#E4EFE3;
+  --brick:#AC3F2E;
+  --brick-light:#F9E6E1;
+  --amber:#B9812A;
+  --amber-light:#F8EDD5;
+  --ink:#2A160D;
+  --ink-soft:#6E5A49;
+  --line:#E4D6B9;
+  --shadow: 0 10px 30px -12px rgba(29,15,8,.20);
+  --disp: 'Fraunces', 'Tajawal', serif;
+  --mono: 'Space Grotesk', 'Tajawal', sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+  display:flex;
+}
+[dir="ltr"] body{font-family:'Space Grotesk','Tajawal',sans-serif;}
+::selection{background:var(--caramel);color:#fff;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  width:272px;
+  min-width:272px;
+  background:radial-gradient(120% 140% at 100% 0%, var(--coffee-800), var(--coffee-950) 70%);
+  color:var(--cream);
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  position:sticky;
+  top:0;
+  box-shadow:var(--shadow);
+  z-index:20;
+}
+.brand{
+  padding:24px 22px 18px;
+  border-bottom:1px solid rgba(247,239,221,.1);
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.brand-glyph{
+  width:42px;height:42px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(155deg, var(--copper), var(--copper-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-weight:700;font-size:20px;color:#fff;
+  box-shadow:0 6px 16px -6px rgba(180,98,42,.7);
+}
+.brand-txt{min-width:0;}
+.brand-mark{
+  font-family:var(--disp);
+  font-weight:700;
+  font-size:23px;
+  color:var(--cream);
+  line-height:1.1;
+  letter-spacing:.2px;
+}
+.brand-sub{
+  font-size:11.5px;
+  color:#BCA687;
+  margin-top:3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.lang-switch{
+  margin:14px 18px 4px;
+  display:flex;
+  background:rgba(247,239,221,.08);
+  border:1px solid rgba(247,239,221,.14);
+  border-radius:10px;
+  padding:3px;
+  gap:3px;
+}
+.lang-btn{
+  flex:1;
+  border:none;background:transparent;color:#CBB89E;
+  font-family:inherit;font-weight:700;font-size:12.5px;
+  padding:7px 6px;border-radius:7px;cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+.lang-btn.active{background:var(--copper);color:#fff;}
+.nav{
+  flex:1;
+  overflow-y:auto;
+  padding:12px 12px;
+}
+.nav-section-lbl{
+  font-size:10.5px;
+  font-weight:700;
+  color:#8A7461;
+  padding:14px 10px 6px;
+  letter-spacing:.3px;
+}
+.nav::-webkit-scrollbar{width:6px;}
+.nav::-webkit-scrollbar-thumb{background:rgba(247,239,221,.15);border-radius:4px;}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  color:#E7DAC6;
+  cursor:pointer;
+  font-size:13.5px;
+  font-weight:500;
+  margin-bottom:2px;
+  transition:background .15s ease, color .15s ease;
+  border:1px solid transparent;
+  white-space:nowrap;
+  position:relative;
+}
+.nav-item .ic{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.nav-item:hover{background:rgba(247,239,221,.07);}
+.nav-item.active{
+  background:var(--copper);
+  color:#fff;
+  box-shadow:0 4px 14px -4px rgba(180,98,42,.6);
+}
+.nav-item .cnt{
+  margin-inline-start:auto;
+  background:rgba(247,239,221,.14);
+  color:#F3E4C8;
+  font-size:10.5px;font-weight:800;
+  padding:1px 7px;border-radius:999px;
+}
+.nav-item.active .cnt{background:rgba(255,255,255,.25);color:#fff;}
+.nav-item .cnt.hot{background:var(--brick);color:#fff;}
+.nav-foot{
+  padding:14px 22px 18px;
+  font-size:11px;
+  color:#8A7461;
+  border-top:1px solid rgba(247,239,221,.1);
+}
+.nav-foot button{
+  margin-top:10px;width:100%;background:transparent;color:#E7A97D;
+  border:1px solid rgba(231,169,125,.35);border-radius:8px;padding:8px;
+  font-family:inherit;font-size:11.5px;cursor:pointer;font-weight:600;
+  transition:background .15s ease;
+}
+.nav-foot button:hover{background:rgba(231,169,125,.1);}
+
+/* ---------- Main ---------- */
+.main{
+  flex:1;
+  min-width:0;
+  height:100vh;
+  overflow-y:auto;
+}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(247,239,221,.88);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  padding:16px 30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.topbar h1{
+  font-family:var(--disp);
+  font-size:21px;
+  margin:0;
+  font-weight:700;
+  color:var(--coffee-900);
+}
+.topbar p{margin:3px 0 0;font-size:12.5px;color:var(--ink-soft);}
+.topbar-right{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-soft);}
+.today-pill{
+  background:var(--paper);
+  border:1px solid var(--line);
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:700;
+  color:var(--copper-dark);
+  font-size:12.5px;
+  white-space:nowrap;
+}
+.content{padding:24px 30px 60px;}
+
+/* ---------- Dashboard ---------- */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:13px;
+  margin-bottom:20px;
+}
+.kpi{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:15px 17px;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.kpi::before{
+  content:"";
+  position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;
+  background:var(--bar,var(--copper));
+}
+.kpi .lbl{font-size:12px;color:var(--ink-soft);font-weight:500;}
+.kpi .val{font-family:var(--disp);font-size:23px;font-weight:700;color:var(--coffee-900);margin-top:6px;}
+.kpi .trend{font-size:11px;margin-top:4px;font-weight:700;}
+.kpi .trend.up{color:var(--sage);}
+.kpi .trend.down{color:var(--brick);}
+
+.panels{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px;}
+@media(max-width:980px){.panels{grid-template-columns:1fr;}}
+.panel{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:18px 20px;
+  box-shadow:var(--shadow);
+}
+.panel h3{margin:0 0 12px;font-size:14.5px;color:var(--coffee-900);font-weight:800;}
+.chart-wrap{position:relative;height:250px;}
+
+.alerts-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;}
+.alert-row{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:var(--amber-light);
+  border:1px solid #EAD4A0;
+  border-radius:10px;
+  padding:9px 12px;
+  font-size:12.5px;
+}
+.alert-row.danger{background:var(--brick-light);border-color:#E9C0B8;}
+.badge{
+  display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap;
+}
+.badge.warn{background:var(--amber-light);color:var(--amber);}
+.badge.bad{background:var(--brick-light);color:var(--brick);}
+
+/* ---------- Module (table) views ---------- */
+.mod-head{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.mod-head .txt h2{margin:0;font-family:var(--disp);font-size:19px;color:var(--coffee-900);font-weight:700;}
+.mod-head .txt p{margin:4px 0 0;font-size:13px;color:var(--ink-soft);max-width:560px;}
+.mod-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{
+  border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:13px;
+  padding:10px 16px;border-radius:10px;transition:transform .12s ease, box-shadow .12s ease;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--copper);color:#fff;box-shadow:0 6px 16px -6px rgba(180,98,42,.55);}
+.btn-primary:hover{background:var(--copper-dark);}
+.btn-ghost{background:var(--paper);color:var(--coffee-900);border:1px solid var(--line);}
+.btn-ghost:hover{background:var(--cream-2);}
+.btn-danger-sm{background:transparent;color:var(--brick);padding:4px 8px;font-size:15px;border-radius:8px;}
+.btn-danger-sm:hover{background:var(--brick-light);}
+
+.toolbar{display:flex;gap:10px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.search-box{
+  flex:1;min-width:160px;position:relative;
+}
+.search-box input{
+  width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+  font-family:inherit;font-size:13px;background:var(--cream);color:var(--ink);
+}
+.search-box input:focus{outline:none;border-color:var(--copper);background:#fff;}
+
+.table-card{
+  background:var(--paper);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.table-scroll{overflow-x:auto;}
+table.data-tbl{border-collapse:collapse;width:100%;min-width:720px;font-size:12.5px;}
+table.data-tbl thead th{
+  background:var(--coffee-900);color:var(--cream);
+  padding:11px 10px;text-align:start;font-weight:700;font-size:12px;
+  white-space:nowrap;position:sticky;top:0;cursor:pointer;user-select:none;
+}
+table.data-tbl thead th:hover{background:var(--coffee-800);}
+table.data-tbl thead th .arrow{opacity:.5;font-size:10px;margin-inline-start:3px;}
+table.data-tbl tbody td{
+  padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+table.data-tbl tbody tr:hover{background:var(--cream-2);}
+table.data-tbl tbody tr:last-child td{border-bottom:none;}
+.cell-input, .cell-select{
+  width:100%;min-width:88px;border:1px solid transparent;background:transparent;
+  font-family:inherit;font-size:12.5px;color:var(--ink);padding:6px 6px;border-radius:7px;
+}
+.cell-input:hover,.cell-select:hover{border-color:var(--line);}
+.cell-input:focus,.cell-select:focus{outline:none;border-color:var(--copper);background:#fff;}
+.cell-input[type="number"]{min-width:80px;}
+.cell-input[type="date"]{min-width:130px;}
+.cell-ro{padding:6px 8px;font-weight:800;color:var(--copper-dark);white-space:nowrap;}
+.row-del{width:36px;text-align:center;}
+.status-pill{padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:800;}
+.status-ok{background:var(--sage-light);color:var(--sage);}
+.status-warn{background:var(--amber-light);color:var(--amber);}
+.status-bad{background:var(--brick-light);color:var(--brick);}
+.empty-hint{padding:34px 20px;text-align:center;color:var(--ink-soft);font-size:13.5px;}
+.tbl-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft);
+  flex-wrap:wrap;gap:8px;
+}
+.tbl-footer b{color:var(--coffee-900);}
+
+@media(max-width:760px){
+  body{display:block;}
+  .sidebar{
+    position:fixed;inset-inline-end:0;top:0;bottom:0;
+    width:min(82vw,300px);min-width:0;
+    transform:translateX(100%);transition:transform .2s ease;
+  }
+  [dir="ltr"] .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar::before{
+    content:"";position:fixed;inset:0;z-index:-1;
+  }
+  .menu-btn{display:inline-flex;flex-shrink:0;}
+  .main{width:100%;height:auto;min-height:100vh;overflow-y:visible;}
+  .topbar{padding:12px 14px;gap:10px;}
+  .topbar h1{font-size:17px;}
+  .topbar p{font-size:11.5px;}
+  .topbar-right{gap:8px;}
+  .today-pill{padding:6px 10px;font-size:11px;}
+  .content{padding:14px 12px 40px;}
+
+  .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+  .kpi{padding:11px 12px;border-radius:12px;}
+  .kpi .lbl{font-size:11px;}
+  .kpi .val{font-size:18px;margin-top:4px;}
+  .kpi .trend{font-size:10px;}
+
+  .panels{gap:12px;}
+  .panel{padding:14px;border-radius:12px;}
+  .chart-wrap{height:210px;}
+
+  .mod-head{gap:10px;}
+  .mod-head .txt h2{font-size:16.5px;}
+  .mod-head .txt p{font-size:12px;}
+  .mod-actions{width:100%;gap:6px;}
+  .mod-actions .btn{flex:1;justify-content:center;padding:9px 10px;font-size:12px;white-space:nowrap;}
+
+  .toolbar{padding:10px 12px;}
+  .search-box input{font-size:16px;} /* prevents iOS auto-zoom on focus */
+  table.data-tbl{min-width:600px;font-size:11.5px;}
+  table.data-tbl thead th{padding:9px 8px;font-size:11px;}
+  .tbl-footer{font-size:11px;padding:10px 12px;}
+}
+@media(max-width:400px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .today-pill{display:none;}
+}
+.menu-btn{display:none;background:var(--coffee-900);color:#fff;border:none;width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer;align-items:center;justify-content:center;}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-glyph">ç</div>
+    <div class="brand-txt">
+      <div class="brand-mark">çukur</div>
+      <div class="brand-sub" id="brandSub"></div>
+    </div>
+  </div>
+  <div class="lang-switch">
+    <button class="lang-btn" id="langAr" data-lang="ar">العربية</button>
+    <button class="lang-btn" id="langEn" data-lang="en">English</button>
+  </div>
+  <nav class="nav" id="navList"></nav>
+  <div class="nav-foot">
+    <span id="storageNote"></span>
+    <button id="resetBtn"></button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div>
+        <h1 id="topTitle"></h1>
+        <p id="topSub"></p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="today-pill" id="todayPill"></span>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+/* =========================================================
+   I18N
+========================================================= */
+const STORAGE_KEY = 'cukur_ops_data';
+const LANG_KEY = 'cukur_ops_lang';
+let LANG = 'ar';
+
+const UI = {
+  ar:{
+    brandSub:'كافيه آند جاليري — لوحة التشغيل',
+    storageNote:'بياناتك محفوظة في هذه المحادثة',
+    resetAll:'مسح كل البيانات والبدء من جديد',
+    resetConfirm:'هل أنت متأكد؟ سيتم مسح كل البيانات المدخلة في جميع الشاشات نهائيًا.',
+    addRow:'+ إضافة صف جديد',
+    rowCount:'عدد الصفوف',
+    search:'ابحث في هذا الجدول…',
+    exportCsv:'تصدير CSV',
+    print:'طباعة',
+    delete:'حذف',
+    noData:'لا توجد بيانات بعد — اضغط «إضافة صف جديد» للبدء.',
+    noMatch:'لا توجد نتائج مطابقة للبحث.',
+    dashboardTitle:'لوحة التحكم',
+    dashboardDesc:'متابعة التشغيل اليومية • المبيعات • النقدية • المصروفات • الهالك • المخزون • الموظفون',
+    salesTrend:'اتجاه المبيعات اليومية (آخر 14 يومًا)',
+    expenseBreak:'توزيع المصروفات هذا الشهر حسب التصنيف',
+    opsAlerts:'تنبيهات تشغيلية',
+    netSalesLbl:'صافي المبيعات',
+    noAlerts:'لا توجد تنبيهات حاليًا — كل شيء تحت السيطرة ✓',
+    noExpenseData:'لا توجد بيانات',
+    urgent:'عاجل',
+    notice:'تنبيه',
+    lowStock:v=>`مخزون منخفض: ${v.name} — الرصيد ${v.qty} ${v.unit}`,
+    expiryAlert:v=>`${v.state}: ${v.name}`,
+    maintOpen:v=>`صيانة مفتوحة: ${v.equip} (${v.priority})`,
+    complaintOpen:v=>`شكوى غير مغلقة: ${v.no} — ${v.text}`,
+    cashDiff:v=>`فرق نقدية بتاريخ ${v.date}: ${v.amount}`,
+    vsYesterday:'مقارنة بالأمس',
+    vsLastMonth:'مقارنة بالشهر السابق',
+  },
+  en:{
+    brandSub:'Café & Gallery — Ops Dashboard',
+    storageNote:'Your data is saved to this chat',
+    resetAll:'Clear all data and start over',
+    resetConfirm:'Are you sure? This permanently erases every entry across all screens.',
+    addRow:'+ Add new row',
+    rowCount:'Rows',
+    search:'Search this table…',
+    exportCsv:'Export CSV',
+    print:'Print',
+    delete:'Delete',
+    noData:'No data yet — click "Add new row" to start.',
+    noMatch:'No rows match your search.',
+    dashboardTitle:'Dashboard',
+    dashboardDesc:'Daily operations at a glance • Sales • Cash • Expenses • Waste • Inventory • Staff',
+    salesTrend:'Daily sales trend (last 14 days)',
+    expenseBreak:'This month\'s expenses by category',
+    opsAlerts:'Operational alerts',
+    netSalesLbl:'Net sales',
+    noAlerts:'No alerts right now — all clear ✓',
+    noExpenseData:'No data',
+    urgent:'Urgent',
+    notice:'Notice',
+    lowStock:v=>`Low stock: ${v.name} — ${v.qty} ${v.unit} left`,
+    expiryAlert:v=>`${v.state}: ${v.name}`,
+    maintOpen:v=>`Open maintenance: ${v.equip} (${v.priority})`,
+    complaintOpen:v=>`Unresolved complaint: ${v.no} — ${v.text}`,
+    cashDiff:v=>`Cash variance on ${v.date}: ${v.amount}`,
+    vsYesterday:'vs yesterday',
+    vsLastMonth:'vs last month',
+  }
+};
+
+/* Reusable option sets: canonical value + bilingual label */
+const OPT = {
+  shift:[{v:'morning',ar:'صباحية',en:'Morning'},{v:'evening',ar:'مسائية',en:'Evening'}],
+  expenseCategory:[{v:'purchases',ar:'المشتريات',en:'Purchases'},{v:'maintenance',ar:'الصيانة',en:'Maintenance'},
+    {v:'cleaning',ar:'النظافة',en:'Cleaning'},{v:'transport',ar:'النقل',en:'Transport'},
+    {v:'utilities',ar:'المرافق',en:'Utilities'},{v:'marketing',ar:'التسويق',en:'Marketing'},
+    {v:'staff',ar:'الموظفون',en:'Staff'},{v:'other',ar:'أخرى',en:'Other'}],
+  paymentMethod:[{v:'cash',ar:'نقدي',en:'Cash'},{v:'card',ar:'بطاقة',en:'Card'},
+    {v:'transfer',ar:'تحويل بنكي',en:'Bank transfer'},{v:'wallet',ar:'محفظة إلكترونية',en:'E-wallet'}],
+  inventoryCategory:[{v:'hot',ar:'مشروبات ساخنة',en:'Hot drinks'},{v:'cold',ar:'مشروبات باردة',en:'Cold drinks'},
+    {v:'bakery',ar:'مخبوزات',en:'Bakery'},{v:'raw',ar:'مواد خام',en:'Raw materials'},
+    {v:'packaging',ar:'تغليف',en:'Packaging'},{v:'other',ar:'أخرى',en:'Other'}],
+  expiryState:[{v:'none',ar:'سليم',en:'OK'},{v:'near',ar:'قريب الانتهاء',en:'Near expiry'},{v:'expired',ar:'منتهي',en:'Expired'}],
+  deliveryStatus:[{v:'received',ar:'مستلم',en:'Received'},{v:'partial',ar:'جزئي',en:'Partial'},
+    {v:'pending',ar:'معلق',en:'Pending'},{v:'cancelled',ar:'ملغي',en:'Cancelled'}],
+  paymentStatus:[{v:'paid',ar:'مدفوع',en:'Paid'},{v:'pending',ar:'معلق',en:'Pending'},{v:'deferred',ar:'آجل',en:'Deferred'}],
+  wasteCategory:[{v:'damage',ar:'تلف',en:'Damage'},{v:'expiry',ar:'انتهاء صلاحية',en:'Expired'},
+    {v:'prepError',ar:'خطأ تحضير',en:'Prep error'},{v:'return',ar:'مرتجع عميل',en:'Customer return'},
+    {v:'breakage',ar:'كسر',en:'Breakage'}],
+  recipeCategory:[{v:'hot',ar:'مشروبات ساخنة',en:'Hot drinks'},{v:'cold',ar:'مشروبات باردة',en:'Cold drinks'},
+    {v:'desserts',ar:'حلويات',en:'Desserts'},{v:'food',ar:'مأكولات',en:'Food'},{v:'other',ar:'أخرى',en:'Other'}],
+  position:[{v:'barista',ar:'باريستا',en:'Barista'},{v:'cashier',ar:'كاشير',en:'Cashier'},
+    {v:'waiter',ar:'ويتر',en:'Waiter'},{v:'captain',ar:'كابتن',en:'Captain'},{v:'support',ar:'دعم',en:'Support'}],
+  attendanceStatus:[{v:'present',ar:'حضور',en:'Present'},{v:'late',ar:'تأخير',en:'Late'},
+    {v:'absent',ar:'غياب',en:'Absent'},{v:'leave',ar:'إجازة',en:'Leave'}],
+  checklistType:[{v:'open',ar:'فتح',en:'Opening'},{v:'close',ar:'إغلاق',en:'Closing'}],
+  checkState:[{v:'done',ar:'✓',en:'✓'},{v:'notDone',ar:'✕',en:'✕'},{v:'na',ar:'N/A',en:'N/A'}],
+  hygieneArea:[{v:'bar',ar:'البار',en:'Bar'},{v:'kitchen',ar:'المطبخ',en:'Kitchen'},{v:'hall',ar:'الصالة',en:'Dining area'},
+    {v:'restroom',ar:'دورة المياه',en:'Restroom'},{v:'storage',ar:'المخزن',en:'Storage'}],
+  freq:[{v:'daily',ar:'يومي',en:'Daily'},{v:'weekly',ar:'أسبوعي',en:'Weekly'},{v:'monthly',ar:'شهري',en:'Monthly'}],
+  hygieneStatus:[{v:'done',ar:'✓',en:'✓'},{v:'notDone',ar:'✕',en:'✕'},{v:'inProgress',ar:'قيد التنفيذ',en:'In progress'}],
+  priority:[{v:'urgent',ar:'عاجل',en:'Urgent'},{v:'high',ar:'مرتفع',en:'High'},{v:'medium',ar:'متوسط',en:'Medium'},{v:'low',ar:'منخفض',en:'Low'}],
+  maintStatus:[{v:'open',ar:'مفتوح',en:'Open'},{v:'inProgress',ar:'قيد التنفيذ',en:'In progress'},{v:'done',ar:'مكتمل',en:'Done'}],
+  channel:[{v:'inPerson',ar:'حضوري',en:'In person'},{v:'phone',ar:'هاتف',en:'Phone'},{v:'social',ar:'مواقع التواصل',en:'Social media'},
+    {v:'deliveryApp',ar:'تطبيق توصيل',en:'Delivery app'},{v:'other',ar:'أخرى',en:'Other'}],
+  complaintStatus:[{v:'open',ar:'مفتوحة',en:'Open'},{v:'inProgress',ar:'قيد المعالجة',en:'In progress'},{v:'closed',ar:'مغلقة',en:'Closed'}],
+  varianceState:[{v:'ok',ar:'سليم',en:'Balanced'},{v:'over',ar:'زيادة',en:'Overage'},{v:'short',ar:'عجز',en:'Shortfall'}],
+  reorderState:[{v:'reorder',ar:'أعد الطلب',en:'Reorder now'},{v:'available',ar:'متوفر',en:'In stock'}],
+  costState:[{v:'onTarget',ar:'ضمن الهدف',en:'On target'},{v:'high',ar:'مرتفع',en:'High'}],
+  rotaStatus:[{v:'present',ar:'حضور',en:'Present'},{v:'late',ar:'تأخير',en:'Late'},
+    {v:'absent',ar:'غياب',en:'Absent'},{v:'leave',ar:'إجازة',en:'Leave'},
+    {v:'noRecord',ar:'لا يوجد سجل حضور بعد',en:'No attendance record yet'}],
+};
+function optLabel(setKey, val){
+  const set = OPT[setKey]; if(!set) return val;
+  const o = set.find(x=>x.v===val); return o ? o[LANG] : val;
+}
+function optGood(setKey){
+  return {ok:true, available:true, onTarget:true, done:true, received:true, paid:true, present:true, closed:true}[setKey] ?? null;
+}
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+const todayStr = () => new Date().toISOString().slice(0,10);
+const fmtMoney = n => LANG==='ar'
+  ? (Number(n)||0).toLocaleString('ar-EG',{maximumFractionDigits:2}) + ' ج.م'
+  : 'EGP ' + (Number(n)||0).toLocaleString('en-US',{maximumFractionDigits:2});
+const fmtNum = n => (Number(n)||0).toLocaleString(LANG==='ar'?'ar-EG':'en-US',{maximumFractionDigits:2});
+
+/* =========================================================
+   RECIPE ↔ INVENTORY LINKING HELPERS
+   (BOM = Bill of Materials: how much of each inventory item
+   one serving of a menu item consumes)
+========================================================= */
+function bomRowsFor(itemName){ return (DATA.bom||[]).filter(b=>b.item===itemName); }
+
+// Ingredient cost per serving, computed live from the BOM instead of typed in manually.
+function bomIngCost(itemName){
+  return bomRowsFor(itemName).reduce((sum,b)=>{
+    const inv = (DATA.inventory||[]).find(i=>i.name===b.ingredient);
+    return sum + (+b.qty||0) * (inv? (+inv.unitCost||0) : 0);
+  },0);
+}
+
+// Auto-consumption of one inventory item, computed live from item sales × BOM.
+function bomAutoUsage(inventoryItemName){
+  const rows = DATA.bom||[];
+  const linked = rows.filter(b=>b.ingredient===inventoryItemName);
+  if(!linked.length) return null; // not linked to any recipe → caller should fall back to manual entry
+  const sales = DATA.itemSales||[];
+  let total = 0;
+  linked.forEach(b=>{
+    const qtySold = sales.filter(s=>s.item===b.item).reduce((a,s)=>a+(+s.qty||0),0);
+    total += qtySold * (+b.qty||0);
+  });
+  return total;
+}
+
+// Inventory usage/closing stock, honoring the BOM auto-deduction with manual fallback.
+function inventoryUsage(r){
+  const auto = bomAutoUsage(r.name);
+  return auto!==null ? auto : (+r.manualUsage||0);
+}
+function inventoryClosing(r){
+  return (+r.opening||0)+(+r.purchases||0)-inventoryUsage(r)-(+r.waste||0);
+}
+
+function expiryState(dateStr){
+  if(!dateStr) return 'none';
+  const days = (new Date(dateStr) - new Date(todayStr())) / 86400000;
+  if(days < 0) return 'expired';
+  if(days <= 3) return 'near';
+  return 'none';
+}
+
+// Dynamic <select> option builders (value === display text, kept human-readable everywhere)
+function menuItemOptions(){
+  return (DATA.recipes||[]).map(r=>({v:r.item, ar:r.item, en:r.item}));
+}
+function inventoryItemOptions(){
+  return (DATA.inventory||[]).map(i=>({v:i.name, ar:`${i.name} (${i.unit})`, en:`${i.name} (${i.unit})`}));
+}
+
+/* =========================================================
+   MODULE DEFINITIONS (bilingual)
+========================================================= */
+const MODULES = [];
+function defMod(cfg){ MODULES.push(cfg); return cfg; }
+
+defMod({
+  key:'dashboard', icon:'📊', isDashboard:true,
+  title:{ar:'لوحة التحكم',en:'Dashboard'},
+  desc:{ar:'متابعة التشغيل اليومية • المبيعات • النقدية • المصروفات • الهالك • المخزون • الموظفون',
+        en:'Daily operations at a glance • Sales • Cash • Expenses • Waste • Inventory • Staff'}
+});
+
+defMod({
+  key:'sales', icon:'💰',
+  title:{ar:'المبيعات اليومية',en:'Daily Sales'},
+  desc:{ar:'سجّل صفًا لكل يوم أو وردية مع قنوات البيع وعدد الطلبات.',
+        en:'Log one row per day or shift with sales channels and order count.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'shift', label:{ar:'الوردية',en:'Shift'}, type:'select', optionSet:'shift'},
+    {key:'manager', label:{ar:'المسؤول',en:'Manager'}, type:'text'},
+    {key:'cash', label:{ar:'مبيعات نقدية',en:'Cash sales'}, type:'number'},
+    {key:'card', label:{ar:'مبيعات البطاقات',en:'Card sales'}, type:'number'},
+    {key:'wallet', label:{ar:'محفظة/أونلاين',en:'Wallet/Online'}, type:'number'},
+    {key:'orders', label:{ar:'عدد الطلبات',en:'Orders'}, type:'number'},
+    {key:'total', label:{ar:'إجمالي المبيعات',en:'Gross sales'}, type:'ro', calc:r=>(+r.cash||0)+(+r.card||0)+(+r.wallet||0), money:true},
+    {key:'discounts', label:{ar:'الخصومات',en:'Discounts'}, type:'number'},
+    {key:'net', label:{ar:'صافي المبيعات',en:'Net sales'}, type:'ro', calc:r=>((+r.cash||0)+(+r.card||0)+(+r.wallet||0))-(+r.discounts||0), money:true},
+  ],
+  seed:(()=>{const rows=[];const managers=['Yasmin','Karim','Mostafa'];
+    for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
+      const cash=Math.round(900+Math.random()*700), card=Math.round(700+Math.random()*900), wallet=Math.round(150+Math.random()*250);
+      rows.push({id:uid(), date:d.toISOString().slice(0,10), shift:i%2?'evening':'morning', manager:managers[i%3],
+        cash, card, wallet, orders:Math.round(30+Math.random()*40), discounts:Math.round(Math.random()*80)});}
+    return rows;})()
+});
+
+defMod({
+  key:'itemSales', icon:'🧮',
+  title:{ar:'مبيعات الأصناف',en:'Item Sales'},
+  desc:{ar:'سجّل الكمية المباعة من كل صنف يوميًا. هذه البيانات هي ما يدفع الخصم التلقائي للمخزون حسب وصفة كل صنف.',
+        en:'Log the quantity sold per menu item each day. This is what drives automatic inventory deduction via each item’s recipe.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'shift', label:{ar:'الوردية',en:'Shift'}, type:'select', optionSet:'shift'},
+    {key:'item', label:{ar:'صنف المنيو',en:'Menu item'}, type:'select', dynamicOptions:menuItemOptions},
+    {key:'qty', label:{ar:'الكمية المباعة',en:'Qty sold'}, type:'number'},
+    {key:'revenue', label:{ar:'الإيرادات',en:'Revenue'}, type:'ro', money:true,
+      calc:r=>{const rec=(DATA.recipes||[]).find(x=>x.item===r.item); return rec ? (+r.qty||0)*(+rec.price||0) : 0;}},
+  ],
+  seed:(()=>{
+    const items=['Cappuccino','Latte','Americano','Turkish Coffee','Spanish Latte','Caramel Macchiato','Mocha','Hot Matcha'];
+    const rows=[];
+    for(let i=2;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
+      items.forEach((it,idx)=>rows.push({id:uid(), date:d.toISOString().slice(0,10), shift:idx%2?'evening':'morning',
+        item:it, qty:Math.round(5+Math.random()*20)}));}
+    return rows;
+  })()
+});
+
+defMod({
+  key:'cashier', icon:'🧾',
+  title:{ar:'إقفال الكاشير',en:'Cash Register Closeout'},
+  desc:{ar:'تسوية النقدية اليومية ومتابعة الفروقات.',en:'Daily cash reconciliation and variance tracking.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'shift', label:{ar:'الوردية',en:'Shift'}, type:'select', optionSet:'shift'},
+    {key:'cashier', label:{ar:'الكاشير',en:'Cashier'}, type:'text'},
+    {key:'opening', label:{ar:'رصيد بداية الوردية',en:'Opening float'}, type:'number'},
+    {key:'cashSales', label:{ar:'مبيعات نقدية',en:'Cash sales'}, type:'number'},
+    {key:'cashExp', label:{ar:'مصروفات نقدية',en:'Cash expenses'}, type:'number'},
+    {key:'expected', label:{ar:'النقدية المتوقعة',en:'Expected cash'}, type:'ro', calc:r=>(+r.opening||0)+(+r.cashSales||0)-(+r.cashExp||0), money:true},
+    {key:'actual', label:{ar:'النقدية الفعلية',en:'Actual cash'}, type:'number'},
+    {key:'card', label:{ar:'بطاقة',en:'Card'}, type:'number'},
+    {key:'wallet', label:{ar:'محفظة/أونلاين',en:'Wallet/Online'}, type:'number'},
+    {key:'variance', label:{ar:'الفرق',en:'Variance'}, type:'ro', money:true,
+      calc:r=>(+r.actual||0)-(((+r.opening||0)+(+r.cashSales||0)-(+r.cashExp||0)))},
+    {key:'status', label:{ar:'الحالة',en:'Status'}, type:'ro', pill:true, optionSet:'varianceState',
+      calc:r=>{const v=(+r.actual||0)-(((+r.opening||0)+(+r.cashSales||0)-(+r.cashExp||0)));
+        if(Math.abs(v)<1) return 'ok'; return v>0?'over':'short';}},
+  ],
+  seed:(()=>{const rows=[];const names=['Yasmin','Karim'];
+    for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
+      const opening=500, cashSales=Math.round(900+Math.random()*500), cashExp=Math.round(Math.random()*150);
+      const expected=opening+cashSales-cashExp;
+      const actual=expected + Math.round((Math.random()-0.5)*40);
+      rows.push({id:uid(), date:d.toISOString().slice(0,10), shift:i%2?'evening':'morning', cashier:names[i%2],
+        opening, cashSales, cashExp, actual, card:Math.round(700+Math.random()*400), wallet:Math.round(150+Math.random()*150)});}
+    return rows;})()
+});
+
+defMod({
+  key:'expenses', icon:'💸',
+  title:{ar:'المصروفات والعهدة النثرية',en:'Expenses & Petty Cash'},
+  desc:{ar:'سجّل جميع مصروفات التشغيل مع الاعتماد ومرجع الإيصال.',en:'Log all operating expenses with approval and receipt reference.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'voucher', label:{ar:'رقم السند',en:'Voucher #'}, type:'text'},
+    {key:'category', label:{ar:'التصنيف',en:'Category'}, type:'select', optionSet:'expenseCategory'},
+    {key:'desc', label:{ar:'الوصف',en:'Description'}, type:'text'},
+    {key:'amount', label:{ar:'المبلغ',en:'Amount'}, type:'number', money:true},
+    {key:'method', label:{ar:'طريقة الدفع',en:'Payment method'}, type:'select', optionSet:'paymentMethod'},
+    {key:'requestedBy', label:{ar:'طلب بواسطة',en:'Requested by'}, type:'text'},
+    {key:'approvedBy', label:{ar:'اعتماد بواسطة',en:'Approved by'}, type:'text'},
+    {key:'notes', label:{ar:'الإيصال / ملاحظات',en:'Receipt / notes'}, type:'text'},
+  ],
+  seed:(()=>{const cats=[['purchases','Bar supplies'],['maintenance','Espresso machine service'],['cleaning','Cleaning supplies'],
+    ['transport','Stock delivery'],['utilities','Electricity bill'],['marketing','Brochure printing'],['staff','Staff advance']];
+    return cats.map((c,i)=>{const d=new Date();d.setDate(d.getDate()-i*3);
+      return {id:uid(), date:d.toISOString().slice(0,10), voucher:'V-'+(1000+i), category:c[0], desc:c[1],
+        amount:Math.round(150+Math.random()*900), method:i%2?'cash':'transfer', requestedBy:'Mohamed', approvedBy:'Manager', notes:''};});})()
+});
+
+defMod({
+  key:'inventory', icon:'📦',
+  title:{ar:'إدارة المخزون',en:'Inventory Management'},
+  desc:{ar:'متابعة رصيد أول المدة والوارد ورصيد آخر المدة وتنبيهات إعادة الطلب. الاستهلاك يُخصم تلقائيًا من مبيعات الأصناف عبر وصفة كل صنف (BOM)، وتنبيه الصلاحية يُحسب تلقائيًا من تاريخ انتهاء الصلاحية.',
+        en:'Track opening stock, purchases, closing stock and reorder alerts. Usage is auto-deducted from item sales via each item’s recipe (BOM); the expiry alert is computed automatically from the expiry date.'},
+  columns:[
+    {key:'code', label:{ar:'كود الصنف',en:'Item code'}, type:'text'},
+    {key:'name', label:{ar:'اسم الصنف',en:'Item name'}, type:'text'},
+    {key:'category', label:{ar:'التصنيف',en:'Category'}, type:'select', optionSet:'inventoryCategory'},
+    {key:'unit', label:{ar:'الوحدة',en:'Unit'}, type:'text'},
+    {key:'opening', label:{ar:'رصيد أول المدة',en:'Opening stock'}, type:'number'},
+    {key:'purchases', label:{ar:'المشتريات',en:'Purchases'}, type:'number'},
+    {key:'manualUsage', label:{ar:'استهلاك يدوي (للأصناف غير المرتبطة بوصفة)',en:'Manual usage (items with no BOM link)'}, type:'number'},
+    {key:'usage', label:{ar:'الاستهلاك',en:'Usage'}, type:'ro', calc:inventoryUsage},
+    {key:'usageSrc', label:{ar:'مصدر الاستهلاك',en:'Usage source'}, type:'ro', text:true,
+      calc:r=>bomAutoUsage(r.name)!==null ? (LANG==='ar'?'تلقائي من الوصفة':'Auto (recipe)') : (LANG==='ar'?'يدوي':'Manual')},
+    {key:'waste', label:{ar:'الهالك',en:'Waste'}, type:'number'},
+    {key:'closing', label:{ar:'رصيد آخر المدة',en:'Closing stock'}, type:'ro', calc:inventoryClosing},
+    {key:'unitCost', label:{ar:'تكلفة الوحدة',en:'Unit cost'}, type:'number', money:true},
+    {key:'reorder', label:{ar:'حد إعادة الطلب',en:'Reorder point'}, type:'number'},
+    {key:'value', label:{ar:'قيمة المخزون',en:'Stock value'}, type:'ro', money:true,
+      calc:r=>inventoryClosing(r)*(+r.unitCost||0)},
+    {key:'alert', label:{ar:'تنبيه إعادة الطلب',en:'Reorder alert'}, type:'ro', pill:true, optionSet:'reorderState',
+      calc:r=>inventoryClosing(r)<=(+r.reorder||0) ? 'reorder' : 'available'},
+    {key:'expiryDate', label:{ar:'تاريخ انتهاء الصلاحية',en:'Expiry date'}, type:'date'},
+    {key:'expiryAlert', label:{ar:'تنبيه الصلاحية',en:'Expiry alert'}, type:'ro', pill:true, optionSet:'expiryState',
+      calc:r=>expiryState(r.expiryDate)},
+  ],
+  seed:(()=>{
+    const d = (offset)=>{const x=new Date();x.setDate(x.getDate()+offset);return x.toISOString().slice(0,10);};
+    // code, name, category, unit, opening, purchases, manualUsage, waste, unitCost, reorder, expiryDate
+    const items=[
+      ['MLK','Fresh milk','raw','L',40,120,0,4,7.5,20, d(2)],
+      ['ARB','Arabica beans','raw','kg',18,25,0,0.5,320,8, ''],
+      ['CUP','Paper cups 12oz','packaging','pc',900,1500,1400,20,1.4,400, ''],
+      ['SYR','Vanilla syrup','raw','L',6,4,0,0.2,90,3, ''],
+      ['CRO','Frozen croissant','bakery','pc',80,150,140,6,6,40, d(-1)],
+      ['CHC','Belgian chocolate','raw','kg',10,6,0,0.3,240,4, ''],
+      ['CHW','White chocolate','raw','kg',5,4,0,0.2,260,2, ''],
+      ['CRM','Caramel sauce','raw','L',5,4,0,0.1,150,2, ''],
+      ['SCR','Salted caramel sauce','raw','L',4,3,0,0.1,160,2, ''],
+      ['PST','Pistachio sauce','raw','L',3,2,0,0.05,380,1, ''],
+      ['CND','Condensed milk','raw','L',6,4,0,0.2,90,2, d(4)],
+      ['TRK','Turkish coffee (ground)','raw','kg',5,4,0,0.1,280,2, ''],
+      ['MAT','Matcha powder','raw','kg',1,0.5,0,0.02,900,0.3, ''],
+      ['ICR','Ice cream','raw','kg',8,5,0,0.3,180,3, d(3)],
+      ['KND','Kinder chocolate','raw','kg',3,2,0,0.1,300,1, ''],
+      ['WTR','Still water','raw','L',50,40,0,0,5,10, ''],
+    ];
+    return items.map(it=>({id:uid(), code:it[0], name:it[1], category:it[2], unit:it[3], opening:it[4], purchases:it[5],
+      manualUsage:it[6], waste:it[7], unitCost:it[8], reorder:it[9], expiryDate:it[10]}));
+  })()
+});
+
+defMod({
+  key:'purchases', icon:'🛒',
+  title:{ar:'المشتريات',en:'Purchase Orders'},
+  desc:{ar:'سجل طلبات الشراء وأوامر التوريد والاستلام.',en:'Track purchase requests, supply orders and receiving.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'po', label:{ar:'رقم الطلب',en:'PO #'}, type:'text'},
+    {key:'supplier', label:{ar:'المورد',en:'Supplier'}, type:'text'},
+    {key:'item', label:{ar:'الصنف',en:'Item'}, type:'text'},
+    {key:'qty', label:{ar:'الكمية',en:'Qty'}, type:'number'},
+    {key:'unit', label:{ar:'الوحدة',en:'Unit'}, type:'text'},
+    {key:'price', label:{ar:'سعر الوحدة',en:'Unit price'}, type:'number', money:true},
+    {key:'total', label:{ar:'الإجمالي',en:'Total'}, type:'ro', calc:r=>(+r.qty||0)*(+r.price||0), money:true},
+    {key:'delivery', label:{ar:'حالة التسليم',en:'Delivery status'}, type:'select', optionSet:'deliveryStatus'},
+    {key:'payment', label:{ar:'حالة الدفع',en:'Payment status'}, type:'select', optionSet:'paymentStatus'},
+    {key:'notes', label:{ar:'ملاحظات',en:'Notes'}, type:'text'},
+  ],
+  seed:(()=>{const rows=[['Al Aseel Coffee','Arabica beans',25,'kg',320],['Delta Farms','Fresh milk',150,'L',20],
+    ['Plastico Egypt','Paper cups',2000,'pc',1.4],['Golden Bakeries','Frozen croissant',200,'pc',6]];
+    return rows.map((r,i)=>{const d=new Date();d.setDate(d.getDate()-i*4);
+      return {id:uid(), date:d.toISOString().slice(0,10), po:'PO-'+(2000+i), supplier:r[0], item:r[1], qty:r[2], unit:r[3],
+        price:r[4], delivery:'received', payment:i%2?'paid':'deferred', notes:''};});})()
+});
+
+defMod({
+  key:'waste', icon:'🗑️',
+  title:{ar:'الهالك والفروقات',en:'Waste & Variance'},
+  desc:{ar:'سجّل جميع حالات الهالك والتلف وفاقد التحضير ومرتجعات العملاء.',
+        en:'Log all waste, spoilage, prep loss and customer returns.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'shift', label:{ar:'الوردية',en:'Shift'}, type:'select', optionSet:'shift'},
+    {key:'item', label:{ar:'الصنف',en:'Item'}, type:'text'},
+    {key:'category', label:{ar:'السبب الرئيسي',en:'Main cause'}, type:'select', optionSet:'wasteCategory'},
+    {key:'qty', label:{ar:'الكمية',en:'Qty'}, type:'number'},
+    {key:'unit', label:{ar:'الوحدة',en:'Unit'}, type:'text'},
+    {key:'unitCost', label:{ar:'تكلفة الوحدة',en:'Unit cost'}, type:'number', money:true},
+    {key:'cost', label:{ar:'تكلفة الهالك',en:'Waste cost'}, type:'ro', calc:r=>(+r.qty||0)*(+r.unitCost||0), money:true},
+    {key:'reason', label:{ar:'التفاصيل',en:'Details'}, type:'text'},
+    {key:'approvedBy', label:{ar:'اعتماد بواسطة',en:'Approved by'}, type:'text'},
+  ],
+  seed:(()=>{const rows=[['Fresh milk','damage',2,'L',20],['Croissant','prepError',4,'pc',6],['Arabica beans','expiry',0.5,'kg',320]];
+    return rows.map((r,i)=>{const d=new Date();d.setDate(d.getDate()-i*5);
+      return {id:uid(), date:d.toISOString().slice(0,10), shift:'morning', item:r[0], category:r[1], qty:r[2], unit:r[3],
+        unitCost:r[4], reason:'', approvedBy:'Manager'};});})()
+});
+
+defMod({
+  key:'recipes', icon:'🍽️',
+  title:{ar:'الوصفات والتكلفة',en:'Recipes & Costing'},
+  desc:{ar:'صف لكل صنف في المنيو. تكلفة المكونات تُحسب تلقائيًا من وصفة الاستهلاك (BOM) — أضف/عدّل مكونات كل صنف من شاشة «وصفة الاستهلاك».',
+        en:'One row per menu item. Ingredient cost is computed automatically from the recipe (BOM) — add/edit each item’s ingredients in the “Recipe Ingredients (BOM)” screen.'},
+  columns:[
+    {key:'item', label:{ar:'صنف المنيو',en:'Menu item'}, type:'text'},
+    {key:'category', label:{ar:'التصنيف',en:'Category'}, type:'select', optionSet:'recipeCategory'},
+    {key:'ingCost', label:{ar:'تكلفة المكونات (تلقائي)',en:'Ingredient cost (auto)'}, type:'ro', money:true,
+      calc:r=>bomIngCost(r.item)},
+    {key:'pkgCost', label:{ar:'تكلفة التغليف',en:'Packaging cost'}, type:'number', money:true},
+    {key:'totalCost', label:{ar:'التكلفة الإجمالية',en:'Total cost'}, type:'ro', calc:r=>bomIngCost(r.item)+(+r.pkgCost||0), money:true},
+    {key:'price', label:{ar:'سعر البيع',en:'Sale price'}, type:'number', money:true},
+    {key:'costPct', label:{ar:'نسبة التكلفة %',en:'Cost %'}, type:'ro',
+      calc:r=>{const tc=bomIngCost(r.item)+(+r.pkgCost||0); return r.price? (tc/(+r.price))*100 : 0;}, pct:true},
+    {key:'gp', label:{ar:'الربح الإجمالي',en:'Gross profit'}, type:'ro', calc:r=>(+r.price||0)-(bomIngCost(r.item)+(+r.pkgCost||0)), money:true},
+    {key:'marginPct', label:{ar:'هامش الربح %',en:'Margin %'}, type:'ro',
+      calc:r=>{const gp=(+r.price||0)-(bomIngCost(r.item)+(+r.pkgCost||0)); return r.price? (gp/(+r.price))*100 : 0;}, pct:true},
+    {key:'target', label:{ar:'التكلفة المستهدفة %',en:'Target cost %'}, type:'number'},
+    {key:'status', label:{ar:'الحالة',en:'Status'}, type:'ro', pill:true, optionSet:'costState',
+      calc:r=>{const tc=bomIngCost(r.item)+(+r.pkgCost||0); const pct=r.price?(tc/(+r.price))*100:0;
+        return pct<= (+r.target||30) ? 'onTarget' : 'high';}},
+  ],
+  seed:(()=>{
+    // item, category, pkgCost, price, target% — ingredient cost is computed live from the BOM module
+    const rows=[
+      ['Espresso','hot',1.2,70,30],['Cappuccino','hot',1.4,115,30],['Macchiato','hot',1.2,80,30],
+      ['Latte','hot',1.4,100,30],['Americano','hot',1.2,80,30],['Spanish Latte','hot',1.4,140,30],
+      ['Cortado','hot',1.2,95,30],['Mocha','hot',1.4,140,30],['White Mocha','hot',1.4,140,30],
+      ['Affogato','hot',1.2,110,30],['Flat White','hot',1.4,95,30],['Caramel Macchiato','hot',1.4,90,30],
+      ['Pistachio Latte','hot',1.4,150,30],['Kender Latte','hot',1.4,150,30],['Salted Caramel Latte','hot',1.4,140,30],
+      ['Zebra Latte','hot',1.4,170,30],['Turkish Coffee','hot',0.5,70,30],['Frensh Coffee','hot',1.2,75,30],
+      ['Hot Matcha','hot',1.4,140,30],['Vanilla Frappe','cold',1.6,115,30],
+    ];
+    return rows.map(r=>({id:uid(), item:r[0], category:r[1], pkgCost:r[2], price:r[3], target:r[4]}));
+  })()
+});
+
+defMod({
+  key:'bom', icon:'🧩',
+  title:{ar:'وصفة الاستهلاك (BOM)',en:'Recipe Ingredients (BOM)'},
+  desc:{ar:'اربط كل صنف منيو بالخامات التي يستهلكها لكل تقديمة. هذا الربط هو ما يشغّل خصم المخزون التلقائي وتكلفة المكونات التلقائية في شاشتي المخزون والوصفات.',
+        en:'Link each menu item to the raw materials it consumes per serving. This is what drives the automatic inventory deduction and automatic ingredient cost in the Inventory and Recipes screens.'},
+  columns:[
+    {key:'item', label:{ar:'صنف المنيو',en:'Menu item'}, type:'select', dynamicOptions:menuItemOptions},
+    {key:'ingredient', label:{ar:'الخامة',en:'Ingredient'}, type:'select', dynamicOptions:inventoryItemOptions},
+    {key:'qty', label:{ar:'الكمية لكل تقديمة',en:'Qty per serving'}, type:'number'},
+    {key:'unit', label:{ar:'الوحدة',en:'Unit'}, type:'ro', text:true,
+      calc:r=>{const inv=(DATA.inventory||[]).find(i=>i.name===r.ingredient); return inv?inv.unit:'';}},
+    {key:'cost', label:{ar:'تكلفة المكوّن',en:'Ingredient cost'}, type:'ro', money:true,
+      calc:r=>{const inv=(DATA.inventory||[]).find(i=>i.name===r.ingredient); return inv? (+r.qty||0)*(+inv.unitCost||0) : 0;}},
+  ],
+  seed:(()=>{
+    const rows=[
+      ['Espresso','Arabica beans',0.018],
+      ['Cappuccino','Arabica beans',0.018],['Cappuccino','Fresh milk',0.22],
+      ['Macchiato','Arabica beans',0.018],['Macchiato','Fresh milk',0.02],
+      ['Latte','Arabica beans',0.018],['Latte','Fresh milk',0.24],
+      ['Americano','Arabica beans',0.018],['Americano','Still water',0.18],
+      ['Spanish Latte','Arabica beans',0.018],['Spanish Latte','Fresh milk',0.12],['Spanish Latte','Condensed milk',0.045],
+      ['Cortado','Arabica beans',0.018],['Cortado','Fresh milk',0.05],
+      ['Mocha','Arabica beans',0.018],['Mocha','Fresh milk',0.12],['Mocha','Belgian chocolate',0.04],
+      ['White Mocha','Arabica beans',0.018],['White Mocha','Fresh milk',0.12],['White Mocha','White chocolate',0.04],
+      ['Affogato','Arabica beans',0.018],['Affogato','Ice cream',0.06],
+      ['Flat White','Arabica beans',0.018],['Flat White','Fresh milk',0.24],
+      ['Caramel Macchiato','Arabica beans',0.018],['Caramel Macchiato','Fresh milk',0.15],['Caramel Macchiato','Caramel sauce',0.025],
+      ['Pistachio Latte','Arabica beans',0.018],['Pistachio Latte','Fresh milk',0.12],['Pistachio Latte','Pistachio sauce',0.035],
+      ['Kender Latte','Arabica beans',0.018],['Kender Latte','Fresh milk',0.15],['Kender Latte','Kinder chocolate',0.05],
+      ['Salted Caramel Latte','Arabica beans',0.018],['Salted Caramel Latte','Fresh milk',0.22],['Salted Caramel Latte','Salted caramel sauce',0.05],
+      ['Zebra Latte','Arabica beans',0.018],['Zebra Latte','Fresh milk',0.12],['Zebra Latte','Belgian chocolate',0.025],['Zebra Latte','White chocolate',0.025],
+      ['Turkish Coffee','Turkish coffee (ground)',0.012],
+      ['Frensh Coffee','Turkish coffee (ground)',0.012],['Frensh Coffee','Fresh milk',0.2],
+      ['Hot Matcha','Matcha powder',0.0035],['Hot Matcha','Fresh milk',0.14],
+      ['Vanilla Frappe','Arabica beans',0.018],['Vanilla Frappe','Fresh milk',0.15],['Vanilla Frappe','Vanilla syrup',0.03],['Vanilla Frappe','Ice cream',0.05],
+    ];
+    return rows.map(r=>({id:uid(), item:r[0], ingredient:r[1], qty:r[2]}));
+  })()
+});
+
+defMod({
+  key:'suppliers', icon:'🚚',
+  title:{ar:'دليل الموردين',en:'Supplier Directory'},
+  desc:{ar:'قائمة الموردين المعتمدين.',en:'List of approved suppliers.'},
+  columns:[
+    {key:'name', label:{ar:'المورد',en:'Supplier'}, type:'text'},
+    {key:'category', label:{ar:'التصنيف',en:'Category'}, type:'text'},
+    {key:'contact', label:{ar:'مسؤول التواصل',en:'Contact person'}, type:'text'},
+    {key:'phone', label:{ar:'الهاتف',en:'Phone'}, type:'text'},
+    {key:'email', label:{ar:'البريد الإلكتروني',en:'Email'}, type:'text'},
+    {key:'terms', label:{ar:'شروط الدفع',en:'Payment terms'}, type:'text'},
+    {key:'leadTime', label:{ar:'مدة التوريد',en:'Lead time'}, type:'text'},
+    {key:'rating', label:{ar:'التقييم / 5',en:'Rating /5'}, type:'number'},
+    {key:'notes', label:{ar:'ملاحظات',en:'Notes'}, type:'text'},
+  ],
+  seed:[
+    {id:uid(), name:'Al Aseel Coffee', category:'Coffee & beans', contact:'Ahmed Samy', phone:'01001234567', email:'sales@asilcoffee.eg', terms:'Net 15', leadTime:'2 days', rating:5, notes:''},
+    {id:uid(), name:'Delta Farms', category:'Dairy', contact:'Heba Fouad', phone:'01123456789', email:'info@delta-dairy.eg', terms:'Cash on delivery', leadTime:'1 day', rating:4, notes:''},
+    {id:uid(), name:'Plastico Egypt', category:'Packaging', contact:'Karim Adel', phone:'01234567890', email:'orders@plastico.eg', terms:'Net 30', leadTime:'3 days', rating:4, notes:''},
+  ]
+});
+
+defMod({
+  key:'attendance', icon:'🕒',
+  title:{ar:'الحضور والانصراف',en:'Attendance'},
+  desc:{ar:'متابعة حضور الموظفين والتأخير والعمل الإضافي يوميًا.',en:'Track daily staff attendance, lateness and overtime.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'employee', label:{ar:'الموظف',en:'Employee'}, type:'text'},
+    {key:'position', label:{ar:'الوظيفة',en:'Role'}, type:'select', optionSet:'position'},
+    {key:'shift', label:{ar:'الوردية',en:'Shift'}, type:'select', optionSet:'shift'},
+    {key:'checkIn', label:{ar:'وقت الحضور',en:'Check-in'}, type:'text'},
+    {key:'checkOut', label:{ar:'وقت الانصراف',en:'Check-out'}, type:'text'},
+    {key:'status', label:{ar:'الحالة',en:'Status'}, type:'select', optionSet:'attendanceStatus'},
+    {key:'late', label:{ar:'دقائق التأخير',en:'Late minutes'}, type:'number'},
+    {key:'ot', label:{ar:'ساعات إضافية',en:'Overtime hrs'}, type:'number'},
+    {key:'notes', label:{ar:'ملاحظات',en:'Notes'}, type:'text'},
+  ],
+  seed:(()=>{const emp=[['Yasmin','barista'],['Karim','cashier'],['Mostafa','waiter'],['Nour','captain']];
+    const rows=[];
+    for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
+      emp.forEach((e,idx)=>rows.push({id:uid(), date:d.toISOString().slice(0,10), employee:e[0], position:e[1],
+        shift:idx%2?'evening':'morning', checkIn:'08:00', checkOut:'16:00', status: (i===2&&idx===1)?'absent':((i===4&&idx===0)?'late':'present'),
+        late:(i===4&&idx===0)?15:0, ot:0, notes:''}));}
+    return rows;})()
+});
+
+defMod({
+  key:'schedule', icon:'🗓️',
+  title:{ar:'جدول الورديات',en:'Shift Schedule (Rota)'},
+  desc:{ar:'خطّط ورديات الموظفين مقدمًا. عمود «الحضور الفعلي» يقرأ تلقائيًا من شاشة الحضور والانصراف لنفس التاريخ والموظف.',
+        en:'Plan staff shifts ahead of time. The “Actual attendance” column reads automatically from the Attendance screen for the same date and employee.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'employee', label:{ar:'الموظف',en:'Employee'}, type:'text'},
+    {key:'position', label:{ar:'الوظيفة',en:'Role'}, type:'select', optionSet:'position'},
+    {key:'shift', label:{ar:'الوردية',en:'Shift'}, type:'select', optionSet:'shift'},
+    {key:'plannedStart', label:{ar:'بداية الوردية',en:'Planned start'}, type:'text'},
+    {key:'plannedEnd', label:{ar:'نهاية الوردية',en:'Planned end'}, type:'text'},
+    {key:'attendanceStatus', label:{ar:'الحضور الفعلي',en:'Actual attendance'}, type:'ro', pill:true, optionSet:'rotaStatus',
+      calc:r=>{const m=(DATA.attendance||[]).find(a=>a.date===r.date && a.employee===r.employee); return m ? m.status : 'noRecord';}},
+    {key:'notes', label:{ar:'ملاحظات',en:'Notes'}, type:'text'},
+  ],
+  seed:(()=>{const emp=[['Yasmin','barista'],['Karim','cashier'],['Mostafa','waiter'],['Nour','captain']];
+    const rows=[];
+    for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
+      emp.forEach((e,idx)=>rows.push({id:uid(), date:d.toISOString().slice(0,10), employee:e[0], position:e[1],
+        shift:idx%2?'evening':'morning', plannedStart:idx%2?'16:00':'08:00', plannedEnd:idx%2?'00:00':'16:00', notes:''}));}
+    return rows;})()
+});
+
+defMod({
+  key:'evaluation', icon:'⭐',
+  title:{ar:'تقييم أداء الموظفين',en:'Staff Performance Review'},
+  desc:{ar:'تقييم شهري للباريستا والكاشير والويتر والكابتن وطاقم الدعم.',
+        en:'Monthly review for baristas, cashiers, waiters, captains and support staff.'},
+  columns:[
+    {key:'month', label:{ar:'الشهر',en:'Month'}, type:'text'},
+    {key:'employee', label:{ar:'الموظف',en:'Employee'}, type:'text'},
+    {key:'position', label:{ar:'الوظيفة',en:'Role'}, type:'select', optionSet:'position'},
+    {key:'attendancePct', label:{ar:'نسبة الحضور %',en:'Attendance %'}, type:'number'},
+    {key:'punctuality', label:{ar:'الالتزام بالمواعيد /10',en:'Punctuality /10'}, type:'number'},
+    {key:'hygiene', label:{ar:'النظافة الشخصية /10',en:'Personal hygiene /10'}, type:'number'},
+    {key:'service', label:{ar:'جودة الخدمة /10',en:'Service quality /10'}, type:'number'},
+    {key:'quality', label:{ar:'جودة المنتج /10',en:'Product quality /10'}, type:'number'},
+    {key:'upsell', label:{ar:'مهارة البيع الإضافي /10',en:'Upselling skill /10'}, type:'number'},
+    {key:'overall', label:{ar:'التقييم الإجمالي /10',en:'Overall score /10'}, type:'ro',
+      calc:r=>{const arr=[r.punctuality,r.hygiene,r.service,r.quality,r.upsell].map(v=>+v||0);
+        return arr.reduce((a,b)=>a+b,0)/5;}},
+    {key:'notes', label:{ar:'ملاحظات المدير',en:'Manager notes'}, type:'text'},
+  ],
+  seed:[
+    {id:uid(), month:'August 2026', employee:'Yasmin', position:'barista', attendancePct:96, punctuality:9, hygiene:10, service:9, quality:9, upsell:7, notes:''},
+    {id:uid(), month:'August 2026', employee:'Karim', position:'cashier', attendancePct:88, punctuality:7, hygiene:9, service:8, quality:8, upsell:8, notes:'Noticeable improvement'},
+    {id:uid(), month:'August 2026', employee:'Mostafa', position:'waiter', attendancePct:92, punctuality:8, hygiene:9, service:9, quality:8, upsell:6, notes:''},
+  ]
+});
+
+defMod({
+  key:'openclose', icon:'✅',
+  title:{ar:'قائمة فحص الفتح والإغلاق',en:'Opening / Closing Checklist'},
+  desc:{ar:'أكمل القائمة لكل وردية. استخدم ✓ / ✕ / N/A.',en:'Complete the checklist each shift. Use ✓ / ✕ / N/A.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'shift', label:{ar:'الوردية',en:'Shift'}, type:'select', optionSet:'shift'},
+    {key:'type', label:{ar:'النوع',en:'Type'}, type:'select', optionSet:'checklistType'},
+    {key:'area', label:{ar:'المنطقة / المعدة',en:'Area / equipment'}, type:'text'},
+    {key:'item', label:{ar:'بند الفحص',en:'Check item'}, type:'text'},
+    {key:'status', label:{ar:'الحالة',en:'Status'}, type:'select', optionSet:'checkState'},
+    {key:'checkedBy', label:{ar:'تم الفحص بواسطة',en:'Checked by'}, type:'text'},
+    {key:'notes', label:{ar:'ملاحظات',en:'Notes'}, type:'text'},
+  ],
+  seed:[
+    {id:uid(), date:todayStr(), shift:'morning', type:'open', area:'Coffee bar', item:'Espresso machine ready', status:'done', checkedBy:'Yasmin', notes:''},
+    {id:uid(), date:todayStr(), shift:'morning', type:'open', area:'Dining area', item:'Tables and chairs clean', status:'done', checkedBy:'Mostafa', notes:''},
+    {id:uid(), date:todayStr(), shift:'evening', type:'close', area:'Kitchen', item:'Cooking equipment shut down', status:'done', checkedBy:'Nour', notes:''},
+  ]
+});
+
+defMod({
+  key:'hygiene', icon:'🧼',
+  title:{ar:'النظافة والصحة العامة',en:'Hygiene & Sanitation'},
+  desc:{ar:'قائمة النظافة اليومية لمنطقة الخدمة والبار والمطبخ ودورة المياه والمخزن.',
+        en:'Daily hygiene checklist for service area, bar, kitchen, restroom and storage.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'time', label:{ar:'الوقت',en:'Time'}, type:'text'},
+    {key:'area', label:{ar:'المنطقة',en:'Area'}, type:'select', optionSet:'hygieneArea'},
+    {key:'task', label:{ar:'المهمة',en:'Task'}, type:'text'},
+    {key:'freq', label:{ar:'التكرار',en:'Frequency'}, type:'select', optionSet:'freq'},
+    {key:'status', label:{ar:'الحالة',en:'Status'}, type:'select', optionSet:'hygieneStatus'},
+    {key:'employee', label:{ar:'الموظف',en:'Employee'}, type:'text'},
+    {key:'supervisor', label:{ar:'المشرف',en:'Supervisor'}, type:'text'},
+  ],
+  seed:[
+    {id:uid(), date:todayStr(), time:'09:00', area:'bar', task:'Sanitize prep surfaces', freq:'daily', status:'done', employee:'Yasmin', supervisor:'Manager'},
+    {id:uid(), date:todayStr(), time:'10:00', area:'restroom', task:'Clean and disinfect', freq:'daily', status:'done', employee:'Mostafa', supervisor:'Manager'},
+    {id:uid(), date:todayStr(), time:'22:00', area:'kitchen', task:'Weekly deep clean', freq:'weekly', status:'inProgress', employee:'Nour', supervisor:'Manager'},
+  ]
+});
+
+defMod({
+  key:'maintenance', icon:'🔧',
+  title:{ar:'سجل الصيانة',en:'Maintenance Log'},
+  desc:{ar:'سجل أعمال الصيانة العلاجية والوقائية.',en:'Log corrective and preventive maintenance work.'},
+  columns:[
+    {key:'date', label:{ar:'تاريخ البلاغ',en:'Reported date'}, type:'date'},
+    {key:'equipment', label:{ar:'المعدة',en:'Equipment'}, type:'text'},
+    {key:'asset', label:{ar:'الرقم التسلسلي',en:'Asset #'}, type:'text'},
+    {key:'issue', label:{ar:'العطل',en:'Issue'}, type:'text'},
+    {key:'priority', label:{ar:'الأولوية',en:'Priority'}, type:'select', optionSet:'priority'},
+    {key:'tech', label:{ar:'الفني / المورد',en:'Technician / vendor'}, type:'text'},
+    {key:'cost', label:{ar:'التكلفة',en:'Cost'}, type:'number', money:true},
+    {key:'status', label:{ar:'الحالة',en:'Status'}, type:'select', optionSet:'maintStatus'},
+    {key:'repairDate', label:{ar:'تاريخ الإصلاح',en:'Repair date'}, type:'date'},
+    {key:'nextPM', label:{ar:'موعد الصيانة القادمة',en:'Next PM date'}, type:'date'},
+    {key:'notes', label:{ar:'ملاحظات',en:'Notes'}, type:'text'},
+  ],
+  seed:[
+    {id:uid(), date:todayStr(), equipment:'Espresso machine', asset:'ESP-2201', issue:'Weak pressure', priority:'high', tech:'Certified maintenance tech', cost:450, status:'inProgress', repairDate:'', nextPM:'', notes:''},
+    {id:uid(), date:todayStr(), equipment:'Display fridge', asset:'FRZ-0087', issue:'Unusual noise', priority:'medium', tech:'Egyptian Cooling Co.', cost:0, status:'open', repairDate:'', nextPM:'', notes:''},
+  ]
+});
+
+defMod({
+  key:'complaints', icon:'💬',
+  title:{ar:'شكاوى وملاحظات العملاء',en:'Customer Complaints'},
+  desc:{ar:'تتبع الشكوى، السبب الجذري، الإجراء، التعويض والإغلاق.',
+        en:'Track the complaint, root cause, action, compensation and resolution.'},
+  columns:[
+    {key:'date', label:{ar:'التاريخ',en:'Date'}, type:'date'},
+    {key:'orderNo', label:{ar:'رقم الطلب',en:'Order #'}, type:'text'},
+    {key:'channel', label:{ar:'القناة',en:'Channel'}, type:'select', optionSet:'channel'},
+    {key:'customer', label:{ar:'العميل / التواصل',en:'Customer / contact'}, type:'text'},
+    {key:'complaint', label:{ar:'الشكوى',en:'Complaint'}, type:'text'},
+    {key:'area', label:{ar:'المنتج / المنطقة',en:'Product / area'}, type:'text'},
+    {key:'rootCause', label:{ar:'السبب الجذري',en:'Root cause'}, type:'text'},
+    {key:'action', label:{ar:'الإجراء المتخذ',en:'Action taken'}, type:'text'},
+    {key:'compensation', label:{ar:'التعويض',en:'Compensation'}, type:'text'},
+    {key:'status', label:{ar:'الحالة',en:'Status'}, type:'select', optionSet:'complaintStatus'},
+    {key:'closedBy', label:{ar:'أُغلق بواسطة',en:'Closed by'}, type:'text'},
+  ],
+  seed:[
+    {id:uid(), date:todayStr(), orderNo:'#4821', channel:'deliveryApp', customer:'App customer', complaint:'Late delivery', area:'Delivery', rootCause:'Order surge', action:'Apology and discount on next order', compensation:'20% off coupon', status:'closed', closedBy:'Manager'},
+    {id:uid(), date:todayStr(), orderNo:'#4835', channel:'inPerson', customer:'—', complaint:'Coffee served cold', area:'Coffee bar', rootCause:'', action:'Replaced order immediately', compensation:'—', status:'inProgress', closedBy:''},
+  ]
+});
+
+/* =========================================================
+   STORAGE (persistent, in-artifact key-value store)
+========================================================= */
+let DATA = {};
+
+async function loadAll(){
+  try{
+    const langRes = await window.storage.get('lang', false);
+    if(langRes && (langRes.value==='ar' || langRes.value==='en')) LANG = langRes.value;
+  }catch(e){ /* no saved lang yet */ }
+
+  try{
+    const res = await window.storage.get(STORAGE_KEY, false);
+    DATA = res ? JSON.parse(res.value) : {};
+  }catch(e){ DATA = {}; }
+
+  let changed = false;
+  MODULES.forEach(m=>{
+    if(m.isDashboard) return;
+    if(!DATA[m.key]){ DATA[m.key] = m.seed ? JSON.parse(JSON.stringify(m.seed)) : []; changed = true; }
+  });
+  if(changed) await saveData();
+}
+async function saveData(){
+  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(DATA), false); }
+  catch(e){ console.error('Storage error', e); }
+}
+async function saveLang(){
+  try{ await window.storage.set('lang', LANG, false); }catch(e){ console.error(e); }
+}
+
+/* =========================================================
+   NAV / ROUTER
+========================================================= */
+let currentView = 'dashboard';
+let sortState = {};   // per-module {col, dir}
+let searchState = {}; // per-module search text
+const navList = document.getElementById('navList');
+
+function buildNav(){
+  navList.innerHTML = '';
+  MODULES.forEach(m=>{
+    const el = document.createElement('div');
+    el.className = 'nav-item' + (m.key===currentView?' active':'');
+    el.dataset.key = m.key;
+    let cnt = '';
+    if(!m.isDashboard){
+      const n = (DATA[m.key]||[]).length;
+      cnt = `<span class="cnt">${n}</span>`;
+    }
+    el.innerHTML = `<span class="ic">${m.icon}</span><span>${m.title[LANG]}</span>${cnt}`;
+    el.onclick = ()=>switchView(m.key);
+    navList.appendChild(el);
+  });
+}
+
+function switchView(key){
+  currentView = key;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.key===key));
+  const mod = MODULES.find(m=>m.key===key);
+  document.getElementById('topTitle').textContent = mod.title[LANG];
+  document.getElementById('topSub').textContent = mod.desc[LANG];
+  render();
+  if(window.innerWidth<=760) document.getElementById('sidebar').classList.remove('open');
+}
+
+document.getElementById('menuBtn').onclick = ()=>document.getElementById('sidebar').classList.toggle('open');
+document.getElementById('content').addEventListener('click', ()=>{
+  if(window.innerWidth<=760) document.getElementById('sidebar').classList.remove('open');
+});
+document.querySelector('.topbar').addEventListener('click', (e)=>{
+  if(window.innerWidth<=760 && e.target.id!=='menuBtn') document.getElementById('sidebar').classList.remove('open');
+});
+
+/* =========================================================
+   LANGUAGE SWITCH
+========================================================= */
+function applyLangChrome(){
+  const html = document.getElementById('htmlRoot');
+  html.lang = LANG; html.dir = LANG==='ar' ? 'rtl' : 'ltr';
+  document.getElementById('langAr').classList.toggle('active', LANG==='ar');
+  document.getElementById('langEn').classList.toggle('active', LANG==='en');
+  document.getElementById('brandSub').textContent = UI[LANG].brandSub;
+  document.getElementById('storageNote').textContent = UI[LANG].storageNote;
+  document.getElementById('resetBtn').textContent = UI[LANG].resetAll;
+  document.getElementById('todayPill').textContent = new Date().toLocaleDateString(LANG==='ar'?'ar-EG':'en-GB',{weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+document.getElementById('langAr').onclick = ()=>setLang('ar');
+document.getElementById('langEn').onclick = ()=>setLang('en');
+function setLang(l){
+  if(LANG===l) return;
+  LANG = l;
+  saveLang();
+  applyLangChrome();
+  buildNav();
+  const mod = MODULES.find(m=>m.key===currentView);
+  document.getElementById('topTitle').textContent = mod.title[LANG];
+  document.getElementById('topSub').textContent = mod.desc[LANG];
+  render();
+}
+
+/* =========================================================
+   RENDER: generic table module
+========================================================= */
+const content = document.getElementById('content');
+
+function pillClass(setKey, val){
+  const goodMap = {ok:1, available:1, onTarget:1, present:1, none:1};
+  const warnMap = {near:1, noRecord:1, notDone:1, inProgress:1, leave:1};
+  const badMap = {over:1, short:1, reorder:1, high:1, expired:1, absent:1, late:1};
+  if(goodMap[val]) return 'status-ok';
+  if(warnMap[val]) return 'status-warn';
+  if(badMap[val]) return 'status-bad';
+  return 'status-ok';
+}
+
+function filteredSortedRows(mod){
+  let rows = [...DATA[mod.key]];
+  const q = (searchState[mod.key]||'').trim().toLowerCase();
+  if(q){
+    rows = rows.filter(r=>{
+      return mod.columns.some(col=>{
+        let v = col.type==='ro' ? col.calc(r) : r[col.key];
+        if(col.optionSet) v = optLabel(col.optionSet, v);
+        return String(v??'').toLowerCase().includes(q);
+      });
+    });
+  }
+  const sort = sortState[mod.key];
+  if(sort){
+    const col = mod.columns.find(c=>c.key===sort.col);
+    rows.sort((a,b)=>{
+      let va = col.type==='ro' ? col.calc(a) : a[col.key];
+      let vb = col.type==='ro' ? col.calc(b) : b[col.key];
+      if(col.optionSet){ va = optLabel(col.optionSet, va); vb = optLabel(col.optionSet, vb); }
+      const na = parseFloat(va), nb = parseFloat(vb);
+      let cmp;
+      if(!isNaN(na) && !isNaN(nb) && col.type!=='text') cmp = na - nb;
+      else cmp = String(va??'').localeCompare(String(vb??''), LANG==='ar'?'ar':'en');
+      return sort.dir==='asc' ? cmp : -cmp;
+    });
+  }
+  return rows;
+}
+
+function exportCsv(mod){
+  const rows = filteredSortedRows(mod);
+  const headers = mod.columns.map(c=>c.label[LANG]);
+  const lines = [headers.join(',')];
+  rows.forEach(r=>{
+    const cells = mod.columns.map(col=>{
+      let v = col.type==='ro' ? col.calc(r) : (r[col.key] ?? '');
+      if(col.optionSet) v = optLabel(col.optionSet, v);
+      v = String(v).replace(/"/g,'""');
+      return /[",\n]/.test(v) ? `"${v}"` : v;
+    });
+    lines.push(cells.join(','));
+  });
+  const blob = new Blob(['\uFEFF'+lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `cukur-${mod.key}-${todayStr()}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportPdf(mod){
+  const rows = filteredSortedRows(mod);
+  const headers = mod.columns.map(c=>c.label[LANG]);
+  const body = rows.map(r=>mod.columns.map(col=>{
+    let v = col.type==='ro' ? col.calc(r) : (r[col.key] ?? '');
+    if(col.optionSet) v = optLabel(col.optionSet, v);
+    if(col.money) v = fmtMoney(v);
+    else if(col.pct) v = fmtNum(v)+' %';
+    else if(typeof v === 'number') v = fmtNum(v);
+    return String(v ?? '');
+  }));
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'pt', format:'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.setTextColor(42,22,13);
+  doc.text('cukur — ' + mod.title.en, 40, 36);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.setTextColor(110,90,73);
+  doc.text(mod.desc.en, 40, 52, { maxWidth: pageW-80 });
+  doc.text('Generated: ' + todayStr(), pageW-40, 36, { align:'right' });
+
+  doc.autoTable({
+    head:[headers],
+    body:body,
+    startY:68,
+    styles:{ font:'helvetica', fontSize:8, cellPadding:5, overflow:'linebreak', textColor:[42,22,13] },
+    headStyles:{ fillColor:[42,22,13], textColor:[247,239,221], fontStyle:'bold' },
+    alternateRowStyles:{ fillColor:[247,239,221] },
+    margin:{ left:30, right:30 },
+    theme:'grid',
+  });
+
+  doc.save(`cukur-${mod.key}-${todayStr()}.pdf`);
+}
+
+function renderModule(mod){
+  const allRows = DATA[mod.key];
+  const rows = filteredSortedRows(mod);
+  const sort = sortState[mod.key];
+
+  let html = `
+    <div class="mod-head">
+      <div class="txt"><h2>${mod.icon} ${mod.title[LANG]}</h2><p>${mod.desc[LANG]}</p></div>
+      <div class="mod-actions">
+        <button class="btn btn-ghost" id="pdfBtn">📄 PDF</button>
+        <button class="btn btn-ghost" id="exportBtn">⬇ ${UI[LANG].exportCsv}</button>
+        <button class="btn btn-primary" id="addRowBtn">${UI[LANG].addRow}</button>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="toolbar">
+        <div class="search-box"><input type="text" id="searchInput" placeholder="${UI[LANG].search}" value="${(searchState[mod.key]||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="table-scroll"><table class="data-tbl"><thead><tr>
+        <th class="row-del">#</th>
+        ${mod.columns.map(c=>{
+          const arrow = sort && sort.col===c.key ? (sort.dir==='asc'?'▲':'▼') : '';
+          return `<th data-key="${c.key}">${c.label[LANG]}<span class="arrow">${arrow}</span></th>`;
+        }).join('')}
+      </tr></thead><tbody id="tbl-body"></tbody></table></div>
+      <div class="tbl-footer"><span>${UI[LANG].rowCount}: <b>${allRows.length}</b></span><span id="tblSum"></span></div>
+    </div>`;
+  content.innerHTML = html;
+
+  const tbody = document.getElementById('tbl-body');
+  if(allRows.length===0){
+    tbody.innerHTML = `<tr><td colspan="${mod.columns.length+1}"><div class="empty-hint">${UI[LANG].noData}</div></td></tr>`;
+  } else if(rows.length===0){
+    tbody.innerHTML = `<tr><td colspan="${mod.columns.length+1}"><div class="empty-hint">${UI[LANG].noMatch}</div></td></tr>`;
+  } else {
+    rows.forEach((row)=>{
+      const idx = allRows.indexOf(row);
+      const tr = document.createElement('tr');
+      let cells = `<td class="row-del"><button class="btn-danger-sm" data-idx="${idx}" title="${UI[LANG].delete}">✕</button></td>`;
+      mod.columns.forEach(col=>{
+        if(col.type==='ro'){
+          const raw = col.calc(row);
+          let display;
+          if(col.pill){
+            display = `<span class="status-pill ${pillClass(col.optionSet, raw)}">${optLabel(col.optionSet, raw)}</span>`;
+          } else if(col.money){
+            display = fmtMoney(raw);
+          } else if(col.pct){
+            display = fmtNum(raw)+' %';
+          } else if(col.text){
+            display = raw ?? '';
+          } else {
+            display = fmtNum(raw);
+          }
+          cells += `<td class="cell-ro">${display}</td>`;
+        } else if(col.type==='select'){
+          const opts = col.dynamicOptions ? col.dynamicOptions() : OPT[col.optionSet];
+          cells += `<td><select class="cell-select" data-key="${col.key}" data-idx="${idx}">
+            ${opts.map(o=>`<option value="${o.v}" ${row[col.key]===o.v?'selected':''}>${o[LANG]}</option>`).join('')}
+          </select></td>`;
+        } else {
+          const type = col.type==='number'?'number':(col.type==='date'?'date':'text');
+          const val = row[col.key]===undefined?'':row[col.key];
+          cells += `<td><input class="cell-input" type="${type}" data-key="${col.key}" data-idx="${idx}" value="${String(val).replace(/"/g,'&quot;')}"></td>`;
+        }
+      });
+      tr.innerHTML = cells;
+      tbody.appendChild(tr);
+    });
+  }
+
+  const moneyCols = mod.columns.filter(c=>c.money);
+  if(moneyCols.length){
+    const parts = moneyCols.slice(0,2).map(c=>{
+      const sum = rows.reduce((a,r)=>a + (c.type==='ro'? (+c.calc(r)||0) : (+r[c.key]||0)), 0);
+      return `${c.label[LANG]}: <b>${fmtMoney(sum)}</b>`;
+    });
+    document.getElementById('tblSum').innerHTML = parts.join(' &nbsp;•&nbsp; ');
+  }
+
+  document.getElementById('addRowBtn').onclick = async ()=>{
+    const newRow = {id:uid()};
+    mod.columns.forEach(c=>{
+      if(c.type==='ro') return;
+      if(c.type==='date') newRow[c.key] = todayStr();
+      else if(c.type==='select'){ const opts = c.dynamicOptions ? c.dynamicOptions() : OPT[c.optionSet]; newRow[c.key] = opts && opts.length ? opts[0].v : ''; }
+      else newRow[c.key] = '';
+    });
+    DATA[mod.key].push(newRow);
+    await saveData();
+    buildNav();
+    renderModule(mod);
+  };
+  document.getElementById('exportBtn').onclick = ()=>exportCsv(mod);
+  document.getElementById('pdfBtn').onclick = ()=>exportPdf(mod);
+
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    searchState[mod.key] = e.target.value;
+    renderModule(mod);
+    document.getElementById('searchInput').focus();
+    const v = document.getElementById('searchInput').value;
+    document.getElementById('searchInput').setSelectionRange(v.length, v.length);
+  });
+
+  content.querySelectorAll('thead th[data-key]').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.key;
+      const cur = sortState[mod.key];
+      if(cur && cur.col===key) sortState[mod.key] = {col:key, dir: cur.dir==='asc'?'desc':'asc'};
+      else sortState[mod.key] = {col:key, dir:'asc'};
+      renderModule(mod);
+    });
+  });
+
+  tbody.querySelectorAll('.cell-input, .cell-select').forEach(inp=>{
+    inp.addEventListener('input', async ()=>{
+      const idx = +inp.dataset.idx, key = inp.dataset.key;
+      DATA[mod.key][idx][key] = inp.value;
+      await saveData();
+      updateRowReadonlyCells(mod, inp.closest('tr'), DATA[mod.key][idx]);
+      refreshFooterOnly(mod);
+    });
+    inp.addEventListener('change', ()=>{ renderModule(mod); });
+  });
+
+  tbody.querySelectorAll('.btn-danger-sm').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const idx = +btn.dataset.idx;
+      DATA[mod.key].splice(idx,1);
+      await saveData();
+      buildNav();
+      renderModule(mod);
+    });
+  });
+}
+
+function updateRowReadonlyCells(mod, tr, row){
+  if(!tr) return;
+  mod.columns.forEach((col, ci)=>{
+    if(col.type==='ro'){
+      const td = tr.children[ci+1];
+      const raw = col.calc(row);
+      if(col.pill){ td.innerHTML = `<span class="status-pill ${pillClass(col.optionSet, raw)}">${optLabel(col.optionSet, raw)}</span>`; }
+      else if(col.money){ td.textContent = fmtMoney(raw); }
+      else if(col.pct){ td.textContent = fmtNum(raw)+' %'; }
+      else if(col.text){ td.textContent = raw ?? ''; }
+      else { td.textContent = fmtNum(raw); }
+    }
+  });
+}
+function refreshFooterOnly(mod){
+  const rows = filteredSortedRows(mod);
+  const moneyCols = mod.columns.filter(c=>c.money);
+  if(moneyCols.length){
+    const parts = moneyCols.slice(0,2).map(c=>{
+      const sum = rows.reduce((a,r)=>a + (c.type==='ro'? (+c.calc(r)||0) : (+r[c.key]||0)), 0);
+      return `${c.label[LANG]}: <b>${fmtMoney(sum)}</b>`;
+    });
+    const el = document.getElementById('tblSum');
+    if(el) el.innerHTML = parts.join(' &nbsp;•&nbsp; ');
+  }
+}
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+let salesChart, expenseChart;
+const monthKey = d => (d||'').slice(0,7);
+
+function renderDashboard(){
+  const sales = DATA.sales || [];
+  const expenses = DATA.expenses || [];
+  const waste = DATA.waste || [];
+  const cashier = DATA.cashier || [];
+  const inventory = DATA.inventory || [];
+  const maintenance = DATA.maintenance || [];
+  const complaints = DATA.complaints || [];
+  const attendance = DATA.attendance || [];
+
+  const today = todayStr();
+  const yest = (()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);})();
+  const thisMonth = monthKey(today);
+  const lastMonth = (()=>{const d=new Date();d.setMonth(d.getMonth()-1);return monthKey(d.toISOString().slice(0,10));})();
+
+  const netSale = r => ((+r.cash||0)+(+r.card||0)+(+r.wallet||0)) - (+r.discounts||0);
+
+  const todaySales = sales.filter(r=>r.date===today).reduce((a,r)=>a+netSale(r),0);
+  const yestSales = sales.filter(r=>r.date===yest).reduce((a,r)=>a+netSale(r),0);
+  const monthSalesRows = sales.filter(r=>monthKey(r.date)===thisMonth);
+  const lastMonthSalesRows = sales.filter(r=>monthKey(r.date)===lastMonth);
+  const monthSales = monthSalesRows.reduce((a,r)=>a+netSale(r),0);
+  const lastMonthSales = lastMonthSalesRows.reduce((a,r)=>a+netSale(r),0);
+  const monthOrders = monthSalesRows.reduce((a,r)=>a+(+r.orders||0),0);
+  const avgInvoice = monthOrders ? monthSales/monthOrders : 0;
+
+  const monthExpRows = expenses.filter(r=>monthKey(r.date)===thisMonth);
+  const monthExpenses = monthExpRows.reduce((a,r)=>a+(+r.amount||0),0);
+
+  const monthWasteRows = waste.filter(r=>monthKey(r.date)===thisMonth);
+  const monthWaste = monthWasteRows.reduce((a,r)=>a+((+r.qty||0)*(+r.unitCost||0)),0);
+
+  const totalSalesAll = sales.reduce((a,r)=>a+netSale(r),0);
+  const totalExpAll = expenses.reduce((a,r)=>a+(+r.amount||0),0);
+  const totalWasteAll = waste.reduce((a,r)=>a+((+r.qty||0)*(+r.unitCost||0)),0);
+  const invValue = inventory.reduce((a,r)=>a+(inventoryClosing(r)*(+r.unitCost||0)),0);
+
+  const cashVariance = cashier.filter(r=>monthKey(r.date)===thisMonth)
+    .reduce((a,r)=>a+((+r.actual||0)-(((+r.opening||0)+(+r.cashSales||0)-(+r.cashExp||0)))),0);
+
+  const openMaint = maintenance.filter(r=>r.status!=='done').length;
+  const openComplaints = complaints.filter(r=>r.status!=='closed').length;
+  const absenceDays = attendance.filter(r=>r.status==='absent').length;
+
+  function pctDelta(cur, prev){
+    if(!prev) return null;
+    return ((cur-prev)/prev)*100;
+  }
+  const todayDelta = pctDelta(todaySales, yestSales);
+  const monthDelta = pctDelta(monthSales, lastMonthSales);
+  function trendHtml(delta, label){
+    if(delta===null) return '';
+    const up = delta>=0;
+    return `<div class="trend ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(delta).toFixed(1)}% ${label}</div>`;
+  }
+
+  const kpis = [
+    {lbl:LANG==='ar'?'مبيعات اليوم':'Today\'s sales', val:fmtMoney(todaySales), bar:'var(--copper)', trend:trendHtml(todayDelta, UI[LANG].vsYesterday)},
+    {lbl:LANG==='ar'?'مبيعات الشهر':'Month sales', val:fmtMoney(monthSales), bar:'var(--sage)', trend:trendHtml(monthDelta, UI[LANG].vsLastMonth)},
+    {lbl:LANG==='ar'?'طلبات الشهر':'Month orders', val:fmtNum(monthOrders), bar:'var(--caramel)'},
+    {lbl:LANG==='ar'?'متوسط قيمة الفاتورة':'Avg. invoice value', val:fmtMoney(avgInvoice), bar:'var(--copper)'},
+    {lbl:LANG==='ar'?'مصروفات الشهر':'Month expenses', val:fmtMoney(monthExpenses), bar:'var(--brick)'},
+    {lbl:LANG==='ar'?'هالك الشهر':'Month waste', val:fmtMoney(monthWaste), bar:'var(--brick)'},
+    {lbl:LANG==='ar'?'فرق النقدية (الشهر)':'Cash variance (month)', val:fmtMoney(cashVariance), bar: cashVariance<0?'var(--brick)':'var(--sage)'},
+    {lbl:LANG==='ar'?'إجمالي المبيعات':'Total sales', val:fmtMoney(totalSalesAll), bar:'var(--copper)'},
+    {lbl:LANG==='ar'?'إجمالي المصروفات':'Total expenses', val:fmtMoney(totalExpAll), bar:'var(--brick)'},
+    {lbl:LANG==='ar'?'إجمالي الهالك':'Total waste', val:fmtMoney(totalWasteAll), bar:'var(--brick)'},
+    {lbl:LANG==='ar'?'قيمة المخزون':'Inventory value', val:fmtMoney(invValue), bar:'var(--sage)'},
+    {lbl:LANG==='ar'?'طلبات صيانة مفتوحة':'Open maintenance', val:fmtNum(openMaint), bar:'var(--amber)'},
+    {lbl:LANG==='ar'?'شكاوى مفتوحة':'Open complaints', val:fmtNum(openComplaints), bar:'var(--amber)'},
+    {lbl:LANG==='ar'?'أيام الغياب':'Absence days', val:fmtNum(absenceDays), bar:'var(--amber)'},
+  ];
+
+  content.innerHTML = `
+    <div class="kpi-grid">
+      ${kpis.map(k=>`<div class="kpi" style="--bar:${k.bar}"><div class="lbl">${k.lbl}</div><div class="val">${k.val}</div>${k.trend||''}</div>`).join('')}
+    </div>
+    <div class="panels">
+      <div class="panel">
+        <h3>${UI[LANG].salesTrend}</h3>
+        <div class="chart-wrap"><canvas id="salesChartCv"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>${UI[LANG].expenseBreak}</h3>
+        <div class="chart-wrap"><canvas id="expenseChartCv"></canvas></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>${UI[LANG].opsAlerts}</h3>
+      <div class="alerts-list" id="alertsList"></div>
+    </div>
+  `;
+
+  const sorted = [...sales].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).slice(-14);
+  const labels = sorted.map(r=>r.date ? r.date.slice(5) : '');
+  const values = sorted.map(r=>netSale(r));
+
+  if(salesChart) salesChart.destroy();
+  salesChart = new Chart(document.getElementById('salesChartCv'), {
+    type:'line',
+    data:{ labels, datasets:[{ label:UI[LANG].netSalesLbl, data:values, borderColor:'#B4622A',
+      backgroundColor:'rgba(180,98,42,.15)', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:'#B4622A' }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{ y:{ beginAtZero:true, grid:{color:'#EFE5D3'} }, x:{ grid:{display:false} } } }
+  });
+
+  const byCat = {};
+  monthExpRows.forEach(r=>{ const c = optLabel('expenseCategory', r.category||'other'); byCat[c] = (byCat[c]||0) + (+r.amount||0); });
+  const catLabels = Object.keys(byCat);
+  const catValues = Object.values(byCat);
+  const palette = ['#B4622A','#54805A','#B9812A','#AC3F2E','#8F4A1E','#D89544','#3E2415','#6E5A49'];
+
+  if(expenseChart) expenseChart.destroy();
+  expenseChart = new Chart(document.getElementById('expenseChartCv'), {
+    type:'doughnut',
+    data:{ labels: catLabels.length?catLabels:[UI[LANG].noExpenseData], datasets:[{ data: catValues.length?catValues:[1],
+      backgroundColor: catLabels.length? palette.slice(0,catLabels.length) : ['#EFE5D3'], borderWidth:2, borderColor:'#FFFCF6' }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, font:{size:11}, color:'#6E5A49' } } } }
+  });
+
+  const alerts = [];
+  inventory.forEach(r=>{
+    const closing = inventoryClosing(r);
+    if(closing<=(+r.reorder||0)) alerts.push({text:UI[LANG].lowStock({name:r.name||'', qty:fmtNum(closing), unit:r.unit||''}), danger:true});
+    const es = expiryState(r.expiryDate);
+    if(es!=='none') alerts.push({text:UI[LANG].expiryAlert({state:optLabel('expiryState', es), name:r.name||''}), danger:es==='expired'});
+  });
+  maintenance.filter(r=>r.status!=='done').forEach(r=>alerts.push({text:UI[LANG].maintOpen({equip:r.equipment||'', priority:optLabel('priority', r.priority)}), danger:r.priority==='urgent'}));
+  complaints.filter(r=>r.status!=='closed').forEach(r=>alerts.push({text:UI[LANG].complaintOpen({no:r.orderNo||'', text:r.complaint||''}), danger:false}));
+  cashier.filter(r=>{const v=(+r.actual||0)-(((+r.opening||0)+(+r.cashSales||0)-(+r.cashExp||0))); return Math.abs(v)>=1;})
+    .forEach(r=>alerts.push({text:UI[LANG].cashDiff({date:r.date||'', amount:fmtMoney((+r.actual||0)-(((+r.opening||0)+(+r.cashSales||0)-(+r.cashExp||0))))}), danger:true}));
+
+  const alertsList = document.getElementById('alertsList');
+  if(alerts.length===0){
+    alertsList.innerHTML = `<div class="empty-hint">${UI[LANG].noAlerts}</div>`;
+  } else {
+    alertsList.innerHTML = alerts.slice(0,12).map(a=>`
+      <div class="alert-row ${a.danger?'danger':''}">
+        <span>${a.text}</span>
+        <span class="badge ${a.danger?'bad':'warn'}">${a.danger?UI[LANG].urgent:UI[LANG].notice}</span>
+      </div>`).join('');
+  }
+}
+
+/* =========================================================
+   ROOT RENDER
+========================================================= */
+function render(){
+  const mod = MODULES.find(m=>m.key===currentView);
+  if(mod.isDashboard) renderDashboard();
+  else renderModule(mod);
+}
+
+document.getElementById('resetBtn').onclick = async ()=>{
+  if(confirm(UI[LANG].resetConfirm)){
+    DATA = {};
+    MODULES.forEach(m=>{ if(!m.isDashboard) DATA[m.key] = m.seed ? JSON.parse(JSON.stringify(m.seed)) : []; });
+    await saveData();
+    buildNav();
+    render();
+  }
+};
+
+async function init(){
+  await loadAll();
+  applyLangChrome();
+  buildNav();
+  const mod = MODULES.find(m=>m.key===currentView);
+  document.getElementById('topTitle').textContent = mod.title[LANG];
+  document.getElementById('topSub').textContent = mod.desc[LANG];
+  render();
+}
+init();
+</script>
+</body>
+</html>

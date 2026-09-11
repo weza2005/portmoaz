@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BrewHouse — Specialty Coffee</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root{
+  --cream:#faf6f0;--dark:#1a0c04;--brown:#3d1c0a;--amber:#c9943a;--amber-light:#e8b96a;
+  --sand:#f0e4d0;--muted:#8a6248;--border:#ddd0bb;--white:#fffdf9;
+  --green:#1e5c2e;--green-bg:#e8f5e9;--red:#b71c1c;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes pop{0%{transform:scale(0.85);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes ripple{to{transform:translate(-50%,-50%) scale(28);opacity:0}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(201,148,58,.5)}70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@keyframes scanline{0%{background-position:0 0}100%{background-position:0 100vh}}
+@keyframes orderIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useRef,useEffect,useCallback} = React;
+
+/* ─── DATA ─── */
+const MENU = {
+  "Hot Coffee":[{name:"Espresso",price:95},{name:"Americano",price:110},{name:"Macchiato",price:100},{name:"Cortado",price:105},{name:"Flat White",price:115},{name:"Cappuccino",price:125},{name:"Latte",price:135},{name:"Spanish Latte",price:155},{name:"Caramel Latte",price:155},{name:"Salted Caramel Latte",price:160},{name:"Pistachio Latte",price:190},{name:"Mocha",price:170},{name:"White Mocha",price:170}],
+  "Ice Coffee":[{name:"Americano",price:110},{name:"Latte",price:130},{name:"Spanish Latte",price:155},{name:"Caramel Latte",price:145},{name:"Salted Caramel Latte",price:155},{name:"Pistachio Latte",price:180},{name:"Mocha",price:170},{name:"White Mocha",price:170}],
+  "Hot Drinks":[{name:"English Tea",price:55},{name:"Hot Chocolate",price:150},{name:"Matcha",price:170},{name:"Spanish Matcha",price:200}],
+  "Iced Drinks":[{name:"Matcha",price:180},{name:"Spanish Matcha",price:200},{name:"White Chocolate Matcha",price:200},{name:"Strawberry Matcha",price:200},{name:"Mango Matcha",price:200},{name:"Passion Matcha",price:200}],
+  "Speciality Coffee":[{name:"Chemex",price:160},{name:"V60",price:170},{name:"Aeropress",price:150}],
+  "Main Dishes":[{name:"Egg Platter",price:190},{name:"Grilled Chicken Fiesta Wraps",price:240},{name:"Cheesy Egg Omelette",price:240},{name:"Breakfast Egg Platter",price:175}],
+  "Sandwiches":[{name:"Mix Cheese",price:150},{name:"Turkey Cheese",price:170},{name:"Casadia",price:190},{name:"Roastbeef",price:200},{name:"Roastbeef Organic",price:220},{name:"Tuna",price:180},{name:"Salmon",price:230}],
+  "Salads":[{name:"Greek Salad",price:175},{name:"Caesar Salad",price:195},{name:"Tuna Salad",price:200}],
+  "Bakeries":[{name:"Cookies",price:95},{name:"Brownies",price:95},{name:"Brookies",price:100},{name:"Croissant",price:100},{name:"Nutella Croissant",price:150},{name:"Danish",price:150},{name:"Brookie with Ice Cream Vanilla",price:190},{name:"Pain Suisse Chocolate",price:180}],
+  "Desserts":[{name:"Cheesecake Cup",price:170},{name:"Cheesecake Plain",price:170},{name:"San Sebastian",price:190},{name:"Triple Chocolate Cake",price:160},{name:"Honey Cake",price:150},{name:"Tiramisu",price:160},{name:"Red Velvet",price:175},{name:"Mousse Coffee Bean",price:200}],
+  "Smoothies":[{name:"Blueberry",price:135},{name:"Mango Passion",price:135},{name:"Watermelon",price:135},{name:"Lemon Mint",price:135},{name:"Mix Berries",price:135}],
+  "Mojito":[{name:"Passion Fruit",price:145},{name:"Peach",price:145},{name:"Blueberry",price:145},{name:"Mix Berry",price:145},{name:"Strawberry",price:145},{name:"Pineapple Blue Curacao",price:155}],
+  "Milkshakes":[{name:"Blueberry",price:155},{name:"Strawberry",price:155},{name:"Nutella",price:155},{name:"Kinder",price:155},{name:"Oreo",price:155}],
+  "Fresh Juice":[{name:"Mango",price:100},{name:"Orange",price:100},{name:"Strawberry",price:100},{name:"Guava",price:100}],
+  "Soft Drinks":[{name:"Water",price:25},{name:"Sparkling Water",price:55},{name:"Redbull",price:100}],
+};
+
+const CAT_ICONS={"Hot Coffee":"☕","Ice Coffee":"🧊","Hot Drinks":"🍵","Iced Drinks":"🥤","Speciality Coffee":"✨","Main Dishes":"🍳","Sandwiches":"🥪","Salads":"🥗","Bakeries":"🥐","Desserts":"🍰","Smoothies":"🫐","Mojito":"🍹","Milkshakes":"🥛","Fresh Juice":"🍊","Soft Drinks":"🫧"};
+
+// Videos change every day — cycle through 7
+const DAY_VIDEOS = [
+  {src:"https://assets.mixkit.co/videos/preview/mixkit-coffee-being-poured-in-a-cup-viewed-from-above-21975-large.mp4",mood:"Good morning — your perfect cup awaits ☕"},
+  {src:"https://assets.mixkit.co/videos/preview/mixkit-barista-making-coffee-in-a-coffee-shop-1059-large.mp4",mood:"Crafted with care, served with love 🤎"},
+  {src:"https://assets.mixkit.co/videos/preview/mixkit-woman-drinking-coffee-2487-large.mp4",mood:"Take a pause. You deserve it 🌿"},
+  {src:"https://assets.mixkit.co/videos/preview/mixkit-coffee-being-served-in-a-cafe-1058-large.mp4",mood:"Specialty coffee, extraordinary moments ✨"},
+  {src:"https://assets.mixkit.co/videos/preview/mixkit-pouring-milk-in-a-glass-cup-of-coffee-43658-large.mp4",mood:"Friday vibes at BrewHouse 🎶"},
+  {src:"https://assets.mixkit.co/videos/preview/mixkit-coffee-shop-interior-4547-large.mp4",mood:"Saturday — slow down, sip more 🛋️"},
+  {src:"https://assets.mixkit.co/videos/preview/mixkit-coffee-beans-on-a-table-2985-large.mp4",mood:"Sunday roast, Sunday coffee ☀️"},
+];
+
+// Fallback video (always works)
+const FALLBACK_VIDEO = "https://www.w3schools.com/html/mov_bbb.mp4";
+
+const SOCIALS = [
+  {icon:"📷",label:"Instagram",color:"#E1306C",bg:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",url:"https://www.instagram.com/"},
+  {icon:"🎵",label:"TikTok",color:"#fff",bg:"#000",url:"https://www.tiktok.com/"},
+  {icon:"👥",label:"Facebook",color:"#fff",bg:"#1877F2",url:"https://www.facebook.com/"},
+  {icon:"📍",label:"Maps",color:"#fff",bg:"#EA4335",url:"https://maps.google.com/"},
+  {icon:"💬",label:"WhatsApp",color:"#fff",bg:"#25D366",url:"https://wa.me/"},
+];
+
+/* ─── HOOKS ─── */
+function useRipple(){
+  const [ripples,setRipples]=useState([]);
+  const fire=(e)=>{
+    const r=e.currentTarget.getBoundingClientRect();
+    const id=Date.now()+Math.random();
+    setRipples(p=>[...p,{x:e.clientX-r.left,y:e.clientY-r.top,id}]);
+    setTimeout(()=>setRipples(p=>p.filter(x=>x.id!==id)),700);
+  };
+  const Ripples=()=>(<>{ripples.map(r=>(
+    <span key={r.id} style={{position:"absolute",left:r.x,top:r.y,width:8,height:8,borderRadius:"50%",
+      background:"rgba(255,255,255,0.4)",transform:"translate(-50%,-50%) scale(0)",
+      animation:"ripple .7s ease-out forwards",pointerEvents:"none"}}/>
+  ))}</>);
+  return {fire,Ripples};
+}
+
+/* ─── COMPONENTS ─── */
+function Btn({children,onClick,style={},disabled}){
+  const {fire,Ripples}=useRipple();
+  const [down,setDown]=useState(false);
+  return(
+    <button disabled={disabled} onMouseDown={()=>setDown(true)} onMouseUp={()=>setDown(false)}
+      onMouseLeave={()=>setDown(false)}
+      onClick={(e)=>{fire(e);onClick&&onClick(e);}}
+      style={{border:"none",cursor:disabled?"not-allowed":"pointer",position:"relative",overflow:"hidden",
+        fontFamily:"'DM Sans',sans-serif",transform:down?"scale(0.96)":"scale(1)",
+        transition:"transform .12s,opacity .15s",opacity:disabled?.45:1,...style}}>
+      <Ripples/>{children}
+    </button>
+  );
+}
+
+function AddBtn({onClick}){
+  const [done,setDone]=useState(false);
+  const {fire,Ripples}=useRipple();
+  const handle=(e)=>{
+    e.stopPropagation();fire(e);setDone(true);onClick();
+    setTimeout(()=>setDone(false),1000);
+  };
+  return(
+    <button onClick={handle} style={{
+      border:"none",borderRadius:40,padding:"7px 18px",fontSize:12,cursor:"pointer",
+      fontFamily:"'DM Sans',sans-serif",fontWeight:600,position:"relative",overflow:"hidden",
+      background:done?"#1e5c2e":"#3d1c0a",color:done?"#e8f5e9":"#faf6f0",
+      transform:done?"scale(0.94)":"scale(1)",transition:"all .2s",minWidth:72,alignSelf:"flex-end",
+    }}>
+      <Ripples/>
+      {done?"✓ Added":"+ Add"}
+    </button>
+  );
+}
+
+function QtyBtn({children,onClick}){
+  const [b,setB]=useState(false);
+  return(
+    <button onClick={(e)=>{e.stopPropagation();setB(true);setTimeout(()=>setB(false),300);onClick(e);}}
+      style={{width:28,height:28,borderRadius:"50%",border:"1.5px solid #c9943a",background:"none",
+        cursor:"pointer",fontSize:15,display:"flex",alignItems:"center",justifyContent:"center",
+        transform:b?"scale(1.4)":"scale(1)",transition:"transform .2s cubic-bezier(.34,1.56,.64,1)"}}>
+      {children}
+    </button>
+  );
+}
+
+/* ─── MAIN APP ─── */
+function App(){
+  const [page,setPage]=useState("home");
+  const [cart,setCart]=useState([]);
+  const [customer,setCustomer]=useState(null); // {name,phone,email}
+  const [orders,setOrders]=useState([]);
+  const [totalPts,setTotalPts]=useState(0);
+  const [cartOpen,setCartOpen]=useState(false);
+  const [activeCat,setActiveCat]=useState("Hot Coffee");
+  const [bump,setBump]=useState(false);
+  const [toast,setToast]=useState(null);
+  const [successModal,setSuccessModal]=useState(null);
+  const [confirmModal,setConfirmModal]=useState(false);
+  const [formData,setFormData]=useState({name:"",phone:"",email:""});
+  const [formErr,setFormErr]=useState({});
+  const catRefs=useRef({});
+  const menuScroll=useRef(null);
+
+  const dayIdx=new Date().getDay();
+  const video=DAY_VIDEOS[dayIdx];
+
+  const addToCart=(item,cat)=>{
+    setCart(prev=>{
+      const key=`${cat}||${item.name}`;
+      const ex=prev.find(c=>c.key===key);
+      if(ex) return prev.map(c=>c.key===key?{...c,qty:c.qty+1}:c);
+      return [...prev,{...item,cat,key,qty:1}];
+    });
+    setBump(true);setTimeout(()=>setBump(false),450);
+  };
+
+  const removeItem=key=>setCart(p=>p.filter(c=>c.key!==key));
+  const changeQty=(key,d)=>setCart(p=>p.map(c=>c.key===key?{...c,qty:Math.max(1,c.qty+d)}:c));
+  const cartTotal=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const cartPts=Math.floor(cartTotal*0.10);
+  const cartCount=cart.reduce((s,c)=>s+c.qty,0);
+
+  // validate form
+  const validate=()=>{
+    const e={};
+    if(!formData.name.trim()) e.name="Name is required";
+    if(!formData.phone.trim()) e.phone="Phone is required";
+    else if(!/^\+?[\d\s\-]{7,}$/.test(formData.phone.trim())) e.phone="Enter a valid phone number";
+    if(formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) e.email="Enter a valid email";
+    setFormErr(e);
+    return Object.keys(e).length===0;
+  };
+
+  const handleConfirmOrder=()=>{
+    if(!customer){
+      if(!validate()) return;
+      setCustomer({name:formData.name.trim(),phone:formData.phone.trim(),email:formData.email.trim()});
+    }
+    setConfirmModal(true);
+  };
+
+  const placeOrder=()=>{
+    const cust=customer||{name:formData.name.trim(),phone:formData.phone.trim(),email:formData.email.trim()};
+    if(!customer) setCustomer(cust);
+    const orderId=`BH-${Date.now().toString().slice(-5)}`;
+    const pts=Math.floor(cartTotal*0.10);
+    const newOrder={
+      id:orderId,name:cust.name,phone:cust.phone,email:cust.email,
+      items:[...cart],total:cartTotal,pts,status:"received",
+      time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),
+    };
+    setOrders(p=>[newOrder,...p]);
+    setTotalPts(p=>p+pts);
+    try{
+      localStorage.setItem("brewhouse_order",JSON.stringify({
+        ...newOrder,items:cart.map(i=>({...i,cat:i.cat||""}))
+      }));
+    }catch(e){}
+    setCart([]);setCartOpen(false);setConfirmModal(false);
+    setSuccessModal({orderId,pts,name:cust.name});
+  };
+
+  const scrollToCat=(cat)=>{
+    setActiveCat(cat);
+    const el=catRefs.current[cat];
+    if(el&&menuScroll.current) menuScroll.current.scrollTo({top:el.offsetTop-170,behavior:"smooth"});
+  };
+
+  const showToast=(msg,type="success")=>{
+    setToast({msg,type});setTimeout(()=>setToast(null),3500);
+  };
+
+  /* ─── NAV ─── */
+  const Nav=()=>(
+    <nav style={{
+      position:"fixed",top:0,left:0,right:0,zIndex:200,
+      background:"rgba(250,246,240,0.88)",backdropFilter:"blur(20px)",
+      borderBottom:"1px solid var(--border)",height:62,
+      display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 28px",
+    }}>
+      <Btn onClick={()=>setPage("home")} style={{
+        fontFamily:"'Cormorant Garamond',serif",fontSize:23,fontStyle:"italic",
+        color:"var(--dark)",fontWeight:700,background:"none",padding:0,letterSpacing:".02em",
+      }}>Brew House</Btn>
+      <div style={{display:"flex",alignItems:"center",gap:14}}>
+        {customer&&(
+          <div style={{display:"flex",alignItems:"center",gap:6,background:"linear-gradient(135deg,#c9943a,#e8b96a)",
+            borderRadius:20,padding:"3px 12px",animation:"ping 2.5s infinite",cursor:"default"}}>
+            <span style={{fontSize:13}}>⭐</span>
+            <span style={{fontFamily:"'DM Sans',sans-serif",fontWeight:700,color:"#3d1c0a",fontSize:12}}>{totalPts} pts</span>
+          </div>
+        )}
+        <Btn onClick={()=>setPage("menu")} style={{color:"var(--muted)",fontSize:13,fontWeight:500,background:"none",padding:"4px 8px"}}>Menu</Btn>
+        <Btn onClick={()=>setPage("orders")} style={{color:"var(--muted)",fontSize:13,fontWeight:500,background:"none",padding:"4px 8px"}}>Orders</Btn>
+        <Btn onClick={()=>setCartOpen(true)} style={{
+          background:"var(--dark)",color:"var(--cream)",borderRadius:30,padding:"8px 16px",
+          fontSize:13,fontWeight:600,display:"flex",alignItems:"center",gap:6,
+          position:"relative",animation:bump?"bump .45s ease":"none",
+        }}>
+          🛒
+          {cartCount>0&&<span style={{
+            position:"absolute",top:-5,right:-5,background:"var(--amber)",color:"#fff",
+            borderRadius:"50%",width:17,height:17,fontSize:10,fontWeight:700,
+            display:"flex",alignItems:"center",justifyContent:"center",
+          }}>{cartCount}</span>}
+        </Btn>
+      </div>
+    </nav>
+  );
+
+  /* ═══════════════ HOME PAGE ═══════════════ */
+  if(page==="home") return(
+    <div style={{background:"var(--cream)",minHeight:"100vh"}}>
+      <Nav/>
+      {/* HERO WITH DAILY VIDEO */}
+      <div style={{position:"relative",height:"100vh",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <video autoPlay muted loop playsInline
+          style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",filter:"brightness(.42)"}}
+          onError={e=>{ e.target.src=FALLBACK_VIDEO; }}>
+          <source src={video.src} type="video/mp4"/>
+          <source src={FALLBACK_VIDEO} type="video/mp4"/>
+        </video>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,rgba(26,12,4,.25) 0%,rgba(26,12,4,.05) 50%,rgba(26,12,4,.7) 100%)"}}/>
+        {/* Grain overlay */}
+        <div style={{position:"absolute",inset:0,opacity:.04,backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"}}/>
+
+        {/* Mood badge */}
+        <div style={{
+          position:"absolute",top:80,left:"50%",transform:"translateX(-50%)",
+          background:"rgba(250,246,240,.12)",backdropFilter:"blur(10px)",
+          border:"1px solid rgba(250,246,240,.2)",borderRadius:30,
+          padding:"6px 18px",color:"rgba(250,246,240,.85)",
+          fontSize:12,fontWeight:400,fontFamily:"'DM Sans',sans-serif",letterSpacing:".06em",
+          animation:"fadeIn .8s ease",
+        }}>{video.mood}</div>
+
+        <div style={{position:"relative",textAlign:"center",color:"#faf6f0",padding:"0 24px",animation:"fadeUp .9s .2s ease both",opacity:0}}>
+          <div style={{fontSize:"clamp(52px,9vw,96px)",fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontWeight:700,lineHeight:1.05,marginBottom:16,letterSpacing:"-.01em"}}>
+            Brew House
+          </div>
+          <p style={{fontSize:15,color:"rgba(250,246,240,.7)",marginBottom:36,fontFamily:"'DM Sans',sans-serif",maxWidth:400,margin:"0 auto 36px",lineHeight:1.7}}>
+            Specialty coffee &amp; artisan food — crafted for those who care about the details
+          </p>
+          <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+            <Btn onClick={()=>setPage("menu")} style={{background:"var(--amber)",color:"#fff",borderRadius:50,padding:"14px 38px",fontSize:15,fontWeight:700}}>
+              Order Now →
+            </Btn>
+            <Btn onClick={()=>setPage("orders")} style={{background:"rgba(250,246,240,.12)",color:"#faf6f0",border:"1px solid rgba(250,246,240,.3)",borderRadius:50,padding:"14px 30px",fontSize:14,fontWeight:500}}>
+              Track Order
+            </Btn>
+          </div>
+        </div>
+
+        {/* Scroll hint */}
+        <div style={{position:"absolute",bottom:28,left:"50%",transform:"translateX(-50%)",
+          color:"rgba(250,246,240,.4)",fontSize:11,fontFamily:"'DM Sans',sans-serif",letterSpacing:".12em",textTransform:"uppercase",
+          animation:"pulse 2.5s infinite"}}>scroll ↓</div>
+      </div>
+
+      {/* ─── POINTS / CASHBACK SECTION ─── */}
+      <div style={{background:"linear-gradient(135deg,#2a0e03,#4a2010)",padding:"64px 24px",textAlign:"center"}}>
+        <div style={{maxWidth:640,margin:"0 auto"}}>
+          <div style={{fontSize:42,marginBottom:12}}>⭐</div>
+          <h2 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:38,fontStyle:"italic",color:"#e8b96a",marginBottom:10}}>BrewHouse Rewards</h2>
+          <p style={{color:"rgba(250,246,240,.7)",fontFamily:"'DM Sans',sans-serif",fontSize:14,lineHeight:1.8,marginBottom:32}}>
+            Every order earns you <strong style={{color:"#e8b96a"}}>10% cashback</strong> as reward points.
+            Points accumulate automatically and can be redeemed on your next visit.
+          </p>
+          <div style={{display:"flex",justifyContent:"center",gap:40,flexWrap:"wrap"}}>
+            {[["🛒","Order","Any item, any time"],["⭐","Earn","10% back as points"],["🎁","Redeem","On your next visit"]].map(([ic,t,d],i)=>(
+              <div key={i} style={{textAlign:"center",animation:`float ${2.2+i*.4}s ease-in-out infinite`}}>
+                <div style={{fontSize:30,marginBottom:6}}>{ic}</div>
+                <div style={{color:"#e8b96a",fontWeight:700,fontSize:14,fontFamily:"'DM Sans',sans-serif"}}>{t}</div>
+                <div style={{color:"rgba(250,246,240,.5)",fontSize:12,fontFamily:"'DM Sans',sans-serif",marginTop:2}}>{d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ─── SOCIAL MEDIA SECTION ─── */}
+      <div style={{padding:"72px 24px",background:"var(--cream)",textAlign:"center"}}>
+        <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,letterSpacing:".2em",textTransform:"uppercase",color:"var(--muted)",marginBottom:8}}>Find us on</p>
+        <h2 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,fontStyle:"italic",color:"var(--dark)",marginBottom:8}}>Follow Our Story</h2>
+        <p style={{color:"var(--muted)",fontFamily:"'DM Sans',sans-serif",fontSize:13,marginBottom:44}}>Daily specials, behind-the-scenes &amp; special offers</p>
+        <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
+          {SOCIALS.map((s,i)=>(
+            <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+              style={{
+                display:"flex",flexDirection:"column",alignItems:"center",gap:8,
+                padding:"18px 20px",borderRadius:18,background:s.bg,color:s.color,
+                textDecoration:"none",minWidth:88,cursor:"pointer",
+                animation:`float ${2+i*.35}s ease-in-out infinite`,
+                boxShadow:"0 6px 24px rgba(26,12,4,.14)",
+                transition:"transform .2s,box-shadow .2s",
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="scale(1.1)";e.currentTarget.style.boxShadow="0 10px 32px rgba(26,12,4,.22)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="0 6px 24px rgba(26,12,4,.14)";}}>
+              <span style={{fontSize:28}}>{s.icon}</span>
+              <span style={{fontSize:11,fontWeight:600,fontFamily:"'DM Sans',sans-serif",letterSpacing:".04em"}}>{s.label}</span>
+            </a>
+          ))}
+        </div>
+        {/* Instagram CTA */}
+        <div style={{marginTop:36}}>
+          <p style={{color:"var(--muted)",fontFamily:"'DM Sans',sans-serif",fontSize:12,marginBottom:12}}>
+            📸 Tag us <strong>@brewhousecafe</strong> and get featured on our story!
+          </p>
+          <Btn onClick={()=>window.open("https://www.instagram.com/","_blank")} style={{
+            background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",color:"#fff",
+            borderRadius:40,padding:"10px 28px",fontSize:13,fontWeight:600,
+          }}>Open Instagram 📷</Btn>
+        </div>
+      </div>
+
+      {/* ─── MENU PREVIEW ─── */}
+      <div style={{padding:"64px 24px",background:"var(--sand)"}}>
+        <div style={{maxWidth:800,margin:"0 auto",textAlign:"center"}}>
+          <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:11,letterSpacing:".2em",textTransform:"uppercase",color:"var(--muted)",marginBottom:8}}>Today's picks</p>
+          <h2 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,fontStyle:"italic",color:"var(--dark)",marginBottom:36}}>Highlights</h2>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(156px,1fr))",gap:12}}>
+            {[{n:"Pistachio Latte",p:190,e:"☕"},{n:"Spanish Matcha",p:200,e:"🍵"},{n:"San Sebastian",p:190,e:"🍰"},
+              {n:"Croissant",p:100,e:"🥐"},{n:"Caesar Salad",p:195,e:"🥗"},{n:"Blueberry Milkshake",p:155,e:"🥛"}].map((item,i)=>(
+              <div key={i} onClick={()=>setPage("menu")}
+                style={{background:"var(--white)",borderRadius:14,padding:"20px 14px",
+                  border:"1px solid var(--border)",cursor:"pointer",textAlign:"center",
+                  transition:"transform .18s,box-shadow .18s",}}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 8px 28px rgba(26,12,4,.11)";}}
+                onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
+                <div style={{fontSize:30,marginBottom:8}}>{item.e}</div>
+                <div style={{fontSize:13,fontWeight:600,color:"var(--dark)",marginBottom:5,fontFamily:"'DM Sans',sans-serif"}}>{item.n}</div>
+                <div style={{fontSize:15,fontWeight:700,color:"var(--brown)"}}>E£{item.p}</div>
+                <div style={{fontSize:10,color:"var(--amber)",marginTop:3,fontFamily:"'DM Sans',sans-serif"}}>+{Math.floor(item.p*.1)} pts cashback</div>
+              </div>
+            ))}
+          </div>
+          <Btn onClick={()=>setPage("menu")} style={{marginTop:32,background:"var(--dark)",color:"var(--cream)",borderRadius:40,padding:"14px 40px",fontSize:14,fontWeight:600}}>
+            View Full Menu →
+          </Btn>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer style={{background:"var(--dark)",color:"rgba(250,246,240,.5)",padding:"32px 24px",textAlign:"center"}}>
+        <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontStyle:"italic",color:"var(--amber-light)",marginBottom:6}}>Brew House</div>
+        <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:12,marginBottom:14}}>Specialty Coffee &amp; Artisan Food</div>
+        <div style={{display:"flex",justifyContent:"center",gap:14,flexWrap:"wrap"}}>
+          {SOCIALS.map((s,i)=>(
+            <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" style={{color:"rgba(250,246,240,.4)",textDecoration:"none",fontSize:22}}>{s.icon}</a>
+          ))}
+        </div>
+        <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:10,marginTop:14,color:"rgba(250,246,240,.25)"}}>© 2025 BrewHouse. All rights reserved.</div>
+      </footer>
+    </div>
+  );
+
+  /* ═══════════════ MENU PAGE ═══════════════ */
+  /* ═══════════════ ORDERS PAGE ═══════════════ */
+  return(
+    <div style={{background:"var(--cream)",minHeight:"100vh"}}>
+      <Nav/>
+
+      {page==="menu"&&(
+        <div style={{display:"flex",paddingTop:62,height:"100vh",overflow:"hidden"}}>
+          {/* Sidebar */}
+          <aside style={{width:176,flexShrink:0,overflowY:"auto",borderRight:"1px solid var(--border)",
+            padding:"12px 0",background:"var(--white)",}}>
+            {Object.keys(MENU).map(cat=>(
+              <button key={cat} onClick={()=>scrollToCat(cat)} style={{
+                display:"flex",alignItems:"center",gap:7,width:"100%",
+                padding:"9px 14px",border:"none",background:activeCat===cat?"#f5e8d5":"none",
+                cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:12,
+                color:activeCat===cat?"var(--brown)":"var(--muted)",
+                fontWeight:activeCat===cat?700:400,textAlign:"left",
+                borderLeft:activeCat===cat?"3px solid var(--amber)":"3px solid transparent",
+                transition:"background .15s",
+              }}>
+                <span style={{fontSize:14}}>{CAT_ICONS[cat]}</span>
+                <span style={{lineHeight:1.2}}>{cat}</span>
+              </button>
+            ))}
+          </aside>
+
+          {/* Menu content */}
+          <main ref={menuScroll} style={{flex:1,overflowY:"auto",padding:"20px 24px 80px"}}>
+            {/* Points bar */}
+            {customer&&(
+              <div style={{background:"linear-gradient(135deg,#2a0e03,#4a2010)",borderRadius:12,
+                padding:"12px 18px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",}}>
+                <span style={{color:"rgba(250,246,240,.8)",fontFamily:"'DM Sans',sans-serif",fontSize:13}}>
+                  Hi <strong style={{color:"#e8b96a"}}>{customer.name}</strong> 👋 You have
+                </span>
+                <div style={{background:"linear-gradient(135deg,#c9943a,#e8b96a)",borderRadius:20,padding:"3px 12px",
+                  display:"flex",alignItems:"center",gap:5}}>
+                  <span style={{fontSize:12}}>⭐</span>
+                  <span style={{fontWeight:700,color:"#3d1c0a",fontSize:12,fontFamily:"'DM Sans',sans-serif"}}>{totalPts} pts</span>
+                </div>
+              </div>
+            )}
+
+            {Object.entries(MENU).map(([cat,items])=>(
+              <div key={cat} style={{marginBottom:36}} ref={el=>catRefs.current[cat]=el}>
+                <h2 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:26,fontWeight:700,fontStyle:"italic",
+                  color:"var(--dark)",marginBottom:14,paddingBottom:8,borderBottom:"2px solid var(--border)",
+                  display:"flex",alignItems:"center",gap:8}}>
+                  {CAT_ICONS[cat]} {cat}
+                </h2>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))",gap:10}}>
+                  {items.map(item=>(
+                    <div key={item.name} style={{
+                      background:"var(--white)",borderRadius:12,padding:"14px",
+                      border:"1px solid var(--border)",display:"flex",flexDirection:"column",
+                      justifyContent:"space-between",cursor:"pointer",
+                      transition:"transform .18s,box-shadow .18s",
+                    }}
+                    onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 6px 20px rgba(26,12,4,.09)";}}
+                    onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
+                      <div>
+                        <div style={{fontSize:14,fontWeight:600,color:"var(--dark)",marginBottom:4,fontFamily:"'DM Sans',sans-serif",lineHeight:1.3}}>{item.name}</div>
+                        <div style={{fontSize:16,fontWeight:700,color:"var(--brown)"}}>E£{item.price}</div>
+                        <div style={{fontSize:10,color:"var(--amber)",marginTop:3,fontFamily:"'DM Sans',sans-serif"}}>+{Math.floor(item.price*.1)} pts cashback</div>
+                      </div>
+                      <AddBtn onClick={()=>{
+                        if(!customer&&!formData.name.trim()){
+                          showToast("Please fill your details in the cart to order","error");
+                          setCartOpen(true);return;
+                        }
+                        addToCart(item,cat);
+                        showToast(`${item.name} added to cart ✓`);
+                      }}/>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </main>
+        </div>
+      )}
+
+      {page==="orders"&&(
+        <div style={{maxWidth:680,margin:"0 auto",padding:"90px 24px 60px"}}>
+          <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:44,fontStyle:"italic",color:"var(--dark)",marginBottom:6,animation:"fadeUp .4s ease"}}>My Orders</h1>
+          {customer&&(
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:24}}>
+              <span style={{color:"var(--muted)",fontSize:13,fontFamily:"'DM Sans',sans-serif"}}>Rewards balance:</span>
+              <div style={{background:"linear-gradient(135deg,#c9943a,#e8b96a)",borderRadius:20,padding:"3px 12px",
+                display:"flex",alignItems:"center",gap:5,animation:"ping 2.5s infinite"}}>
+                <span style={{fontSize:12}}>⭐</span>
+                <span style={{fontWeight:700,color:"#3d1c0a",fontSize:12,fontFamily:"'DM Sans',sans-serif"}}>{totalPts} pts = E£{totalPts}</span>
+              </div>
+            </div>
+          )}
+          {orders.length===0?(
+            <div style={{textAlign:"center",padding:"64px 24px",color:"var(--muted)",animation:"fadeIn .5s ease"}}>
+              <div style={{fontSize:60,marginBottom:14}}>☕</div>
+              <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:24,fontStyle:"italic",marginBottom:6}}>No orders yet</div>
+              <div style={{fontSize:13,marginBottom:22,fontFamily:"'DM Sans',sans-serif"}}>Head to the menu and place your first order</div>
+              <Btn onClick={()=>setPage("menu")} style={{background:"var(--dark)",color:"var(--cream)",borderRadius:40,padding:"13px 36px",fontSize:14,fontWeight:600}}>Browse Menu</Btn>
+            </div>
+          ):orders.map((order,i)=>(
+            <div key={order.id} style={{
+              background:"var(--white)",borderRadius:16,padding:"20px 22px",
+              border:"1px solid var(--border)",marginBottom:14,
+              animation:"orderIn .4s ease both",animationDelay:`${i*.07}s`,opacity:0,
+            }}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+                <div>
+                  <div style={{fontWeight:700,fontSize:17,color:"var(--dark)",fontFamily:"'DM Sans',sans-serif"}}>{order.name}</div>
+                  <div style={{fontSize:12,color:"var(--muted)",fontFamily:"'DM Sans',sans-serif",marginTop:2}}>{order.id} · {order.time}</div>
+                </div>
+                <span style={{
+                  display:"inline-flex",alignItems:"center",gap:5,
+                  background:order.status==="preparing"?"#e8f5e9":"#fff8e1",
+                  color:order.status==="preparing"?"#2e7d32":"#f57f17",
+                  borderRadius:20,padding:"4px 12px",fontSize:12,fontFamily:"'DM Sans',sans-serif",fontWeight:600,
+                }}>{order.status==="preparing"?"🍳 Being Prepared":"⏳ Received"}</span>
+              </div>
+              <div style={{borderTop:"1px solid var(--border)",paddingTop:10}}>
+                {order.items.map(item=>(
+                  <div key={item.key} style={{display:"flex",justifyContent:"space-between",fontSize:13,
+                    fontFamily:"'DM Sans',sans-serif",color:"var(--muted)",padding:"3px 0"}}>
+                    <span>{item.name} ×{item.qty}</span><span style={{color:"var(--dark)",fontWeight:600}}>E£{item.price*item.qty}</span>
+                  </div>
+                ))}
+                <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,fontSize:16,
+                  marginTop:10,paddingTop:10,borderTop:"1px solid var(--border)",color:"var(--dark)"}}>
+                  <span>Total</span><span>E£{order.total}</span>
+                </div>
+                <div style={{marginTop:8,background:"#fffbeb",borderRadius:8,padding:"6px 10px",
+                  display:"flex",alignItems:"center",gap:6,fontSize:12,fontFamily:"'DM Sans',sans-serif",color:"#7a4428"}}>
+                  ⭐ Earned <strong>{order.pts} reward points</strong> on this order
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ─── CART DRAWER ─── */}
+      {cartOpen&&(
+        <>
+          <div onClick={()=>setCartOpen(false)} style={{position:"fixed",inset:0,background:"rgba(26,12,4,.35)",zIndex:300,animation:"fadeIn .2s ease"}}/>
+          <div style={{
+            position:"fixed",top:0,right:0,bottom:0,width:420,maxWidth:"95vw",background:"var(--white)",zIndex:400,
+            boxShadow:"-10px 0 50px rgba(26,12,4,.16)",display:"flex",flexDirection:"column",
+            animation:"slideRight .32s cubic-bezier(.22,1,.36,1)",
+          }}>
+            <div style={{padding:"18px 22px",borderBottom:"1px solid var(--border)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:24,fontStyle:"italic",color:"var(--dark)",fontWeight:700}}>Your Cart</span>
+              <Btn onClick={()=>setCartOpen(false)} style={{fontSize:24,color:"var(--dark)",background:"none",padding:"2px 6px"}}>×</Btn>
+            </div>
+
+            <div style={{flex:1,overflowY:"auto",padding:"14px 22px"}}>
+              {cart.length===0?(
+                <div style={{textAlign:"center",padding:"48px 0",color:"var(--muted)"}}>
+                  <div style={{fontSize:48,marginBottom:10}}>🛒</div>
+                  <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:14}}>Your cart is empty</div>
+                </div>
+              ):cart.map(item=>(
+                <div key={item.key} style={{display:"flex",justifyContent:"space-between",alignItems:"center",
+                  padding:"11px 0",borderBottom:"1px solid var(--border)"}}>
+                  <div style={{flex:1,marginRight:10}}>
+                    <div style={{fontWeight:600,fontSize:14,fontFamily:"'DM Sans',sans-serif",color:"var(--dark)"}}>{item.name}</div>
+                    <div style={{color:"var(--muted)",fontSize:13}}>E£{item.price}</div>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:7}}>
+                    <QtyBtn onClick={()=>changeQty(item.key,-1)}>−</QtyBtn>
+                    <span style={{fontWeight:700,minWidth:18,textAlign:"center",fontFamily:"'DM Sans',sans-serif"}}>{item.qty}</span>
+                    <QtyBtn onClick={()=>changeQty(item.key,1)}>+</QtyBtn>
+                    <span style={{fontWeight:700,minWidth:52,textAlign:"right",fontSize:13,fontFamily:"'DM Sans',sans-serif"}}>E£{item.price*item.qty}</span>
+                    <Btn onClick={()=>removeItem(item.key)} style={{color:"var(--muted)",fontSize:16,background:"none",padding:"2px 4px"}}>🗑</Btn>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{padding:"18px 22px",borderTop:"1px solid var(--border)"}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,fontSize:18,marginBottom:8,color:"var(--dark)"}}>
+                <span>Total</span><span>E£{cartTotal}</span>
+              </div>
+              {cart.length>0&&(
+                <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:14,
+                  background:"#fffbeb",borderRadius:8,padding:"7px 11px",fontSize:12,fontFamily:"'DM Sans',sans-serif",color:"#7a4428"}}>
+                  ⭐ You'll earn <strong style={{marginLeft:3}}>{cartPts} reward points</strong> with this order
+                </div>
+              )}
+
+              {/* CUSTOMER DETAILS FORM */}
+              {!customer&&(
+                <div style={{marginBottom:14}}>
+                  <div style={{fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",color:"var(--dark)",marginBottom:10}}>Your Details</div>
+                  {[
+                    {key:"name",placeholder:"Full Name *",type:"text",icon:"👤"},
+                    {key:"phone",placeholder:"Phone Number *",type:"tel",icon:"📞"},
+                    {key:"email",placeholder:"Email Address (optional)",type:"email",icon:"✉️"},
+                  ].map(f=>(
+                    <div key={f.key} style={{marginBottom:8}}>
+                      <div style={{position:"relative"}}>
+                        <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14}}>{f.icon}</span>
+                        <input
+                          value={formData[f.key]}
+                          onChange={e=>setFormData(p=>({...p,[f.key]:e.target.value}))}
+                          placeholder={f.placeholder}
+                          type={f.type}
+                          style={{
+                            width:"100%",padding:"9px 12px 9px 34px",
+                            border:`1.5px solid ${formErr[f.key]?"#b71c1c":"var(--border)"}`,
+                            borderRadius:30,fontSize:13,fontFamily:"'DM Sans',sans-serif",
+                            outline:"none",background:"var(--cream)",color:"var(--dark)",
+                          }}
+                        />
+                      </div>
+                      {formErr[f.key]&&<div style={{color:"#b71c1c",fontSize:11,marginTop:3,paddingLeft:12,fontFamily:"'DM Sans',sans-serif"}}>{formErr[f.key]}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {customer&&(
+                <div style={{fontSize:13,fontFamily:"'DM Sans',sans-serif",color:"var(--muted)",marginBottom:12}}>
+                  Ordering as <strong style={{color:"var(--dark)"}}>{customer.name}</strong>
+                  {customer.phone&&<span> · {customer.phone}</span>}
+                </div>
+              )}
+
+              <Btn onClick={handleConfirmOrder} disabled={cart.length===0}
+                style={{width:"100%",background:"var(--dark)",color:"var(--cream)",borderRadius:40,
+                  padding:"14px",fontSize:15,fontWeight:700,letterSpacing:".03em"}}>
+                Confirm Order →
+              </Btn>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ─── CONFIRM MODAL ─── */}
+      {confirmModal&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(26,12,4,.5)",zIndex:500,
+          display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s ease",padding:"20px"}}
+          onClick={()=>setConfirmModal(false)}>
+          <div onClick={e=>e.stopPropagation()} style={{
+            background:"var(--white)",borderRadius:20,padding:"36px 32px",maxWidth:400,width:"100%",
+            animation:"pop .4s cubic-bezier(.34,1.56,.64,1)",
+          }}>
+            <div style={{fontSize:40,textAlign:"center",marginBottom:12}}>🧾</div>
+            <h2 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:28,fontStyle:"italic",color:"var(--dark)",textAlign:"center",marginBottom:6}}>Confirm Order</h2>
+            <div style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"var(--muted)",textAlign:"center",marginBottom:18}}>
+              Review your order before placing it
+            </div>
+            <div style={{background:"var(--cream)",borderRadius:12,padding:"12px 14px",marginBottom:14}}>
+              {cart.map(item=>(
+                <div key={item.key} style={{display:"flex",justifyContent:"space-between",fontSize:13,
+                  fontFamily:"'DM Sans',sans-serif",color:"var(--dark)",padding:"3px 0"}}>
+                  <span>{item.name} ×{item.qty}</span><span style={{fontWeight:600}}>E£{item.price*item.qty}</span>
+                </div>
+              ))}
+              <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,fontSize:16,
+                marginTop:10,paddingTop:10,borderTop:"1px solid var(--border)",color:"var(--dark)"}}>
+                <span>Total</span><span>E£{cartTotal}</span>
+              </div>
+            </div>
+            <div style={{background:"#fffbeb",borderRadius:10,padding:"8px 12px",marginBottom:18,
+              display:"flex",alignItems:"center",gap:6,fontSize:12,fontFamily:"'DM Sans',sans-serif",color:"#7a4428"}}>
+              ⭐ You'll earn <strong>{cartPts} reward points</strong> with this order!
+            </div>
+            <div style={{display:"flex",gap:10}}>
+              <Btn onClick={()=>setConfirmModal(false)} style={{flex:1,background:"var(--sand)",color:"var(--dark)",borderRadius:30,padding:"12px",fontSize:14,fontWeight:600}}>
+                ← Back
+              </Btn>
+              <Btn onClick={placeOrder} style={{flex:2,background:"var(--dark)",color:"var(--cream)",borderRadius:30,padding:"12px",fontSize:14,fontWeight:700}}>
+                Place Order ✓
+              </Btn>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── SUCCESS MODAL ─── */}
+      {successModal&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(26,12,4,.5)",zIndex:500,
+          display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s ease",padding:"20px"}}
+          onClick={()=>{setSuccessModal(null);setPage("orders");}}>
+          <div onClick={e=>e.stopPropagation()} style={{
+            background:"var(--white)",borderRadius:24,padding:"42px 36px",maxWidth:400,width:"100%",
+            textAlign:"center",animation:"pop .45s cubic-bezier(.34,1.56,.64,1)",
+          }}>
+            <div style={{fontSize:64,marginBottom:14,animation:"bump .5s .2s ease both"}}>🎉</div>
+            <h2 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:32,fontStyle:"italic",color:"var(--dark)",marginBottom:8}}>Order Placed!</h2>
+            <p style={{color:"var(--muted)",fontFamily:"'DM Sans',sans-serif",fontSize:14,lineHeight:1.7,marginBottom:16}}>
+              Thank you, <strong style={{color:"var(--dark)"}}>{successModal.name}</strong>!<br/>Your order is being received.
+            </p>
+            <div style={{background:"#fffbeb",borderRadius:12,padding:"12px 16px",marginBottom:20,
+              display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
+              <span style={{fontSize:20}}>⭐</span>
+              <span style={{fontFamily:"'DM Sans',sans-serif",fontSize:13,color:"#7a4428"}}>
+                You earned <strong>{successModal.pts} reward points</strong>!
+              </span>
+            </div>
+            <Btn onClick={()=>{setSuccessModal(null);setPage("orders");}} style={{
+              width:"100%",background:"var(--dark)",color:"var(--cream)",borderRadius:40,
+              padding:"14px",fontSize:15,fontWeight:700,
+            }}>Track My Order</Btn>
+          </div>
+        </div>
+      )}
+
+      {/* ─── TOAST ─── */}
+      {toast&&(
+        <div style={{
+          position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",
+          background:toast.type==="error"?"#b71c1c":"var(--dark)",color:"var(--cream)",
+          padding:"13px 26px",borderRadius:40,fontSize:14,fontFamily:"'DM Sans',sans-serif",
+          zIndex:600,boxShadow:"0 8px 28px rgba(26,12,4,.3)",animation:"pop .35s ease",whiteSpace:"nowrap",
+        }}>{toast.msg}</div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

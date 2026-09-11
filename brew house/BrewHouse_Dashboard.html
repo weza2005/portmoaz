@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BrewHouse · Cashier Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0705;
+      --surface: #1a0f08;
+      --surface2: #231409;
+      --card: #2a180d;
+      --card-hover: #341e10;
+      --border: #3d2512;
+      --border-light: #4a2e18;
+      --cream: #fdf3e3;
+      --gold: #c9943a;
+      --gold-light: #e8b96a;
+      --amber: #d47a2a;
+      --rust: #a04020;
+      --green: #2d7a4f;
+      --green-bg: #0d2118;
+      --green-text: #6ecf9e;
+      --yellow: #c8940a;
+      --yellow-bg: #201500;
+      --yellow-text: #f5d060;
+      --red: #c03030;
+      --red-bg: #1e0808;
+      --red-text: #f07070;
+      --text: #f0e6d3;
+      --text-muted: #8a6a4a;
+      --text-dim: #5a3e28;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── ANIMATED BACKGROUND ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 10%, rgba(201,148,58,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 90% 80%, rgba(160,64,32,0.05) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── GRAIN TEXTURE ─── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,7,5,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-style: italic;
+      color: var(--gold-light);
+      letter-spacing: 0.02em;
+    }
+
+    .logo span { color: var(--text-muted); font-size: 13px; font-style: normal; font-family: 'DM Sans', sans-serif; margin-left: 12px; font-weight: 300; }
+
+    .header-right {
+      display: flex; align-items: center; gap: 20px;
+    }
+
+    .live-dot {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--green-text); font-weight: 500;
+    }
+
+    .live-dot::before {
+      content: '';
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green-text);
+      box-shadow: 0 0 0 0 rgba(110,207,158,0.6);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0% { box-shadow: 0 0 0 0 rgba(110,207,158,0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(110,207,158,0); }
+      100% { box-shadow: 0 0 0 0 rgba(110,207,158,0); }
+    }
+
+    .clock {
+      font-size: 13px; color: var(--text-muted); font-weight: 400;
+      font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+    }
+
+    /* ─── LAYOUT ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+      gap: 0;
+      min-height: calc(100vh - 64px);
+      position: relative; z-index: 1;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      background: var(--surface);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .sidebar-title {
+      font-size: 10px; letter-spacing: 0.15em; color: var(--text-dim);
+      text-transform: uppercase; font-weight: 600;
+      padding: 0 12px 8px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover { border-color: var(--border-light); }
+
+    .stat-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px; color: var(--gold-light);
+      line-height: 1;
+    }
+
+    .stat-sub { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+
+    .divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+    .filter-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 10px;
+      background: none; border: 1px solid transparent;
+      color: var(--text-muted); font-size: 13px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: all 0.2s; width: 100%;
+      font-weight: 500;
+    }
+
+    .filter-btn:hover { background: var(--card); color: var(--text); }
+
+    .filter-btn.active {
+      background: var(--card);
+      border-color: var(--border-light);
+      color: var(--gold-light);
+    }
+
+    .filter-btn .badge {
+      margin-left: auto;
+      background: var(--border-light);
+      color: var(--text-muted);
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+    }
+
+    .filter-btn.active .badge { background: var(--gold); color: #000; }
+
+    /* ─── MAIN ORDERS ─── */
+    .main {
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .main-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .main-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px; font-style: italic;
+      color: var(--cream);
+    }
+
+    .sort-select {
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text-muted); font-family: 'DM Sans', sans-serif;
+      font-size: 12px; padding: 8px 12px; border-radius: 8px;
+      cursor: pointer; outline: none;
+    }
+
+    /* ─── ORDER CARDS ─── */
+    .orders-grid {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .order-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+      cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+
+    .order-card::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+
+    .order-card.status-received::before { background: var(--yellow); }
+    .order-card.status-preparing::before { background: var(--gold); }
+    .order-card.status-ready::before { background: var(--green-text); }
+    .order-card.status-done::before { background: var(--text-dim); }
+
+    .order-card:hover {
+      border-color: var(--border-light);
+      background: var(--card-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .order-card.flash {
+      animation: cardFlash 0.6s ease;
+    }
+
+    @keyframes cardFlash {
+      0%, 100% { border-color: var(--border); }
+      50% { border-color: var(--gold); box-shadow: 0 0 20px rgba(201,148,58,0.3); }
+    }
+
+    .order-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .order-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; color: var(--cream); font-weight: 600;
+    }
+
+    .order-meta {
+      font-size: 11px; color: var(--text-dim); margin-top: 3px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .status-received { background: var(--yellow-bg); color: var(--yellow-text); border-color: rgba(200,148,10,0.2); }
+    .status-preparing { background: rgba(201,148,58,0.1); color: var(--gold-light); border-color: rgba(201,148,58,0.2); }
+    .status-ready { background: var(--green-bg); color: var(--green-text); border-color: rgba(110,207,158,0.2); }
+    .status-done { background: rgba(90,62,40,0.2); color: var(--text-dim); border-color: var(--border); }
+
+    .order-items {
+      border-top: 1px solid var(--border);
+      padding-top: 12px; margin-top: 4px;
+      display: flex; flex-direction: column; gap: 5px;
+    }
+
+    .order-item-row {
+      display: flex; justify-content: space-between;
+      font-size: 13px; color: var(--text-muted);
+    }
+
+    .order-item-row span:last-child { color: var(--text); font-weight: 500; }
+
+    .order-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);
+    }
+
+    .order-total {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; color: var(--gold-light);
+    }
+
+    .action-btns { display: flex; gap: 8px; }
+
+    .btn {
+      padding: 8px 16px; border-radius: 8px; border: 1px solid;
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .btn-prepare {
+      background: rgba(201,148,58,0.12); color: var(--gold-light);
+      border-color: rgba(201,148,58,0.3);
+    }
+
+    .btn-prepare:hover { background: rgba(201,148,58,0.25); }
+
+    .btn-ready {
+      background: var(--green-bg); color: var(--green-text);
+      border-color: rgba(110,207,158,0.2);
+    }
+
+    .btn-ready:hover { background: rgba(45,122,79,0.25); }
+
+    .btn-done {
+      background: rgba(90,62,40,0.2); color: var(--text-dim);
+      border-color: var(--border);
+    }
+
+    .btn-done:hover { background: rgba(90,62,40,0.4); color: var(--text-muted); }
+
+    .btn-cancel {
+      background: var(--red-bg); color: var(--red-text);
+      border-color: rgba(192,48,48,0.2);
+    }
+
+    .btn-cancel:hover { background: rgba(192,48,48,0.2); }
+
+    /* ─── RIGHT PANEL (SUMMARY) ─── */
+    .right-panel {
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+      padding: 24px 20px;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-style: italic; color: var(--cream);
+      margin-bottom: 20px;
+    }
+
+    .receipt-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .receipt-row {
+      display: flex; justify-content: space-between;
+      font-size: 13px; color: var(--text-muted);
+      padding: 4px 0;
+    }
+
+    .receipt-row.total {
+      font-size: 15px; font-weight: 600;
+      color: var(--cream); padding-top: 10px;
+      margin-top: 6px; border-top: 1px solid var(--border);
+    }
+
+    .receipt-row.total span:last-child { color: var(--gold-light); }
+
+    .revenue-bar {
+      height: 4px; background: var(--border);
+      border-radius: 4px; overflow: hidden; margin: 10px 0;
+    }
+
+    .revenue-fill {
+      height: 100%; background: linear-gradient(90deg, var(--gold), var(--amber));
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+
+    /* ─── NEW ORDER ALERT ─── */
+    .alert-banner {
+      position: fixed; top: 80px; right: 24px; z-index: 500;
+      background: var(--card);
+      border: 1px solid var(--gold);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,148,58,0.1);
+      animation: alertSlide 0.4s cubic-bezier(0.22,1,0.36,1);
+      max-width: 320px;
+    }
+
+    @keyframes alertSlide {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .alert-icon {
+      font-size: 28px;
+      animation: alertBounce 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes alertBounce {
+      from { transform: scale(0); }
+      to { transform: scale(1); }
+    }
+
+    .alert-content { flex: 1; }
+    .alert-title { font-size: 14px; font-weight: 600; color: var(--cream); }
+    .alert-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .alert-close {
+      background: none; border: none; color: var(--text-dim);
+      font-size: 18px; cursor: pointer; line-height: 1;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 80px 24px;
+      color: var(--text-dim); text-align: center;
+    }
+
+    .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.5; }
+    .empty-text { font-size: 16px; font-style: italic; color: var(--text-muted); }
+
+    /* ─── ANIMATIONS ─── */
+    .fade-in {
+      animation: fadeIn 0.4s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .order-enter {
+      animation: orderEnter 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes orderEnter {
+      from { opacity: 0; transform: translateX(-20px) scale(0.98); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    /* ─── DEMO BUTTON ─── */
+    .demo-btn {
+      background: linear-gradient(135deg, var(--gold), var(--amber));
+      color: #000; font-weight: 700; font-family: 'DM Sans', sans-serif;
+      border: none; padding: 10px 20px; border-radius: 10px;
+      cursor: pointer; font-size: 13px; letter-spacing: 0.03em;
+      transition: opacity 0.2s; box-shadow: 0 4px 16px rgba(201,148,58,0.3);
+    }
+
+    .demo-btn:hover { opacity: 0.85; }
+
+    /* ─── TIMER ─── */
+    .timer {
+      font-size: 11px; color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer.urgent { color: var(--red-text); animation: blink 1s step-end infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* ─── SCROLLBARS ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+    /* ─── CHANNEL BADGE ─── */
+    .channel-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; color: var(--text-dim); background: var(--surface);
+      border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px;
+      margin-left: 8px; vertical-align: middle;
+    }
+
+    .progress-steps {
+      display: flex; align-items: center; gap: 6px; margin-top: 10px;
+    }
+
+    .step {
+      height: 3px; flex: 1; border-radius: 4px;
+      background: var(--border); transition: background 0.4s;
+    }
+
+    .step.done { background: var(--gold); }
+    .step.active { background: var(--gold-light); animation: stepPulse 1.5s ease infinite; }
+
+    @keyframes stepPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    BrewHouse
+    <span>Cashier Dashboard</span>
+  </div>
+  <div class="header-right">
+    <div class="live-dot">Live</div>
+    <div class="clock" id="clock">--:--:--</div>
+    <button class="demo-btn" onclick="addDemoOrder()">+ Simulate Order</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Today</div>
+
+    <div class="stat-card">
+      <div class="stat-label">Total Orders</div>
+      <div class="stat-value" id="stat-total">0</div>
+      <div class="stat-sub">+0 this hour</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Revenue</div>
+      <div class="stat-value" id="stat-revenue">E£0</div>
+      <div class="revenue-bar"><div class="revenue-fill" id="revenue-fill" style="width:0%"></div></div>
+      <div class="stat-sub" id="stat-target">0% of daily target</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Avg. Order Value</div>
+      <div class="stat-value" id="stat-avg">E£0</div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sidebar-title">Filter</div>
+
+    <button class="filter-btn active" onclick="setFilter('all', this)">
+      <span>☕</span> All Orders <span class="badge" id="badge-all">0</span>
+    </button>
+    <button class="filter-btn" onclick="setFilter('received', this)">
+      <span>⏳</span> Received <span class="badge" id="badge-received">0</span>
+    </button>
+    <button class="filter-btn" onclick="setFilter('preparing', this)">
+      <span>🍳</span> Preparing <span class="badge" id="badge-preparing">0</span>
+    </button>
+    <button class="filter-btn" onclick="setFilter('ready', this)">
+      <span>✅</span> Ready <span class="badge" id="badge-ready">0</span>
+    </button>
+    <button class="filter-btn" onclick="setFilter('done', this)">
+      <span>📦</span> Done <span class="badge" id="badge-done">0</span>
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-header">
+      <div class="main-title" id="main-title">All Orders</div>
+      <select class="sort-select" onchange="setSort(this.value)">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="total-high">Highest Total</option>
+        <option value="total-low">Lowest Total</option>
+      </select>
+    </div>
+    <div class="orders-grid" id="orders-grid">
+      <div class="empty fade-in">
+        <div class="empty-icon">☕</div>
+        <div class="empty-text">Waiting for orders...<br><small style="font-size:12px;opacity:0.6;margin-top:8px;display:block">Click "Simulate Order" to test or open the BrewHouse customer page</small></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <div class="panel-title">Revenue Summary</div>
+
+    <div class="receipt-card">
+      <div class="receipt-row"><span>Hot Coffee</span><span id="cat-hot">E£0</span></div>
+      <div class="receipt-row"><span>Ice Coffee</span><span id="cat-ice">E£0</span></div>
+      <div class="receipt-row"><span>Food & Bakery</span><span id="cat-food">E£0</span></div>
+      <div class="receipt-row"><span>Drinks</span><span id="cat-drinks">E£0</span></div>
+      <div class="receipt-row"><span>Desserts</span><span id="cat-desserts">E£0</span></div>
+      <div class="receipt-row total"><span>Total Revenue</span><span id="panel-revenue">E£0</span></div>
+    </div>
+
+    <div class="panel-title" style="margin-top:8px">Active Orders Queue</div>
+    <div id="queue-list">
+      <div style="font-size:13px;color:var(--text-dim);text-align:center;padding:24px">No active orders</div>
+    </div>
+
+    <div class="panel-title" style="margin-top:16px">Top Items Today</div>
+    <div id="top-items">
+      <div style="font-size:13px;color:var(--text-dim);text-align:center;padding:24px">No data yet</div>
+    </div>
+  </aside>
+</div>
+
+<!-- ALERT CONTAINER -->
+<div id="alert-container"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────
+let orders = [];
+let filter = 'all';
+let sort = 'newest';
+let dailyTarget = 10000;
+let itemCounts = {};
+let catRevenue = { hot: 0, ice: 0, food: 0, drinks: 0, desserts: 0 };
+let orderId = 1;
+
+const DEMO_NAMES = ['Ahmed', 'Sara', 'Mohamed', 'Nour', 'Youssef', 'Rana', 'Karim', 'Layla', 'Omar', 'Dina'];
+const DEMO_ITEMS = [
+  { name: 'Pistachio Latte', price: 190, cat: 'Hot Coffee' },
+  { name: 'Caramel Latte', price: 155, cat: 'Ice Coffee' },
+  { name: 'Croissant', price: 100, cat: 'Bakeries' },
+  { name: 'Spanish Matcha', price: 200, cat: 'Iced Drinks' },
+  { name: 'Espresso', price: 95, cat: 'Hot Coffee' },
+  { name: 'Tiramisu', price: 160, cat: 'Desserts' },
+  { name: 'Mocha', price: 170, cat: 'Ice Coffee' },
+  { name: 'San Sebastian', price: 190, cat: 'Desserts' },
+  { name: 'Turkey Cheese', price: 170, cat: 'Sandwiches' },
+  { name: 'Matcha', price: 180, cat: 'Iced Drinks' },
+  { name: 'Latte', price: 135, cat: 'Hot Coffee' },
+  { name: 'Americano', price: 110, cat: 'Hot Coffee' },
+  { name: 'Greek Salad', price: 175, cat: 'Salads' },
+  { name: 'Cheesecake Cup', price: 170, cat: 'Desserts' },
+  { name: 'Blueberry Smoothie', price: 135, cat: 'Smoothies' },
+];
+
+function genId() { return 'BH-' + String(orderId++).padStart(4, '0'); }
+
+function getNow() {
+  return new Date().toLocaleTimeString('en-EG', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ─── CLOCK ───────────────────────────────────────────────────────────
+function updateClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('en-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── STORAGE SYNC ────────────────────────────────────────────────────
+// Listen for orders placed from BrewHouse customer page (same origin)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'brewhouse_order' && e.newValue) {
+    try {
+      const incoming = JSON.parse(e.newValue);
+      receiveOrder(incoming);
+    } catch {}
+  }
+});
+
+// Also poll localStorage for orders
+let lastStorageCheck = null;
+setInterval(() => {
+  const raw = localStorage.getItem('brewhouse_order');
+  if (raw && raw !== lastStorageCheck) {
+    lastStorageCheck = raw;
+    try {
+      const incoming = JSON.parse(raw);
+      // Only add if not already in list
+      if (!orders.find(o => o.id === incoming.id)) {
+        receiveOrder(incoming);
+      }
+    } catch {}
+  }
+}, 1000);
+
+function receiveOrder(incoming) {
+  const order = {
+    id: incoming.id || genId(),
+    name: incoming.name || 'Customer',
+    items: incoming.items || [],
+    total: incoming.total || 0,
+    time: incoming.time || getNow(),
+    status: 'received',
+    receivedAt: Date.now(),
+    cats: incoming.cats || [],
+  };
+  orders.unshift(order);
+  processOrderStats(order);
+  showAlert(order);
+  render();
+}
+
+// ─── DEMO ORDER ──────────────────────────────────────────────────────
+function addDemoOrder() {
+  const name = DEMO_NAMES[Math.floor(Math.random() * DEMO_NAMES.length)];
+  const numItems = Math.floor(Math.random() * 3) + 1;
+  const chosenItems = [];
+  const usedIdxs = new Set();
+  for (let i = 0; i < numItems; i++) {
+    let idx;
+    do { idx = Math.floor(Math.random() * DEMO_ITEMS.length); } while (usedIdxs.has(idx));
+    usedIdxs.add(idx);
+    const item = DEMO_ITEMS[idx];
+    const qty = Math.random() > 0.6 ? 2 : 1;
+    chosenItems.push({ ...item, qty, key: item.name + i });
+  }
+  const total = chosenItems.reduce((s, i) => s + i.price * i.qty, 0);
+  const order = {
+    id: genId(),
+    name,
+    items: chosenItems,
+    total,
+    time: getNow(),
+    status: 'received',
+    receivedAt: Date.now(),
+  };
+  orders.unshift(order);
+  processOrderStats(order);
+  showAlert(order);
+  render();
+}
+
+// ─── STATS ───────────────────────────────────────────────────────────
+function processOrderStats(order) {
+  order.items.forEach(item => {
+    itemCounts[item.name] = (itemCounts[item.name] || 0) + (item.qty || 1);
+    const cat = (item.cat || '').toLowerCase();
+    if (cat.includes('hot coffee') || cat === 'hot coffee') catRevenue.hot += item.price * (item.qty || 1);
+    else if (cat.includes('ice coffee') || cat === 'ice coffee') catRevenue.ice += item.price * (item.qty || 1);
+    else if (cat.includes('dessert') || cat.includes('bakery') || cat.includes('sandwich') || cat.includes('salad') || cat.includes('main')) catRevenue.food += item.price * (item.qty || 1);
+    else if (cat.includes('drink') || cat.includes('smoothie') || cat.includes('juice') || cat.includes('mojito') || cat.includes('milkshake') || cat.includes('matcha')) catRevenue.drinks += item.price * (item.qty || 1);
+    else catRevenue.food += item.price * (item.qty || 1);
+  });
+}
+
+function updateStats() {
+  const doneOrders = orders.filter(o => o.status !== 'cancelled');
+  const total = doneOrders.length;
+  const revenue = doneOrders.reduce((s, o) => s + o.total, 0);
+  const avg = total > 0 ? Math.round(revenue / total) : 0;
+  const pct = Math.min(100, Math.round(revenue / dailyTarget * 100));
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-revenue').textContent = 'E£' + revenue.toLocaleString();
+  document.getElementById('stat-avg').textContent = 'E£' + avg;
+  document.getElementById('revenue-fill').style.width = pct + '%';
+  document.getElementById('stat-target').textContent = pct + '% of daily target';
+  document.getElementById('panel-revenue').textContent = 'E£' + revenue.toLocaleString();
+
+  // Category revenue
+  document.getElementById('cat-hot').textContent = 'E£' + catRevenue.hot;
+  document.getElementById('cat-ice').textContent = 'E£' + catRevenue.ice;
+  document.getElementById('cat-food').textContent = 'E£' + catRevenue.food;
+  document.getElementById('cat-drinks').textContent = 'E£' + catRevenue.drinks;
+  document.getElementById('cat-desserts').textContent = 'E£' + catRevenue.desserts;
+
+  // Badges
+  ['all', 'received', 'preparing', 'ready', 'done'].forEach(s => {
+    const el = document.getElementById('badge-' + s);
+    if (el) el.textContent = s === 'all'
+      ? orders.filter(o => o.status !== 'cancelled').length
+      : orders.filter(o => o.status === s).length;
+  });
+
+  // Top items
+  const sorted = Object.entries(itemCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const topEl = document.getElementById('top-items');
+  if (sorted.length === 0) {
+    topEl.innerHTML = '<div style="font-size:13px;color:var(--text-dim);text-align:center;padding:24px">No data yet</div>';
+  } else {
+    const max = sorted[0][1];
+    topEl.innerHTML = sorted.map(([name, count]) => `
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+          <span style="color:var(--text)">${name}</span>
+          <span style="color:var(--gold-light);font-weight:600">×${count}</span>
+        </div>
+        <div style="height:3px;background:var(--border);border-radius:4px;overflow:hidden">
+          <div style="height:100%;background:linear-gradient(90deg,var(--gold),var(--amber));width:${Math.round(count/max*100)}%;border-radius:4px;transition:width 0.5s"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Queue list (received + preparing)
+  const active = orders.filter(o => o.status === 'received' || o.status === 'preparing');
+  const queueEl = document.getElementById('queue-list');
+  if (active.length === 0) {
+    queueEl.innerHTML = '<div style="font-size:13px;color:var(--text-dim);text-align:center;padding:24px">No active orders</div>';
+  } else {
+    queueEl.innerHTML = active.map(o => `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:14px;font-weight:600;color:var(--cream)">${o.name}</span>
+          <span class="status-badge status-${o.status}" style="font-size:10px;padding:3px 8px">${o.status}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">${o.id} · ${o.items.length} item(s) · E£${o.total}</div>
+      </div>
+    `).join('');
+  }
+}
+
+// ─── STATUS ACTIONS ──────────────────────────────────────────────────
+function updateStatus(id, newStatus) {
+  const order = orders.find(o => o.id === id);
+  if (!order) return;
+  order.status = newStatus;
+  // Flash
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (el) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 700); }
+  render();
+}
+
+// ─── FILTER & SORT ───────────────────────────────────────────────────
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const titles = { all: 'All Orders', received: 'Received Orders', preparing: 'Being Prepared', ready: 'Ready for Pickup', done: 'Completed Orders' };
+  document.getElementById('main-title').textContent = titles[f];
+  render();
+}
+
+function setSort(s) { sort = s; render(); }
+
+// ─── RENDER ──────────────────────────────────────────────────────────
+function render() {
+  updateStats();
+
+  let filtered = orders.filter(o => filter === 'all' ? o.status !== 'cancelled' : o.status === filter);
+
+  // Sort
+  filtered = [...filtered];
+  if (sort === 'oldest') filtered.reverse();
+  else if (sort === 'total-high') filtered.sort((a, b) => b.total - a.total);
+  else if (sort === 'total-low') filtered.sort((a, b) => a.total - b.total);
+
+  const grid = document.getElementById('orders-grid');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty fade-in"><div class="empty-icon">☕</div><div class="empty-text">${filter === 'all' ? 'Waiting for orders...<br><small style="font-size:12px;opacity:0.6;margin-top:8px;display:block">Click "Simulate Order" to test</small>' : 'No orders in this category'}</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((order, i) => {
+    const elapsed = Math.floor((Date.now() - order.receivedAt) / 60000);
+    const urgent = order.status === 'received' && elapsed >= 5;
+
+    const steps = ['received', 'preparing', 'ready', 'done'];
+    const stepIdx = steps.indexOf(order.status);
+
+    const buttons = () => {
+      if (order.status === 'received') return `
+        <button class="btn btn-prepare" onclick="event.stopPropagation();updateStatus('${order.id}','preparing')">🍳 Prepare</button>
+        <button class="btn btn-cancel" onclick="event.stopPropagation();cancelOrder('${order.id}')">✕ Cancel</button>`;
+      if (order.status === 'preparing') return `
+        <button class="btn btn-ready" onclick="event.stopPropagation();updateStatus('${order.id}','ready')">✅ Ready</button>`;
+      if (order.status === 'ready') return `
+        <button class="btn btn-done" onclick="event.stopPropagation();updateStatus('${order.id}','done')">📦 Done</button>`;
+      return '';
+    };
+
+    return `
+      <div class="order-card status-${order.status} order-enter" data-id="${order.id}" style="animation-delay:${i * 0.04}s">
+        <div class="order-header">
+          <div>
+            <div class="order-name">${order.name}</div>
+            <div class="order-meta">${order.id} · ${order.time} ${elapsed > 0 ? `· <span class="timer ${urgent ? 'urgent' : ''}">${elapsed}m ago</span>` : ''}</div>
+          </div>
+          <span class="status-badge status-${order.status}">
+            ${{ received: '⏳ Received', preparing: '🍳 Preparing', ready: '✅ Ready', done: '📦 Done' }[order.status]}
+          </span>
+        </div>
+
+        <div class="progress-steps">
+          ${steps.map((s, si) => `<div class="step ${si < stepIdx ? 'done' : si === stepIdx ? 'active' : ''}"></div>`).join('')}
+        </div>
+
+        <div class="order-items" style="margin-top:12px">
+          ${order.items.map(item => `
+            <div class="order-item-row">
+              <span>${item.name} <span style="opacity:0.5">×${item.qty || 1}</span></span>
+              <span>E£${item.price * (item.qty || 1)}</span>
+            </div>`).join('')}
+        </div>
+
+        <div class="order-footer">
+          <div class="order-total">E£${order.total}</div>
+          <div class="action-btns">${buttons()}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function cancelOrder(id) {
+  if (!confirm('Cancel this order?')) return;
+  const o = orders.find(x => x.id === id);
+  if (o) o.status = 'cancelled';
+  render();
+}
+
+// ─── ALERT ───────────────────────────────────────────────────────────
+function showAlert(order) {
+  const container = document.getElementById('alert-container');
+  const el = document.createElement('div');
+  el.className = 'alert-banner';
+  el.innerHTML = `
+    <div class="alert-icon">🔔</div>
+    <div class="alert-content">
+      <div class="alert-title">New Order: ${order.name}</div>
+      <div class="alert-sub">${order.id} · E£${order.total} · ${order.items.length} item(s)</div>
+    </div>
+    <button class="alert-close" onclick="this.closest('.alert-banner').remove()">×</button>`;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.4s'; setTimeout(() => el.remove(), 400); }, 4000);
+
+  // Play audio cue (silent fallback)
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(); osc.stop(ctx.currentTime + 0.4);
+  } catch {}
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
